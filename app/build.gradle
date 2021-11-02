@@ -56,7 +56,7 @@ dependencies {
     kapt "org.xerial:sqlite-jdbc:3.34.0"
 
     // Charts
-    implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 
     testImplementation 'junit:junit:'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
