@@ -1,7 +1,8 @@
-package com.avelycure.cryptostats
+package com.avelycure.cryptostats.presentation
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.avelycure.cryptostats.R
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
