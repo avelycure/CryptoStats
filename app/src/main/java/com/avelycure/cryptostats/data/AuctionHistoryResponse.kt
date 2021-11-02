@@ -3,8 +3,8 @@ package com.avelycure.cryptostats.data
 data class AuctionHistoryResponse(
     val timestamp: Long,
     val timestampms: Long,
-    val auction_id: Int,
-    val eid: Int,
+    val auction_id: Long,
+    val eid: Long,
     val event_type: String,
     val auction_result: String,
     val auction_price: Float,
