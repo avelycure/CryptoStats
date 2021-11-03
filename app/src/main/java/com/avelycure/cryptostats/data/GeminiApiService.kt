@@ -7,6 +7,6 @@ interface GeminiApiService {
     @GET("v1/auction/btcusd/history")
     fun getAuctionHistory(): Observable<List<AuctionHistoryResponse>>
 
-    @GET("v1/trades/btcusd")
+    @GET("v1/trades/btcusd?limit_trades=30")
     fun getTradeHistory(): Observable<List<TradeHistory>>
 }
