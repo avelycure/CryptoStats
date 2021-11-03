@@ -29,4 +29,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_response"
+        app:layout_constraintTop_toBottomOf="@+id/btn" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

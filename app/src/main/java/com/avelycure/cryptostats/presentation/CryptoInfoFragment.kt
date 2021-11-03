@@ -1,15 +1,18 @@
 package com.avelycure.cryptostats.presentation
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
 import com.avelycure.cryptostats.R
 import com.avelycure.cryptostats.common.Constants
 import com.avelycure.cryptostats.data.AuctionHistoryResponse
+import com.avelycure.cryptostats.data.CandlesResponse
 import com.avelycure.cryptostats.data.GeminiApiService
 import com.avelycure.cryptostats.data.TradeHistory
 import com.github.mikephil.charting.charts.LineChart
@@ -34,6 +37,7 @@ class CryptoInfoFragment : Fragment() {
     private lateinit var lineChart: LineChart
     private lateinit var observable: Observable<AuctionHistoryResponse>
     private lateinit var btn: AppCompatButton
+    private lateinit var tv: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,9 +46,10 @@ class CryptoInfoFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_crypto_info, container, false)
         lineChart = view.findViewById(R.id.chart)
         btn = view.findViewById(R.id.btn)
+        tv = view.findViewById(R.id.tv_response)
 
         btn.setOnClickListener {
-            /*val retrofit = Retrofit.Builder()
+            val retrofit = Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 .baseUrl(Constants.BASE_URL)
@@ -56,29 +61,12 @@ class CryptoInfoFragment : Fragment() {
 
             val compositeDisposable = CompositeDisposable()
             compositeDisposable.add(
-                apiService.getAuctionHistory()
+                apiService.getCandles()
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.io())
-                    .subscribe({ data -> onResponse(data) },
-                        { t -> onFailure(t) },
-                        { onFinish() })*/
-
-            val retrofit = Retrofit.Builder()
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
-                .baseUrl(Constants.BASE_URL)
-                .build()
-
-            val apiService = retrofit.create(GeminiApiService::class.java)
-
-            val compositeDisposable = CompositeDisposable()
-            compositeDisposable.add(
-                apiService.getTradeHistory()
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(Schedulers.io())
-                    .subscribe({ data -> onResponse2(data) },
-                        { t -> onFailure2(t) },
-                        { onFinish2() })
+                    .subscribe({ data -> onResponse3(data) },
+                        { t -> onFailure3(t) },
+                        { onFinish3() })
             )
         }
 
@@ -127,18 +115,18 @@ class CryptoInfoFragment : Fragment() {
             lineChart.data.notifyDataChanged()
             lineChart.notifyDataSetChanged()
         } else {*/
-            val dataSet1 = LineDataSet(dataForChart2, "Data set 1")
-            dataSet1.setDrawIcons(false)
-            //dataSet1.setDrawCircleHole(false)
-            dataSet1.setDrawFilled(true)
+        val dataSet1 = LineDataSet(dataForChart2, "Data set 1")
+        dataSet1.setDrawIcons(false)
+        //dataSet1.setDrawCircleHole(false)
+        dataSet1.setDrawFilled(true)
 
-            val dataSets: ArrayList<ILineDataSet> = arrayListOf(
-                dataSet1
-            )
+        val dataSets: ArrayList<ILineDataSet> = arrayListOf(
+            dataSet1
+        )
 
-            val lineData = LineData(dataSets)
-            lineChart.data = lineData
-            lineChart.invalidate()
+        val lineData = LineData(dataSets)
+        lineChart.data = lineData
+        lineChart.invalidate()
         //}
     }
 
@@ -165,5 +153,43 @@ class CryptoInfoFragment : Fragment() {
         val cal = Calendar.getInstance()
         cal.timeInMillis = ms
         return SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS").format(cal.time)
+    }
+
+
+    private fun onFinish3() {
+
+    }
+
+    private fun onFailure3(t: Throwable) {
+        Toast.makeText(requireContext(), "error" + t.message, Toast.LENGTH_LONG).show()
+    }
+
+
+    private fun onResponse3(data: List<List<Float>>) {
+
+        val dataForChart3 = arrayListOf<Entry>()
+
+        for (i in 0 until data.size) {
+            dataForChart3.add(Entry(data[i][0], data[i][1]))
+        }
+
+        dataForChart3.sortBy { it.x }
+
+        val dataSet1 = LineDataSet(dataForChart3, "Data set 3")
+        Toast.makeText(requireContext(), "Got response" + dataSet1.entryCount, Toast.LENGTH_SHORT)
+            .show()
+        dataSet1.setDrawIcons(false)
+        //dataSet1.setDrawCircleHole(false)
+        dataSet1.setDrawFilled(true)
+
+        val dataSets = arrayListOf<ILineDataSet>()
+        dataSets.add(dataSet1)
+
+        //for (i in 1 until dataSets.size)
+        //    tv.text = "${tv.text}, ${dataSets[0].entryCount}"
+
+        val lineData = LineData(dataSets)
+        lineChart.data = lineData
+        lineChart.invalidate()
     }
 }

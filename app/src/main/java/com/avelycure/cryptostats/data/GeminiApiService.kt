@@ -9,4 +9,7 @@ interface GeminiApiService {
 
     @GET("v1/trades/btcusd?limit_trades=30")
     fun getTradeHistory(): Observable<List<TradeHistory>>
+
+    @GET("v2/candles/btcusd/6hr")
+    fun getCandles(): Observable<List<List<Float>>>
 }
