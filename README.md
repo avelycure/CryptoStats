@@ -1,3 +1,3 @@
 # CryptoStats
 
-App for getting information from CoinPaprika Api
+App for getting information from Gemini Api
