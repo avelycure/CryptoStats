@@ -1,5 +1,6 @@
 package com.avelycure.cryptostats.presentation
 
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -16,9 +17,14 @@ import com.avelycure.cryptostats.data.CandlesResponse
 import com.avelycure.cryptostats.data.GeminiApiService
 import com.avelycure.cryptostats.data.TradeHistory
 import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.components.Legend
+import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.IFillFormatter
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
@@ -42,6 +48,7 @@ class CryptoInfoFragment : Fragment() {
     ): View {
         val view = inflater.inflate(R.layout.fragment_crypto_info, container, false)
         lineChart = view.findViewById(R.id.chart)
+        setChart()
         btn = view.findViewById(R.id.btn)
 
         btn.setOnClickListener {
@@ -74,25 +81,67 @@ class CryptoInfoFragment : Fragment() {
         Toast.makeText(requireContext(), "error" + t.message, Toast.LENGTH_LONG).show()
     }
 
+    private fun setChart() {
+        lineChart.apply {
+            axisLeft.setDrawGridLines(false)
+            xAxis.setDrawGridLines(false)
+
+            setPinchZoom(false)
+            setDrawGridBackground(false)
+            isDragEnabled = false
+            isScaleXEnabled = false
+            isScaleYEnabled = false
+
+            legend.verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
+
+            description.isEnabled = false
+
+            //xAxis.valueFormatter = IndexAxisValueFormatter(arrayListOf("a", "b", "c", "d"))
+            xAxis.position = XAxis.XAxisPosition.BOTTOM
+            xAxis.granularity = 1f
+            xAxis.labelCount = 5
+            xAxis.setDrawLabels(true)
+            xAxis.setCenterAxisLabels(true)
+        }
+    }
+
     private fun onResponse(data: List<List<Float>>) {
 
         val dataForChart3 = arrayListOf<Entry>()
-
         for (i in 0 until data.size)
-            dataForChart3.add(Entry(data[i][0], (data[i][1] + data[i][4]) / 2F))
-
+            dataForChart3.add(Entry(data[i][0] / 1000F / 60F / 60F, (data[i][1] + data[i][4]) / 2F))
         dataForChart3.sortBy { it.x }
 
-        val dataSet1 = LineDataSet(dataForChart3, "Data set 3")
-        dataSet1.setDrawIcons(false)
-        dataSet1.setDrawCircleHole(false)
-        dataSet1.setDrawFilled(true)
+        plotGraphic(dataForChart3)
+    }
 
-        val dataSets = arrayListOf<ILineDataSet>()
-        dataSets.add(dataSet1)
+    private fun plotGraphic(data1: ArrayList<Entry>) {
+        val chartDataSets = arrayListOf<ILineDataSet>()
 
-        val lineData = LineData(dataSets)
-        lineChart.data = lineData
+        val set1 = makeSet(data1, "Set 1")
+        chartDataSets.add(set1)
+
+        lineChart.data = LineData(chartDataSets)
         lineChart.invalidate()
     }
+
+    private fun makeSet(data: ArrayList<Entry>, label: String): LineDataSet {
+        val set = LineDataSet(data, label)
+
+        set.apply {
+            setDrawIcons(false)
+            setDrawCircleHole(false)
+            setDrawCircles(false)
+            setDrawFilled(false)
+
+            color = Color.RED
+            lineWidth = 2F
+            mode = LineDataSet.Mode.CUBIC_BEZIER
+            cubicIntensity = 0.2F
+        }
+
+        return set
+    }
+
+
 }
