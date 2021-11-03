@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.avelycure.cryptostats.R
 import com.avelycure.cryptostats.common.Constants
@@ -24,6 +25,7 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IFillFormatter
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -83,8 +85,8 @@ class CryptoInfoFragment : Fragment() {
 
     private fun setChart() {
         lineChart.apply {
-            axisLeft.setDrawGridLines(false)
             xAxis.setDrawGridLines(false)
+            axisRight.isEnabled = false
 
             setPinchZoom(false)
             setDrawGridBackground(false)
@@ -96,9 +98,7 @@ class CryptoInfoFragment : Fragment() {
 
             description.isEnabled = false
 
-            //xAxis.valueFormatter = IndexAxisValueFormatter(arrayListOf("a", "b", "c", "d"))
             xAxis.position = XAxis.XAxisPosition.BOTTOM
-            xAxis.granularity = 1f
             xAxis.labelCount = 5
             xAxis.setDrawLabels(true)
             xAxis.setCenterAxisLabels(true)
@@ -132,8 +132,9 @@ class CryptoInfoFragment : Fragment() {
             setDrawIcons(false)
             setDrawCircleHole(false)
             setDrawCircles(false)
-            setDrawFilled(false)
+            setDrawFilled(true)
 
+            fillDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.gradient)
             color = Color.RED
             lineWidth = 2F
             mode = LineDataSet.Mode.CUBIC_BEZIER
