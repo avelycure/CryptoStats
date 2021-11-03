@@ -170,7 +170,7 @@ class CryptoInfoFragment : Fragment() {
         val dataForChart3 = arrayListOf<Entry>()
 
         for (i in 0 until data.size) {
-            dataForChart3.add(Entry(data[i][0], data[i][1]))
+            dataForChart3.add(Entry(data[i][0], (data[i][1] + data[i][4]) / 2F))
         }
 
         dataForChart3.sortBy { it.x }
@@ -179,7 +179,7 @@ class CryptoInfoFragment : Fragment() {
         Toast.makeText(requireContext(), "Got response" + dataSet1.entryCount, Toast.LENGTH_SHORT)
             .show()
         dataSet1.setDrawIcons(false)
-        //dataSet1.setDrawCircleHole(false)
+        dataSet1.setDrawCircleHole(false)
         dataSet1.setDrawFilled(true)
 
         val dataSets = arrayListOf<ILineDataSet>()
