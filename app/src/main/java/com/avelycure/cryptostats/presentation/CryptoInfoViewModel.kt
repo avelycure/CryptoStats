@@ -9,7 +9,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 
 class CryptoInfoViewModel(
-    val repo: ICryptoRepo
+    private val repo: ICryptoRepo
 ): ViewModel() {
 
     private val candles: MutableLiveData<ArrayList<Entry>> = MutableLiveData()
@@ -18,7 +18,7 @@ class CryptoInfoViewModel(
     }
 
     fun requestCandles(symbol: String){
-        repo.getCandles("btcusd")
+        repo.getCandles(symbol)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponse(data) }, {}, {})
