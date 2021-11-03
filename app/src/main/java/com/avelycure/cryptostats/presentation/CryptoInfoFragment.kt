@@ -2,42 +2,37 @@ package com.avelycure.cryptostats.presentation
 
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.avelycure.cryptostats.R
 import com.avelycure.cryptostats.common.Constants
-import com.avelycure.cryptostats.data.AuctionHistoryResponse
-import com.avelycure.cryptostats.data.CandlesResponse
 import com.avelycure.cryptostats.data.GeminiApiService
-import com.avelycure.cryptostats.data.TradeHistory
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.formatter.IFillFormatter
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
-import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import com.github.mikephil.charting.utils.Utils
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.math.roundToInt
 
 
 class CryptoInfoFragment : Fragment() {
@@ -97,22 +92,39 @@ class CryptoInfoFragment : Fragment() {
             legend.verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
 
             description.isEnabled = false
+            legend.isEnabled = false
+            invalidate()
+            axisLeft.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART)
+
+            xAxis.labelCount = 4
+            xAxis.valueFormatter = object : ValueFormatter() {
+                override fun getFormattedValue(value: Float): String {
+                    /*val mm = (value / 1000F / 60F).roundToInt() % 60
+                    val hh = (value / 1000F / (60F * 60F)).roundToInt() % 24*/
+                    val date = Date(value.toLong())
+                    //val mobileDateTime =
+                    return getFormatTimeWithTZ(date)//formatter.format(Date(value.toString()))//"$hh:$mm"
+                }
+            }
 
             xAxis.position = XAxis.XAxisPosition.BOTTOM
-            xAxis.labelCount = 5
             xAxis.setDrawLabels(true)
             xAxis.setCenterAxisLabels(true)
         }
     }
 
+    fun getFormatTimeWithTZ(currentTime:Date):String {
+        val timeZoneDate = SimpleDateFormat("h:mm a", Locale.getDefault())
+        return timeZoneDate.format(currentTime)
+    }
+
     private fun onResponse(data: List<List<Float>>) {
-
-        val dataForChart3 = arrayListOf<Entry>()
+        val dataForChart = arrayListOf<Entry>()
         for (i in 0 until data.size)
-            dataForChart3.add(Entry(data[i][0] / 1000F / 60F / 60F, (data[i][1] + data[i][4]) / 2F))
-        dataForChart3.sortBy { it.x }
+            dataForChart.add(Entry(data[i][0], data[i][1]))
+        dataForChart.sortBy { it.x }
 
-        plotGraphic(dataForChart3)
+        plotGraphic(dataForChart)
     }
 
     private fun plotGraphic(data1: ArrayList<Entry>) {
