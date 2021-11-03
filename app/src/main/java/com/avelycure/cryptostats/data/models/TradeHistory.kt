@@ -1,4 +1,4 @@
-package com.avelycure.cryptostats.data
+package com.avelycure.cryptostats.data.models
 
 data class TradeHistory(
     val timestamp: Long,

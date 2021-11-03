@@ -1,6 +1,6 @@
-package com.avelycure.cryptostats.data
+package com.avelycure.cryptostats.data.models
 
-data class AuctionHistoryResponse(
+data class AuctionHistory(
     val timestamp: Long,
     val timestampms: Long,
     val auction_id: Long,

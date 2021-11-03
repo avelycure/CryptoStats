@@ -11,7 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.avelycure.cryptostats.R
 import com.avelycure.cryptostats.common.Constants
-import com.avelycure.cryptostats.data.GeminiApiService
+import com.avelycure.cryptostats.data.api_service.GeminiApiService
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.XAxis
@@ -21,18 +21,15 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
-import com.github.mikephil.charting.utils.Utils
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.math.roundToInt
 
 
 class CryptoInfoFragment : Fragment() {
