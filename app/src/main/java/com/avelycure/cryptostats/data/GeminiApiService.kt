@@ -6,4 +6,7 @@ import retrofit2.http.GET
 interface GeminiApiService {
     @GET("v1/auction/btcusd/history")
     fun getAuctionHistory(): Observable<List<AuctionHistoryResponse>>
+
+    @GET("v1/trades/btcusd")
+    fun getTradeHistory(): Observable<List<TradeHistory>>
 }
