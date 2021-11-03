@@ -18,9 +18,9 @@ class CryptoRepo(
 
     val apiService = retrofit.create(GeminiApiService::class.java)
 
-    /*override fun getCandles(symbol: String): Observable<List<List<Float>>> {
-
-    }*/
+    override fun getCandles(symbol: String): Observable<List<List<Float>>> {
+        return apiService.getCandles(symbol)
+    }
 
     override fun hello() = "Hello"
 }
