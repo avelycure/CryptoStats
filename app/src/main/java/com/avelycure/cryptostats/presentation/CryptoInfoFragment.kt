@@ -24,6 +24,7 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
@@ -35,6 +36,8 @@ import kotlin.collections.ArrayList
 class CryptoInfoFragment : Fragment() {
     private lateinit var lineChart: LineChart
     private lateinit var btn: AppCompatButton
+
+    val cryptoInfoViewModel: CryptoInfoViewModel by viewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -127,7 +130,7 @@ class CryptoInfoFragment : Fragment() {
     private fun plotGraphic(data1: ArrayList<Entry>) {
         val chartDataSets = arrayListOf<ILineDataSet>()
 
-        val set1 = makeSet(data1, "Set 1")
+        val set1 = makeSet(data1, cryptoInfoViewModel.getHello())
         chartDataSets.add(set1)
 
         lineChart.data = LineData(chartDataSets)
