@@ -1,6 +1,7 @@
 package com.avelycure.cryptostats.data.api_service
 
 import com.avelycure.cryptostats.data.models.AuctionHistory
+import com.avelycure.cryptostats.data.models.TickerV2
 import com.avelycure.cryptostats.data.models.TradeHistory
 import io.reactivex.rxjava3.core.Observable
 import retrofit2.http.GET
@@ -15,4 +16,7 @@ interface GeminiApiService {
 
     @GET("v2/candles/{symbol}/1day")
     fun getCandles(@Path("symbol") symbol: String): Observable<List<List<Float>>>
+
+    @GET("v2/ticker/btcusd")
+    fun getTickerV2(): Observable<TickerV2>
 }
