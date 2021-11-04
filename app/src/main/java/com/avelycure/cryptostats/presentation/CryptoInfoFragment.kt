@@ -72,12 +72,15 @@ class CryptoInfoFragment : Fragment() {
     }
 
     private fun updatePrice(priceFeed: PriceFeed) {
-        tvCoinValue.text = priceFeed.price
-        tvPercentageChanging24h.text = "${priceFeed.percentChange24h.toFloat() * 100F}%"
-        if(priceFeed.percentChange24h.toFloat() > 0F)
-            tvPercentageChanging24h.setTextColor(Color.GREEN)
-        else
-            tvPercentageChanging24h.setTextColor(Color.RED)
+        if (priceFeed.percentChange24h.isNotEmpty()) {
+            tvCoinValue.text = priceFeed.price
+            tvPercentageChanging24h.text = "${priceFeed.percentChange24h.toFloat() * 100F}%"
+
+            if (priceFeed.percentChange24h.toFloat() > 0F)
+                tvPercentageChanging24h.setTextColor(Color.GREEN)
+            else
+                tvPercentageChanging24h.setTextColor(Color.RED)
+        }
     }
 
     private fun initViews(view: View) {

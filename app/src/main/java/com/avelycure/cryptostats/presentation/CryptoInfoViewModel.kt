@@ -1,5 +1,6 @@
 package com.avelycure.cryptostats.presentation
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -26,6 +27,14 @@ class CryptoInfoViewModel(
     val stats24: LiveData<TickerV2>
         get() = _stats24
 
+    init{
+        _coinPrice.value = PriceFeed(
+            pair = "",
+            price = "",
+            percentChange24h = ""
+        )
+    }
+
     fun requestCandles(symbol: String) {
         repo.getCandles(symbol)
             .observeOn(AndroidSchedulers.mainThread())
@@ -40,17 +49,21 @@ class CryptoInfoViewModel(
             .subscribe({ data -> onResponseTicker(data) }, {}, {})
     }
 
-    fun requestPriceFeed(pair: String){
+    fun requestPriceFeed(pair: String) {
         repo.getPriceFeed()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .subscribe({data -> onResponsePriceFeed(data, pair)},{},{})
+            .subscribe({ data -> onResponsePriceFeed(data, pair) }, {}, {})
     }
 
     private fun onResponsePriceFeed(data: List<PriceFeed>, pair: String) {
-        for(i in data)
-            if(i.pair==pair){
-                _coinPrice.postValue(PriceFeed(i.pair, i.price, i.percentChange24h))
+        for (i in data)
+            if (i.pair == pair) {
+                _coinPrice.value = _coinPrice.value?.copy(
+                    pair = i.pair,
+                    price = i.price,
+                    percentChange24h = i.percentChange24h
+                )
                 break
             }
     }
