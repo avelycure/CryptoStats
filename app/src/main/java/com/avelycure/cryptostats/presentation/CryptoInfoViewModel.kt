@@ -8,10 +8,7 @@ import com.avelycure.cryptostats.data.models.PriceFeed
 import com.avelycure.cryptostats.data.models.TickerV1
 import com.avelycure.cryptostats.data.models.TickerV2
 import com.avelycure.cryptostats.data.repo.ICryptoRepo
-import com.avelycure.cryptostats.domain.Candle
-import com.avelycure.cryptostats.domain.CoinPrice
-import com.avelycure.cryptostats.domain.Point
-import com.avelycure.cryptostats.domain.Statistic24h
+import com.avelycure.cryptostats.domain.*
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlin.math.roundToInt
@@ -36,6 +33,10 @@ class CryptoInfoViewModel(
             coinPrice = CoinPrice(
                 price = "",
                 percentChange24h = ""
+            ),
+            ticker = Ticker(
+                bid = 0F,
+                ask = 0F
             )
         )
     }
@@ -67,11 +68,16 @@ class CryptoInfoViewModel(
         repo.getTickerV1(symbol)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .subscribe({data -> onResponseTickerV1(data)},{},{})
+            .subscribe({ data -> onResponseTickerV1(data) }, {}, {})
     }
 
     private fun onResponseTickerV1(data: TickerV1) {
-
+        _state.value = _state.value?.copy(
+            ticker = Ticker(
+                bid = data.bid,
+                ask = data.ask
+            )
+        )
     }
 
     private fun onResponsePriceFeed(data: List<PriceFeed>, pair: String) {
