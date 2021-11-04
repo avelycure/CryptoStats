@@ -5,10 +5,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.avelycure.cryptostats.R
+import com.avelycure.cryptostats.data.models.PriceFeed
+import com.avelycure.cryptostats.data.models.TickerV2
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.XAxis
@@ -22,10 +26,15 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.math.roundToInt
 
 class CryptoInfoFragment : Fragment() {
     private lateinit var lineChart: LineChart
     private lateinit var btn: AppCompatButton
+    private lateinit var tvCoinValue: AppCompatTextView
+    private lateinit var tvPercentageChanging24h: AppCompatTextView
+    private lateinit var tvLowest24h: AppCompatTextView
+    private lateinit var tvHighest24h: AppCompatTextView
 
     private val cryptoInfoViewModel: CryptoInfoViewModel by viewModel()
 
@@ -35,17 +44,50 @@ class CryptoInfoFragment : Fragment() {
     ): View {
         val view = inflater.inflate(R.layout.fragment_crypto_info, container, false)
         lineChart = view.findViewById(R.id.chart)
-        setChart()
-        btn = view.findViewById(R.id.btn)
+        initViews(view)
 
         btn.setOnClickListener {
-            cryptoInfoViewModel.requestCandles("btcusd")
+            cryptoInfoViewModel.requestTicker("btcusd")
+            cryptoInfoViewModel.requestPriceFeed("BTCUSD")
         }
 
-        cryptoInfoViewModel.getCandles().observe(viewLifecycleOwner, { chartData ->
+        cryptoInfoViewModel.chartData.observe(viewLifecycleOwner, { chartData ->
             plotGraphic(chartData)
         })
+
+        cryptoInfoViewModel.coinPrice.observe(viewLifecycleOwner, { priceFeed ->
+            updatePrice(priceFeed)
+        })
+
+        cryptoInfoViewModel.stats24.observe(viewLifecycleOwner, { stats ->
+            updateStats(stats)
+        })
+
         return view
+    }
+
+    private fun updateStats(stats: TickerV2) {
+        tvLowest24h.text = stats.low.toString()
+        tvHighest24h.text = stats.high.toString()
+    }
+
+    private fun updatePrice(priceFeed: PriceFeed) {
+        tvCoinValue.text = priceFeed.price
+        tvPercentageChanging24h.text = "${priceFeed.percentChange24h.toFloat() * 100F}%"
+        if(priceFeed.percentChange24h.toFloat() > 0F)
+            tvPercentageChanging24h.setTextColor(Color.GREEN)
+        else
+            tvPercentageChanging24h.setTextColor(Color.RED)
+    }
+
+    private fun initViews(view: View) {
+        setChart()
+
+        btn = view.findViewById(R.id.btn)
+        tvCoinValue = view.findViewById(R.id.ci_tv_coin_value)
+        tvPercentageChanging24h = view.findViewById(R.id.ci_tv_percent_change_in_last_24h)
+        tvLowest24h = view.findViewById(R.id.ci_tv_lowest_in_last_24h)
+        tvHighest24h = view.findViewById(R.id.ci_tv_highest_in_last_24h)
     }
 
     private fun setChart() {
@@ -63,14 +105,13 @@ class CryptoInfoFragment : Fragment() {
 
             description.isEnabled = false
             legend.isEnabled = false
-            invalidate()
             axisLeft.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART)
 
-            xAxis.labelCount = 4
+            xAxis.labelCount = 6
+
             xAxis.valueFormatter = object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String {
-                    val date = Date(value.toLong())
-                    return getFormatTimeWithTZ(date)
+                    return "${(24F - value).roundToInt()}h"
                 }
             }
 
