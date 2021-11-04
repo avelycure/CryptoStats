@@ -37,8 +37,8 @@ class CryptoInfoViewModel(
         )
     }
 
-    fun requestCandles(symbol: String) {
-        repo.getCandles(symbol)
+    fun requestCandles(symbol: String, timeFrame: String) {
+        repo.getCandles(symbol, timeFrame)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponse(data) }, {}, {})

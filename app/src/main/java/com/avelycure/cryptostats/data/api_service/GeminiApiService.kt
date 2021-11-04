@@ -16,8 +16,9 @@ interface GeminiApiService {
         @Query("limit_trades") tradesLimit: Int
     ): Observable<List<TradeHistory>>
 
-    @GET("v2/candles/{symbol}/1day")
-    fun getCandles(@Path("symbol") symbol: String): Observable<List<List<Float>>>
+    @GET("v2/candles/{symbol}/{time_frame}}")
+    fun getCandles(@Path("symbol") symbol: String,
+    @Path("time_frame") timeFrame: String): Observable<List<List<Float>>>
 
     @GET("v2/ticker/{symbol}")
     fun getTickerV2(@Path("symbol") symbol: String): Observable<TickerV2>
