@@ -3,7 +3,6 @@ package com.avelycure.cryptostats.presentation
 import android.graphics.Color
 import android.graphics.Paint
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -50,7 +49,7 @@ class CryptoInfoFragment : Fragment() {
         initViews(view)
 
         btn.setOnClickListener {
-            cryptoInfoViewModel.requestTicker("btcusd")
+            cryptoInfoViewModel.requestTickerV2("btcusd")
             cryptoInfoViewModel.requestCandles("btcusd", "1m")
             cryptoInfoViewModel.requestPriceFeed("BTCUSD")
         }

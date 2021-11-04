@@ -5,13 +5,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.avelycure.cryptostats.data.models.PriceFeed
+import com.avelycure.cryptostats.data.models.TickerV1
 import com.avelycure.cryptostats.data.models.TickerV2
 import com.avelycure.cryptostats.data.repo.ICryptoRepo
 import com.avelycure.cryptostats.domain.Candle
 import com.avelycure.cryptostats.domain.CoinPrice
 import com.avelycure.cryptostats.domain.Point
 import com.avelycure.cryptostats.domain.Statistic24h
-import com.github.mikephil.charting.data.Entry
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlin.math.roundToInt
@@ -49,11 +49,11 @@ class CryptoInfoViewModel(
             }, {})
     }
 
-    fun requestTicker(symbol: String) {
-        repo.getTicker(symbol)
+    fun requestTickerV2(symbol: String) {
+        repo.getTickerV2(symbol)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .subscribe({ data -> onResponseTicker(data) }, {}, {})
+            .subscribe({ data -> onResponseTickerV2(data) }, {}, {})
     }
 
     fun requestPriceFeed(pair: String) {
@@ -61,6 +61,17 @@ class CryptoInfoViewModel(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponsePriceFeed(data, pair) }, {}, {})
+    }
+
+    fun requestTickerV1(symbol: String) {
+        repo.getTickerV1(symbol)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({data -> onResponseTickerV1(data)},{},{})
+    }
+
+    private fun onResponseTickerV1(data: TickerV1) {
+
     }
 
     private fun onResponsePriceFeed(data: List<PriceFeed>, pair: String) {
@@ -76,7 +87,7 @@ class CryptoInfoViewModel(
             }
     }
 
-    private fun onResponseTicker(data: TickerV2) {
+    private fun onResponseTickerV2(data: TickerV2) {
         val dataForChart = arrayListOf<Point>()
         for (i in 0 until data.changes.size)
             dataForChart.add(Point(24F - i.toFloat(), data.changes[i]))
@@ -117,7 +128,7 @@ class CryptoInfoViewModel(
         val dataForChartCopy = arrayListOf<Candle>()
         for (i in 0 until dataForChart.size)
             if (i % 3 == 0)
-                dataForChartCopy.add(dataForChart[i].copy(time = (dataForChart[i].time - first)/ 600F))
+                dataForChartCopy.add(dataForChart[i].copy(time = (dataForChart[i].time - first) / 600F))
 
         dataForChart
             .sortBy { it.time }
