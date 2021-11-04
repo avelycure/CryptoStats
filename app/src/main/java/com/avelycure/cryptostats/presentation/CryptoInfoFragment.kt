@@ -13,6 +13,8 @@ import androidx.fragment.app.Fragment
 import com.avelycure.cryptostats.R
 import com.avelycure.cryptostats.data.models.PriceFeed
 import com.avelycure.cryptostats.data.models.TickerV2
+import com.avelycure.cryptostats.domain.CoinPrice
+import com.avelycure.cryptostats.domain.Statistic24h
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.XAxis
@@ -51,32 +53,36 @@ class CryptoInfoFragment : Fragment() {
             cryptoInfoViewModel.requestPriceFeed("BTCUSD")
         }
 
-        cryptoInfoViewModel.chartData.observe(viewLifecycleOwner, { chartData ->
-            plotGraphic(chartData)
-        })
+        cryptoInfoViewModel.state.observe(viewLifecycleOwner, { state ->
+            plotGraphic(
+                ArrayList(
+                    state
+                        .statistic
+                        .changes
+                        .map { point ->
+                            Entry(point.x, point.y)
+                        })
+            )
 
-        cryptoInfoViewModel.coinPrice.observe(viewLifecycleOwner, { priceFeed ->
-            updatePrice(priceFeed)
-        })
+            updateStats(state.statistic)
 
-        cryptoInfoViewModel.stats24.observe(viewLifecycleOwner, { stats ->
-            updateStats(stats)
+            updatePrice(state.coinPrice)
         })
 
         return view
     }
 
-    private fun updateStats(stats: TickerV2) {
+    private fun updateStats(stats: Statistic24h) {
         tvLowest24h.text = stats.low.toString()
         tvHighest24h.text = stats.high.toString()
     }
 
-    private fun updatePrice(priceFeed: PriceFeed) {
-        if (priceFeed.percentChange24h.isNotEmpty()) {
-            tvCoinValue.text = priceFeed.price
-            tvPercentageChanging24h.text = "${priceFeed.percentChange24h.toFloat() * 100F}%"
+    private fun updatePrice(coinPrice: CoinPrice) {
+        if (coinPrice.percentChange24h.isNotEmpty()) {
+            tvCoinValue.text = coinPrice.price
+            tvPercentageChanging24h.text = "${coinPrice.percentChange24h.toFloat() * 100F}%"
 
-            if (priceFeed.percentChange24h.toFloat() > 0F)
+            if (coinPrice.percentChange24h.toFloat() > 0F)
                 tvPercentageChanging24h.setTextColor(Color.GREEN)
             else
                 tvPercentageChanging24h.setTextColor(Color.RED)
