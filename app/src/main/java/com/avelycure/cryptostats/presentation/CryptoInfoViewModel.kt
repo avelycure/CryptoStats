@@ -31,6 +31,10 @@ class CryptoInfoViewModel(
             .subscribe({ data -> onResponseTicker(data) }, {}, {})
     }
 
+    fun requestPriceFeed(){
+
+    }
+
     private fun onResponseTicker(data: TickerV2) {
         val dataForChart = arrayListOf<Entry>()
         for (i in 0 until data.changes.size)
