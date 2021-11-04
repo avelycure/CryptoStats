@@ -23,6 +23,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.math.roundToInt
 
 class CryptoInfoFragment : Fragment() {
     private lateinit var lineChart: LineChart
@@ -41,7 +42,7 @@ class CryptoInfoFragment : Fragment() {
 
         btn.setOnClickListener {
             //cryptoInfoViewModel.requestCandles("btcusd")
-            cryptoInfoViewModel.requestTicker("BTCUSD")
+            cryptoInfoViewModel.requestTicker("btcusd")
         }
 
         cryptoInfoViewModel.getCandles().observe(viewLifecycleOwner, { chartData ->
@@ -65,14 +66,13 @@ class CryptoInfoFragment : Fragment() {
 
             description.isEnabled = false
             legend.isEnabled = false
-            invalidate()
             axisLeft.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART)
 
-            xAxis.labelCount = 4
+            xAxis.labelCount = 6
+
             xAxis.valueFormatter = object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String {
-                    val date = Date(value.toLong())
-                    return getFormatTimeWithTZ(date)
+                    return "${(24F - value).roundToInt()}h"
                 }
             }
 

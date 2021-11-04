@@ -38,7 +38,7 @@ class CryptoInfoViewModel(
     private fun onResponseTicker(data: TickerV2) {
         val dataForChart = arrayListOf<Entry>()
         for (i in 0 until data.changes.size)
-            dataForChart.add(Entry(24 - i.toFloat(), data.changes[i]))
+            dataForChart.add(Entry(24F - i.toFloat(), data.changes[i]))
 
         dataForChart.sortBy { it.x }
         candles.postValue(dataForChart)
