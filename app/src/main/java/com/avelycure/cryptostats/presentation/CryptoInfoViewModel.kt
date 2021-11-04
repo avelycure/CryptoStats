@@ -5,13 +5,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.avelycure.cryptostats.data.models.PriceFeed
+import com.avelycure.cryptostats.data.models.TickerV1
 import com.avelycure.cryptostats.data.models.TickerV2
 import com.avelycure.cryptostats.data.repo.ICryptoRepo
-import com.avelycure.cryptostats.domain.Candle
-import com.avelycure.cryptostats.domain.CoinPrice
-import com.avelycure.cryptostats.domain.Point
-import com.avelycure.cryptostats.domain.Statistic24h
-import com.github.mikephil.charting.data.Entry
+import com.avelycure.cryptostats.domain.*
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlin.math.roundToInt
@@ -30,12 +27,17 @@ class CryptoInfoViewModel(
                 symbol = "",
                 high = 0F,
                 low = 0F,
+                open = 0F,
                 emptyList(),
                 emptyList()
             ),
             coinPrice = CoinPrice(
                 price = "",
                 percentChange24h = ""
+            ),
+            ticker = Ticker(
+                bid = 0F,
+                ask = 0F
             )
         )
     }
@@ -49,11 +51,11 @@ class CryptoInfoViewModel(
             }, {})
     }
 
-    fun requestTicker(symbol: String) {
-        repo.getTicker(symbol)
+    fun requestTickerV2(symbol: String) {
+        repo.getTickerV2(symbol)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .subscribe({ data -> onResponseTicker(data) }, {}, {})
+            .subscribe({ data -> onResponseTickerV2(data) }, {}, {})
     }
 
     fun requestPriceFeed(pair: String) {
@@ -61,6 +63,22 @@ class CryptoInfoViewModel(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponsePriceFeed(data, pair) }, {}, {})
+    }
+
+    fun requestTickerV1(symbol: String) {
+        repo.getTickerV1(symbol)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({ data -> onResponseTickerV1(data) }, {}, {})
+    }
+
+    private fun onResponseTickerV1(data: TickerV1) {
+        _state.value = _state.value?.copy(
+            ticker = Ticker(
+                bid = data.bid,
+                ask = data.ask
+            )
+        )
     }
 
     private fun onResponsePriceFeed(data: List<PriceFeed>, pair: String) {
@@ -76,7 +94,7 @@ class CryptoInfoViewModel(
             }
     }
 
-    private fun onResponseTicker(data: TickerV2) {
+    private fun onResponseTickerV2(data: TickerV2) {
         val dataForChart = arrayListOf<Point>()
         for (i in 0 until data.changes.size)
             dataForChart.add(Point(24F - i.toFloat(), data.changes[i]))
@@ -90,6 +108,7 @@ class CryptoInfoViewModel(
                 symbol = data.symbol,
                 high = data.high,
                 low = data.low,
+                open = data.open,
                 changes = dataForChart,
                 candles = newCandles
             )
@@ -117,14 +136,14 @@ class CryptoInfoViewModel(
         val dataForChartCopy = arrayListOf<Candle>()
         for (i in 0 until dataForChart.size)
             if (i % 3 == 0)
-                dataForChartCopy.add(dataForChart[i].copy(time = (dataForChart[i].time - first)/ 600F))
+                dataForChartCopy.add(dataForChart[i].copy(time = (dataForChart[i].time - first) / 600F))
 
         dataForChart
             .sortBy { it.time }
 
         val newStat = _state.value?.statistic?.copy(
             candles = dataForChartCopy
-        ) ?: Statistic24h("", 0F, 0F, emptyList(), emptyList())
+        ) ?: Statistic24h("", 0F, 0F, 0F, emptyList(), emptyList())
 
         _state.value = state.value?.copy(
             statistic = newStat

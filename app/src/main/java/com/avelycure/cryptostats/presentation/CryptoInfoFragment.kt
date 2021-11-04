@@ -3,7 +3,6 @@ package com.avelycure.cryptostats.presentation
 import android.graphics.Color
 import android.graphics.Paint
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -38,6 +37,10 @@ class CryptoInfoFragment : Fragment() {
     private lateinit var tvPercentageChanging24h: AppCompatTextView
     private lateinit var tvLowest24h: AppCompatTextView
     private lateinit var tvHighest24h: AppCompatTextView
+    private lateinit var tvOpenPrice: AppCompatTextView
+    private lateinit var tvPriceChange: AppCompatTextView
+    private lateinit var currentTvBidPrice: AppCompatTextView
+    private lateinit var currentTvAskPrice: AppCompatTextView
 
     private val cryptoInfoViewModel: CryptoInfoViewModel by viewModel()
 
@@ -50,9 +53,10 @@ class CryptoInfoFragment : Fragment() {
         initViews(view)
 
         btn.setOnClickListener {
-            cryptoInfoViewModel.requestTicker("btcusd")
+            cryptoInfoViewModel.requestTickerV2("btcusd")
             cryptoInfoViewModel.requestCandles("btcusd", "1m")
             cryptoInfoViewModel.requestPriceFeed("BTCUSD")
+            cryptoInfoViewModel.requestTickerV1("btcusd")
         }
 
         cryptoInfoViewModel.state.observe(viewLifecycleOwner, { state ->
@@ -66,9 +70,6 @@ class CryptoInfoFragment : Fragment() {
                         })
             )
 
-            /*val list: ArrayList<CandleEntry> = arrayListOf()
-            for(i in 0 until 100)
-                list.add( CandleEntry(i.toFloat()*100, 225.0F, 219.84F, 224.94F, 221.07F))*/
             plotCandleGraphic(
                 ArrayList(
                     state
@@ -88,7 +89,20 @@ class CryptoInfoFragment : Fragment() {
 
             updateStats(state.statistic)
 
+            if (state.coinPrice.percentChange24h.isNotEmpty()) {
+                tvPriceChange.text =
+                    (state.coinPrice.price.toFloat() - state.statistic.high).toString()
+                if (state.coinPrice.price.toFloat() - state.statistic.high > 0F)
+                    tvPriceChange.setTextColor(Color.GREEN)
+                else
+                    tvPriceChange.setTextColor(Color.RED)
+
+                currentTvAskPrice.text = state.ticker.ask.toString()
+                currentTvBidPrice.text = state.ticker.bid.toString()
+            }
+
             updatePrice(state.coinPrice)
+
         })
 
         return view
@@ -97,6 +111,7 @@ class CryptoInfoFragment : Fragment() {
     private fun updateStats(stats: Statistic24h) {
         tvLowest24h.text = stats.low.toString()
         tvHighest24h.text = stats.high.toString()
+        tvOpenPrice.text = stats.open.toString()
     }
 
     private fun updatePrice(coinPrice: CoinPrice) {
@@ -123,6 +138,10 @@ class CryptoInfoFragment : Fragment() {
         tvPercentageChanging24h = view.findViewById(R.id.ci_tv_percent_change_in_last_24h)
         tvLowest24h = view.findViewById(R.id.ci_tv_lowest_in_last_24h)
         tvHighest24h = view.findViewById(R.id.ci_tv_highest_in_last_24h)
+        tvOpenPrice = view.findViewById(R.id.ci_tv_open_price)
+        tvPriceChange = view.findViewById(R.id.ci_tv_price_change)
+        currentTvBidPrice = view.findViewById(R.id.ci_tv_current_price_bid)
+        currentTvAskPrice = view.findViewById(R.id.ci_tv_current_ask)
     }
 
     private fun setCandleChart() {

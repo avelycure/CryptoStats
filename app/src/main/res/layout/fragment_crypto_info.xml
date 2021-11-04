@@ -6,31 +6,35 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:background="#A9A9A9">
+
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/ci_tv_coin_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
             android:text="Bitcoin"
-            android:textSize="32sp"
-            android:textStyle="bold"
             android:textColor="@color/white"
+            android:textSize="40sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/ci_tv_coin_value"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="48sp"
             android:textColor="@color/white"
-            app:layout_constraintStart_toStartOf="@+id/ci_tv_coin_name"
+            android:textSize="40sp"
+            app:layout_constraintEnd_toStartOf="@id/ci_last24_stats"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/ci_tv_coin_name" />
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/ci_last24_stats"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
@@ -38,48 +42,242 @@
             app:layout_constraintTop_toTopOf="@+id/ci_tv_coin_value">
 
             <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv24percent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:text="24H%"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv24low"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv24percent"
+                android:layout_alignParentStart="true"
+                android:layout_marginEnd="4dp"
+                android:text="24H Low"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv24low"
+                android:layout_alignParentStart="true"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="4dp"
+                android:text="24H High"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/ci_tv_percent_change_in_last_24h"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
                 android:textColor="@color/white"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/ci_tv_lowest_in_last_24h"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/ci_tv_percent_change_in_last_24h"
+                android:layout_alignParentEnd="true"
                 android:textColor="@color/white"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/ci_tv_highest_in_last_24h"
                 android:layout_width="wrap_content"
-                android:textColor="@color/white"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/ci_tv_lowest_in_last_24h"
+                android:layout_alignParentEnd="true"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+        </RelativeLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/price"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:text="Price"
+            android:textColor="@color/white"
+            android:textSize="40sp"
+            app:layout_constraintTop_toBottomOf="@+id/ci_tv_coin_value" />
+
+        <RelativeLayout
+            android:id="@+id/price_stats"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/price">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/price_open"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:text="24H Open"
                 android:textSize="16sp" />
 
-        </LinearLayout>
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/ci_tv_open_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/price_open"
+                android:layout_alignParentStart="true"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/price_change"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:text="24H Change"
+                android:textSize="16sp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/ci_tv_price_change"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/price_change"
+                android:layout_alignParentEnd="true"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/current_price_stats"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/price_stats">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/current_price_bid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:text="Current bid"
+                android:textSize="16sp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/ci_tv_current_price_bid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/current_price_bid"
+                android:layout_alignParentStart="true"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/current_ask"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:text="Current ask"
+                android:textSize="16sp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/ci_tv_current_ask"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/current_ask"
+                android:layout_alignParentEnd="true"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/changes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:text="Changes"
+            android:textColor="@color/white"
+            android:textSize="40sp"
+            app:layout_constraintTop_toBottomOf="@+id/current_price_stats" />
 
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/chart"
             android:layout_width="match_parent"
             android:layout_height="256dp"
-            app:layout_constraintTop_toBottomOf="@+id/ci_tv_coin_value" />
+            app:layout_constraintTop_toBottomOf="@+id/changes" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/candles"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:text="Candles"
+            android:textColor="@color/white"
+            android:textSize="40sp"
+            app:layout_constraintTop_toBottomOf="@+id/chart" />
 
         <com.github.mikephil.charting.charts.CandleStickChart
             android:id="@+id/candle_stick_chart"
             android:layout_width="match_parent"
             android:layout_height="256dp"
-            app:layout_constraintTop_toBottomOf="@+id/chart" />
+            app:layout_constraintTop_toBottomOf="@+id/candles" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/btn_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/candle_stick_chart">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn24h"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="24h"
+                app:layout_constraintEnd_toStartOf="@+id/btn6h"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn6h"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="6"
+                app:layout_constraintEnd_toStartOf="@+id/btn15m"
+                app:layout_constraintStart_toEndOf="@+id/btn24h"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn15m"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="15m"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/btn6h"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Get data"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_container" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

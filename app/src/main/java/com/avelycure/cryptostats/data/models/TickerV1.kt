@@ -4,5 +4,5 @@ data class TickerV1(
     val bid: Float,
     val ask: Float,
     val last: Float,
-    val node: VolumeBtcUsd
+    val volume: VolumeBtcUsd
 )
