@@ -41,7 +41,9 @@ class CryptoInfoViewModel(
         repo.getCandles(symbol, timeFrame)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .subscribe({ data -> onResponse(data) }, {}, {})
+            .subscribe({ data -> onResponse(data) }, {
+                Log.d("mytag", "error: ${it.message}")
+            }, {})
     }
 
     fun requestTicker(symbol: String) {
@@ -89,11 +91,19 @@ class CryptoInfoViewModel(
     }
 
     private fun onResponse(data: List<List<Float>>) {
-        val dataForChart = arrayListOf<Entry>()
+        val dataForChart = arrayListOf<Point>()
         for (i in 0 until data.size)
-            dataForChart.add(Entry(data[i][0], data[i][1]))
+            dataForChart.add(Point(data[i][0], data[i][1]))
         dataForChart.sortBy { it.x }
 
-        //_chartData.postValue(dataForChart)
+        val newStat = _state.value?.statistic?.copy(
+            changes = dataForChart
+        ) ?: Statistic24h("", 0F, 0F, emptyList())
+
+        _state.value = state.value?.copy(
+            statistic = newStat
+        )
+
+        Log.d("mytag", "" + _state.value?.statistic?.changes?.toList().toString())
     }
 }

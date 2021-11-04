@@ -49,7 +49,8 @@ class CryptoInfoFragment : Fragment() {
         initViews(view)
 
         btn.setOnClickListener {
-            cryptoInfoViewModel.requestTicker("btcusd")
+            //cryptoInfoViewModel.requestTicker("btcusd")
+            cryptoInfoViewModel.requestCandles("btcusd", "1m")
             cryptoInfoViewModel.requestPriceFeed("BTCUSD")
         }
 
