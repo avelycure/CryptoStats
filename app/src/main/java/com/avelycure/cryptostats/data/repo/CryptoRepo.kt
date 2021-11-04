@@ -9,8 +9,8 @@ class CryptoRepo(
     private val apiService: GeminiApiService
 ): ICryptoRepo {
 
-    override fun getCandles(symbol: String): Observable<List<List<Float>>> {
-        return apiService.getCandles(symbol)
+    override fun getCandles(symbol: String, timeFrame: String): Observable<List<List<Float>>> {
+        return apiService.getCandles(symbol, timeFrame)
     }
 
     override fun getTicker(symbol: String): Observable<TickerV2> {

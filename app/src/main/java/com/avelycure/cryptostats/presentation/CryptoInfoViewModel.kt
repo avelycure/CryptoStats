@@ -1,36 +1,52 @@
 package com.avelycure.cryptostats.presentation
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.avelycure.cryptostats.data.models.PriceFeed
 import com.avelycure.cryptostats.data.models.TickerV2
 import com.avelycure.cryptostats.data.repo.ICryptoRepo
+import com.avelycure.cryptostats.domain.Candle
+import com.avelycure.cryptostats.domain.CoinPrice
+import com.avelycure.cryptostats.domain.Point
+import com.avelycure.cryptostats.domain.Statistic24h
 import com.github.mikephil.charting.data.Entry
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlin.math.roundToInt
 
 class CryptoInfoViewModel(
     private val repo: ICryptoRepo
 ) : ViewModel() {
 
-    private val _chartData: MutableLiveData<ArrayList<Entry>> = MutableLiveData()
-    val chartData: LiveData<ArrayList<Entry>>
-        get() = _chartData
+    private val _state: MutableLiveData<CryptoInfoState> = MutableLiveData()
+    val state: LiveData<CryptoInfoState>
+        get() = _state
 
-    private val _coinPrice: MutableLiveData<PriceFeed> = MutableLiveData()
-    val coinPrice: LiveData<PriceFeed>
-        get() = _coinPrice
+    init {
+        _state.value = CryptoInfoState(
+            statistic = Statistic24h(
+                symbol = "",
+                high = 0F,
+                low = 0F,
+                emptyList(),
+                emptyList()
+            ),
+            coinPrice = CoinPrice(
+                price = "",
+                percentChange24h = ""
+            )
+        )
+    }
 
-    private val _stats24: MutableLiveData<TickerV2> = MutableLiveData()
-    val stats24: LiveData<TickerV2>
-        get() = _stats24
-
-    fun requestCandles(symbol: String) {
-        repo.getCandles(symbol)
+    fun requestCandles(symbol: String, timeFrame: String) {
+        repo.getCandles(symbol, timeFrame)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .subscribe({ data -> onResponse(data) }, {}, {})
+            .subscribe({ data -> onResponse(data) }, {
+                Log.d("mytag", "error: ${it.message}")
+            }, {})
     }
 
     fun requestTicker(symbol: String) {
@@ -40,38 +56,78 @@ class CryptoInfoViewModel(
             .subscribe({ data -> onResponseTicker(data) }, {}, {})
     }
 
-    fun requestPriceFeed(pair: String){
+    fun requestPriceFeed(pair: String) {
         repo.getPriceFeed()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .subscribe({data -> onResponsePriceFeed(data, pair)},{},{})
+            .subscribe({ data -> onResponsePriceFeed(data, pair) }, {}, {})
     }
 
     private fun onResponsePriceFeed(data: List<PriceFeed>, pair: String) {
-        for(i in data)
-            if(i.pair==pair){
-                _coinPrice.postValue(PriceFeed(i.pair, i.price, i.percentChange24h))
+        for (i in data)
+            if (i.pair == pair) {
+                _state.value = _state.value?.copy(
+                    coinPrice = CoinPrice(
+                        price = i.price,
+                        percentChange24h = i.percentChange24h
+                    )
+                )
                 break
             }
     }
 
     private fun onResponseTicker(data: TickerV2) {
-        val dataForChart = arrayListOf<Entry>()
+        val dataForChart = arrayListOf<Point>()
         for (i in 0 until data.changes.size)
-            dataForChart.add(Entry(24F - i.toFloat(), data.changes[i]))
+            dataForChart.add(Point(24F - i.toFloat(), data.changes[i]))
 
         dataForChart.sortBy { it.x }
-        _chartData.postValue(dataForChart)
 
-        _stats24.postValue(data)
+        val newCandles = _state.value?.statistic?.candles?.toList() ?: emptyList()
+
+        _state.value = state.value?.copy(
+            statistic = Statistic24h(
+                symbol = data.symbol,
+                high = data.high,
+                low = data.low,
+                changes = dataForChart,
+                candles = newCandles
+            )
+        )
     }
 
-    private fun onResponse(data: List<List<Float>>) {
-        val dataForChart = arrayListOf<Entry>()
-        for (i in 0 until data.size)
-            dataForChart.add(Entry(data[i][0], data[i][1]))
-        dataForChart.sortBy { it.x }
+    private fun onResponse(candles: List<List<Float>>) {
+        val dataForChart = arrayListOf<Candle>()
+        for (candle in candles)
+            dataForChart.add(
+                Candle(
+                    time = (candle[0] / 1000).roundToInt().toFloat(),
+                    open = candle[1],
+                    high = candle[2],
+                    low = candle[3],
+                    close = candle[4],
+                )
+            )
 
-        _chartData.postValue(dataForChart)
+        dataForChart
+            .sortBy { it.time }
+
+        val first = dataForChart[0].time
+
+        val dataForChartCopy = arrayListOf<Candle>()
+        for (i in 0 until dataForChart.size)
+            if (i % 3 == 0)
+                dataForChartCopy.add(dataForChart[i].copy(time = (dataForChart[i].time - first)/ 600F))
+
+        dataForChart
+            .sortBy { it.time }
+
+        val newStat = _state.value?.statistic?.copy(
+            candles = dataForChartCopy
+        ) ?: Statistic24h("", 0F, 0F, emptyList(), emptyList())
+
+        _state.value = state.value?.copy(
+            statistic = newStat
+        )
     }
 }
