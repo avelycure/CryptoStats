@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.avelycure.cryptostats.R
@@ -28,6 +29,8 @@ import kotlin.math.roundToInt
 class CryptoInfoFragment : Fragment() {
     private lateinit var lineChart: LineChart
     private lateinit var btn: AppCompatButton
+    private lateinit var tvCoinValue: AppCompatTextView
+    private lateinit var tvCoinValueChanging: AppCompatTextView
 
     private val cryptoInfoViewModel: CryptoInfoViewModel by viewModel()
 
@@ -37,18 +40,25 @@ class CryptoInfoFragment : Fragment() {
     ): View {
         val view = inflater.inflate(R.layout.fragment_crypto_info, container, false)
         lineChart = view.findViewById(R.id.chart)
-        setChart()
-        btn = view.findViewById(R.id.btn)
+        initViews(view)
 
         btn.setOnClickListener {
-            //cryptoInfoViewModel.requestCandles("btcusd")
             cryptoInfoViewModel.requestTicker("btcusd")
         }
 
-        cryptoInfoViewModel.getCandles().observe(viewLifecycleOwner, { chartData ->
+        cryptoInfoViewModel.chartData.observe(viewLifecycleOwner, { chartData ->
             plotGraphic(chartData)
         })
+
         return view
+    }
+
+    private fun initViews(view: View) {
+        setChart()
+
+        btn = view.findViewById(R.id.btn)
+        tvCoinValue = view.findViewById(R.id.ci_tv_coin_value)
+        tvCoinValueChanging = view.findViewById(R.id.ci_tv_coin_value_change_in_last_24h)
     }
 
     private fun setChart() {

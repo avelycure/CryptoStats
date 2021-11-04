@@ -1,8 +1,5 @@
 package com.avelycure.cryptostats.presentation
 
-import android.content.Context
-import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -16,10 +13,9 @@ class CryptoInfoViewModel(
     private val repo: ICryptoRepo
 ) : ViewModel() {
 
-    private val candles: MutableLiveData<ArrayList<Entry>> = MutableLiveData()
-    fun getCandles(): LiveData<ArrayList<Entry>> {
-        return candles
-    }
+    private val _chartData: MutableLiveData<ArrayList<Entry>> = MutableLiveData()
+    val chartData: LiveData<ArrayList<Entry>>
+        get() = _chartData
 
     fun requestCandles(symbol: String) {
         repo.getCandles(symbol)
@@ -41,7 +37,7 @@ class CryptoInfoViewModel(
             dataForChart.add(Entry(24F - i.toFloat(), data.changes[i]))
 
         dataForChart.sortBy { it.x }
-        candles.postValue(dataForChart)
+        _chartData.postValue(dataForChart)
     }
 
     private fun onResponse(data: List<List<Float>>) {
@@ -50,6 +46,6 @@ class CryptoInfoViewModel(
             dataForChart.add(Entry(data[i][0], data[i][1]))
         dataForChart.sortBy { it.x }
 
-        candles.postValue(dataForChart)
+        _chartData.postValue(dataForChart)
     }
 }
