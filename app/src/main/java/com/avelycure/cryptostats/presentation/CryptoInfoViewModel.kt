@@ -27,6 +27,7 @@ class CryptoInfoViewModel(
                 symbol = "",
                 high = 0F,
                 low = 0F,
+                open = 0F,
                 emptyList(),
                 emptyList()
             ),
@@ -107,6 +108,7 @@ class CryptoInfoViewModel(
                 symbol = data.symbol,
                 high = data.high,
                 low = data.low,
+                open = data.open,
                 changes = dataForChart,
                 candles = newCandles
             )
@@ -141,7 +143,7 @@ class CryptoInfoViewModel(
 
         val newStat = _state.value?.statistic?.copy(
             candles = dataForChartCopy
-        ) ?: Statistic24h("", 0F, 0F, emptyList(), emptyList())
+        ) ?: Statistic24h("", 0F, 0F, 0F, emptyList(), emptyList())
 
         _state.value = state.value?.copy(
             statistic = newStat
