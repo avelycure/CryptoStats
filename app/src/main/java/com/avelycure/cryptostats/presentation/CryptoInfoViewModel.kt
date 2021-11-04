@@ -7,12 +7,14 @@ import androidx.lifecycle.ViewModel
 import com.avelycure.cryptostats.data.models.PriceFeed
 import com.avelycure.cryptostats.data.models.TickerV2
 import com.avelycure.cryptostats.data.repo.ICryptoRepo
+import com.avelycure.cryptostats.domain.Candle
 import com.avelycure.cryptostats.domain.CoinPrice
 import com.avelycure.cryptostats.domain.Point
 import com.avelycure.cryptostats.domain.Statistic24h
 import com.github.mikephil.charting.data.Entry
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlin.math.roundToInt
 
 class CryptoInfoViewModel(
     private val repo: ICryptoRepo
@@ -28,6 +30,7 @@ class CryptoInfoViewModel(
                 symbol = "",
                 high = 0F,
                 low = 0F,
+                emptyList(),
                 emptyList()
             ),
             coinPrice = CoinPrice(
@@ -80,30 +83,51 @@ class CryptoInfoViewModel(
 
         dataForChart.sortBy { it.x }
 
+        val newCandles = _state.value?.statistic?.candles?.toList() ?: emptyList()
+
         _state.value = state.value?.copy(
             statistic = Statistic24h(
                 symbol = data.symbol,
                 high = data.high,
                 low = data.low,
-                changes = dataForChart
+                changes = dataForChart,
+                candles = newCandles
             )
         )
     }
 
-    private fun onResponse(data: List<List<Float>>) {
-        val dataForChart = arrayListOf<Point>()
-        for (i in 0 until data.size)
-            dataForChart.add(Point(data[i][0], data[i][1]))
-        dataForChart.sortBy { it.x }
+    private fun onResponse(candles: List<List<Float>>) {
+        val dataForChart = arrayListOf<Candle>()
+        for (candle in candles)
+            dataForChart.add(
+                Candle(
+                    time = (candle[0] / 1000).roundToInt().toFloat(),
+                    open = candle[1],
+                    high = candle[2],
+                    low = candle[3],
+                    close = candle[4],
+                )
+            )
+
+        dataForChart
+            .sortBy { it.time }
+
+        val first = dataForChart[0].time
+
+        val dataForChartCopy = arrayListOf<Candle>()
+        for (i in 0 until dataForChart.size)
+            if (i % 3 == 0)
+                dataForChartCopy.add(dataForChart[i].copy(time = (dataForChart[i].time - first)/ 600F))
+
+        dataForChart
+            .sortBy { it.time }
 
         val newStat = _state.value?.statistic?.copy(
-            changes = dataForChart
-        ) ?: Statistic24h("", 0F, 0F, emptyList())
+            candles = dataForChartCopy
+        ) ?: Statistic24h("", 0F, 0F, emptyList(), emptyList())
 
         _state.value = state.value?.copy(
             statistic = newStat
         )
-
-        Log.d("mytag", "" + _state.value?.statistic?.changes?.toList().toString())
     }
 }
