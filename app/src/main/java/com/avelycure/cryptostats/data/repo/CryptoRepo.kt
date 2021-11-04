@@ -13,7 +13,7 @@ class CryptoRepo(
     }
 
     override fun getTicker(symbol: String): Observable<TickerV2> {
-        return apiService.getTickerV2()
+        return apiService.getTickerV2(symbol)
     }
 
 }
