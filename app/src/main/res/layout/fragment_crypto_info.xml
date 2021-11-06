@@ -7,7 +7,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#A9A9A9">
+        android:background="?attr/colorSurface">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/ci_tv_coin_name"
@@ -154,8 +154,6 @@
                 android:layout_alignParentEnd="true"
                 android:textSize="20sp"
                 android:textStyle="bold" />
-
-
         </RelativeLayout>
 
         <RelativeLayout
