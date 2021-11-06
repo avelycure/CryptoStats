@@ -4,6 +4,9 @@
         <item name="colorSurface">@color/light_white</item>
         <item name="colorOnSurface">@color/dark_green</item>
 
+        <item name="titleTextColor">@color/green_light</item>
+        <item name="textFillColor">@color/dark_green</item>
+
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/yellow</item>
         <item name="colorPrimaryVariant">@color/peach</item>
