@@ -11,7 +11,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class TradeAdapter(
-    val tradeList: List<Trade>
+    var tradeList: List<Trade>
 ) : RecyclerView.Adapter<TradeAdapter.TradeViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TradeViewHolder {

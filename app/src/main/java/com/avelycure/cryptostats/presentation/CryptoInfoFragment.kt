@@ -11,7 +11,6 @@ import android.view.ViewGroup
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -51,6 +50,7 @@ class CryptoInfoFragment : Fragment() {
     private lateinit var rvTrades: RecyclerView
 
     private val cryptoInfoViewModel: CryptoInfoViewModel by viewModel()
+private lateinit var adapter: TradeAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -65,6 +65,7 @@ class CryptoInfoFragment : Fragment() {
             cryptoInfoViewModel.requestCandles("btcusd", "1m")
             cryptoInfoViewModel.requestPriceFeed("BTCUSD")
             cryptoInfoViewModel.requestTickerV1("btcusd")
+            cryptoInfoViewModel.requestTradeHistory("btcusd", 50)
             swipeRefresh.isRefreshing = false
         }
 
@@ -113,6 +114,8 @@ class CryptoInfoFragment : Fragment() {
 
             updatePrice(state.coinPrice)
 
+            adapter.tradeList = state.trades
+            rvTrades.adapter?.notifyDataSetChanged()
         })
 
         return view
@@ -161,18 +164,20 @@ class CryptoInfoFragment : Fragment() {
     }
 
     private fun setRv() {
-        rvTrades.adapter = TradeAdapter(cryptoInfoViewModel.state.value?.trades ?: emptyList())
+        adapter = TradeAdapter(cryptoInfoViewModel.state.value?.trades ?: emptyList())
+        rvTrades.adapter = adapter
         rvTrades.layoutManager = LinearLayoutManager(requireContext())
     }
 
     private fun setLineChart() {
         lineChart.apply {
+            isScaleXEnabled = false
+            isDragEnabled = false
+            isScaleYEnabled = false
+
             axisLeft.isEnabled = false
             description.isEnabled = false
             legend.isEnabled = false
-            isDragEnabled = false
-            isScaleYEnabled = false
-            isScaleXEnabled = false
             legend.verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
 
             setDrawGridBackground(false)

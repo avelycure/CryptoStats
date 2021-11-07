@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.avelycure.cryptostats.data.models.PriceFeed
 import com.avelycure.cryptostats.data.models.TickerV1
 import com.avelycure.cryptostats.data.models.TickerV2
+import com.avelycure.cryptostats.data.models.TradeHistory
 import com.avelycure.cryptostats.data.repo.ICryptoRepo
 import com.avelycure.cryptostats.domain.*
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -71,6 +72,29 @@ class CryptoInfoViewModel(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponseTickerV1(data) }, {}, {})
+    }
+
+    fun requestTradeHistory(symbol: String, limit: Int) {
+        repo.getTrades(symbol, limit)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({ data -> onResponseTrades(data) }, {}, {})
+    }
+
+    private fun onResponseTrades(data: List<TradeHistory>) {
+        val trades: List<Trade> = data.map { tradeHistory ->
+            Trade(
+                timestampms = tradeHistory.timestampms,
+                tid = tradeHistory.tid,
+                price = tradeHistory.price,
+                amount = tradeHistory.amount,
+                type = tradeHistory.type
+            )
+        }
+
+        _state.value = _state.value?.copy(
+            trades = trades
+        )
     }
 
     private fun onResponseTickerV1(data: TickerV1) {
