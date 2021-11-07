@@ -4,6 +4,8 @@
         <item name="colorSurface">@color/light_white</item>
         <item name="colorOnSurface">@color/dark_green</item>
 
+        <item name="strokeColor">@color/dark_green</item>
+
         <item name="titleTextColor">@color/green_light</item>
         <item name="textFillColor">@color/dark_green</item>
 

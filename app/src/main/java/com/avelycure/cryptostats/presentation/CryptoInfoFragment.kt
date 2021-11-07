@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
@@ -148,6 +149,9 @@ class CryptoInfoFragment : Fragment() {
         currentTvBidPrice = view.findViewById(R.id.ci_tv_current_price_bid)
         currentTvAskPrice = view.findViewById(R.id.ci_tv_current_ask)
         swipeRefresh = view.findViewById(R.id.swipe_refresh_layout)
+
+        (activity as AppCompatActivity).setSupportActionBar(view.findViewById(R.id.ci_toolbar))
+        (activity as AppCompatActivity).supportActionBar?.title = "Crypto stats"
     }
 
     private fun setLineChart() {
@@ -169,7 +173,7 @@ class CryptoInfoFragment : Fragment() {
             axisRight.apply {
                 textColor = activity?.getColorFromAttr(R.attr.colorOnSurface) ?: Color.BLACK
 
-                setDrawGridLines(false)
+                setDrawGridLines(true)
                 setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART)
             }
 
@@ -247,12 +251,13 @@ class CryptoInfoFragment : Fragment() {
             setDrawCircleHole(false)
             setDrawCircles(false)
             setDrawFilled(true)
+            setDrawValues(false)
 
             fillDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.gradient)
             color = activity?.getColorFromAttr(R.attr.colorOnSecondary) ?: Color.BLACK
             lineWidth = 2F
             mode = LineDataSet.Mode.CUBIC_BEZIER
-            cubicIntensity = 0.2F
+            cubicIntensity = 0.1F
         }
         return set
     }
