@@ -14,6 +14,7 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.avelycure.cryptostats.R
 import com.avelycure.cryptostats.domain.CoinPrice
 import com.avelycure.cryptostats.domain.Statistic24h
@@ -34,8 +35,8 @@ import kotlin.math.roundToInt
 class CryptoInfoFragment : Fragment() {
     private lateinit var lineChart: LineChart
     private lateinit var candleChart: CandleStickChart
+    private lateinit var swipeRefresh: SwipeRefreshLayout
 
-    private lateinit var btn: AppCompatButton
     private lateinit var tvCoinValue: AppCompatTextView
     private lateinit var tvPercentageChanging24h: AppCompatTextView
     private lateinit var tvLowest24h: AppCompatTextView
@@ -55,11 +56,12 @@ class CryptoInfoFragment : Fragment() {
 
         initViews(view)
 
-        btn.setOnClickListener {
+        swipeRefresh.setOnRefreshListener {
             cryptoInfoViewModel.requestTickerV2("btcusd")
             cryptoInfoViewModel.requestCandles("btcusd", "1m")
             cryptoInfoViewModel.requestPriceFeed("BTCUSD")
             cryptoInfoViewModel.requestTickerV1("btcusd")
+            swipeRefresh.isRefreshing = false
         }
 
         cryptoInfoViewModel.state.observe(viewLifecycleOwner, { state ->
@@ -137,7 +139,6 @@ class CryptoInfoFragment : Fragment() {
         candleChart = view.findViewById(R.id.candle_stick_chart)
         setCandleChart()
 
-        btn = view.findViewById(R.id.btn)
         tvCoinValue = view.findViewById(R.id.ci_tv_coin_value)
         tvPercentageChanging24h = view.findViewById(R.id.ci_tv_percent_change_in_last_24h)
         tvLowest24h = view.findViewById(R.id.ci_tv_lowest_in_last_24h)
@@ -146,6 +147,7 @@ class CryptoInfoFragment : Fragment() {
         tvPriceChange = view.findViewById(R.id.ci_tv_price_change)
         currentTvBidPrice = view.findViewById(R.id.ci_tv_current_price_bid)
         currentTvAskPrice = view.findViewById(R.id.ci_tv_current_ask)
+        swipeRefresh = view.findViewById(R.id.swipe_refresh_layout)
     }
 
     private fun setLineChart() {
