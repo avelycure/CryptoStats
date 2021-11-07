@@ -38,7 +38,8 @@ class CryptoInfoViewModel(
             ticker = Ticker(
                 bid = 0F,
                 ask = 0F
-            )
+            ),
+            trades = emptyList()
         )
     }
 

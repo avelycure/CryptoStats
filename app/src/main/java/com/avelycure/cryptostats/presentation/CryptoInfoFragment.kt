@@ -15,6 +15,8 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.avelycure.cryptostats.R
 import com.avelycure.cryptostats.domain.CoinPrice
@@ -46,6 +48,7 @@ class CryptoInfoFragment : Fragment() {
     private lateinit var tvPriceChange: AppCompatTextView
     private lateinit var currentTvBidPrice: AppCompatTextView
     private lateinit var currentTvAskPrice: AppCompatTextView
+    private lateinit var rvTrades: RecyclerView
 
     private val cryptoInfoViewModel: CryptoInfoViewModel by viewModel()
 
@@ -140,6 +143,9 @@ class CryptoInfoFragment : Fragment() {
         candleChart = view.findViewById(R.id.candle_stick_chart)
         setCandleChart()
 
+        rvTrades = view.findViewById(R.id.rv_trades)
+        setRv()
+
         tvCoinValue = view.findViewById(R.id.ci_tv_coin_value)
         tvPercentageChanging24h = view.findViewById(R.id.ci_tv_percent_change_in_last_24h)
         tvLowest24h = view.findViewById(R.id.ci_tv_lowest_in_last_24h)
@@ -152,6 +158,11 @@ class CryptoInfoFragment : Fragment() {
 
         (activity as AppCompatActivity).setSupportActionBar(view.findViewById(R.id.ci_toolbar))
         (activity as AppCompatActivity).supportActionBar?.title = "Crypto stats"
+    }
+
+    private fun setRv() {
+        rvTrades.adapter = TradeAdapter(cryptoInfoViewModel.state.value?.trades ?: emptyList())
+        rvTrades.layoutManager = LinearLayoutManager(requireContext())
     }
 
     private fun setLineChart() {
