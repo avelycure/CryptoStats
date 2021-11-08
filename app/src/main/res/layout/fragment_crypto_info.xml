@@ -310,47 +310,47 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn24h"
+                    style="@style/ButtonCryptoChange"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="24h"
-                    style="@style/ButtonCryptoChange"
-                    android:textSize="10sp"
                     android:textColor="?attr/titleTextColor"
+                    android:textSize="10sp"
+                    app:cornerRadius="8dp"
                     app:layout_constraintEnd_toStartOf="@+id/btn6h"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:cornerRadius="8dp"
                     app:rippleColor="#33AAAAAA"
                     app:strokeColor="?attr/strokeColor" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn6h"
+                    style="@style/ButtonCryptoChange"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="6"
-                    style="@style/ButtonCryptoChange"
-                    android:textSize="10sp"
                     android:textColor="?attr/titleTextColor"
+                    android:textSize="10sp"
+                    app:cornerRadius="8dp"
                     app:layout_constraintEnd_toStartOf="@+id/btn15m"
                     app:layout_constraintStart_toEndOf="@+id/btn24h"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:cornerRadius="8dp"
                     app:rippleColor="#33AAAAAA"
                     app:strokeColor="?attr/strokeColor" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn15m"
+                    style="@style/ButtonCryptoChange"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    style="@style/ButtonCryptoChange"
-                    android:textSize="10sp"
                     android:text="15m"
-                    app:cornerRadius="8dp"
                     android:textColor="?attr/titleTextColor"
+                    android:textSize="10sp"
+                    app:cornerRadius="8dp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:rippleColor="#33AAAAAA"
                     app:layout_constraintStart_toEndOf="@+id/btn6h"
-                    app:layout_constraintTop_toTopOf="parent"/>
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:rippleColor="#33AAAAAA" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -365,12 +365,19 @@
                 android:textSize="40sp"
                 app:layout_constraintTop_toBottomOf="@+id/btn_container" />
 
-            <androidx.recyclerview.widget.RecyclerView
+            <HorizontalScrollView
+                android:id="@+id/horizontal_sv"
                 android:layout_width="match_parent"
-                android:layout_height="480dp"
-                android:id="@+id/rv_trades"
-                android:orientation="vertical"
-                app:layout_constraintTop_toBottomOf="@id/trades"/>
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/trades">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_trades"
+                    android:layout_width="match_parent"
+                    android:layout_height="480dp"
+                    android:orientation="vertical" />
+
+            </HorizontalScrollView>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

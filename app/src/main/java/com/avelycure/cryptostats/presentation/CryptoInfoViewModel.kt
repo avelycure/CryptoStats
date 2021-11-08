@@ -12,6 +12,8 @@ import com.avelycure.cryptostats.data.repo.ICryptoRepo
 import com.avelycure.cryptostats.domain.*
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.math.roundToInt
 
 class CryptoInfoViewModel(
@@ -48,7 +50,7 @@ class CryptoInfoViewModel(
         repo.getCandles(symbol, timeFrame)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .subscribe({ data -> onResponse(data) }, {
+            .subscribe({ data -> onResponseCandles(data) }, {
                 Log.d("mytag", "error: ${it.message}")
             }, {})
     }
@@ -78,10 +80,10 @@ class CryptoInfoViewModel(
         repo.getTrades(symbol, limit)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .subscribe({ data -> onResponseTrades(data) }, {}, {})
+            .subscribe({ data -> onResponseTradeHistory(data) }, {}, {})
     }
 
-    private fun onResponseTrades(data: List<TradeHistory>) {
+    private fun onResponseTradeHistory(data: List<TradeHistory>) {
         val trades: List<Trade> = data.map { tradeHistory ->
             Trade(
                 timestampms = tradeHistory.timestampms,
@@ -126,8 +128,6 @@ class CryptoInfoViewModel(
 
         dataForChart.sortBy { it.x }
 
-        val newCandles = _state.value?.statistic?.candles?.toList() ?: emptyList()
-
         _state.value = state.value?.copy(
             statistic = Statistic24h(
                 symbol = data.symbol,
@@ -135,12 +135,12 @@ class CryptoInfoViewModel(
                 low = data.low,
                 open = data.open,
                 changes = dataForChart,
-                candles = newCandles
+                candles = _state.value?.statistic?.candles?.toList() ?: emptyList()
             )
         )
     }
 
-    private fun onResponse(candles: List<List<Float>>) {
+    private fun onResponseCandles(candles: List<List<Float>>) {
         val dataForChart = arrayListOf<Candle>()
         for (candle in candles)
             dataForChart.add(
@@ -173,5 +173,11 @@ class CryptoInfoViewModel(
         _state.value = state.value?.copy(
             statistic = newStat
         )
+    }
+
+    fun unixTimeToStringDate(timestamp: Long): String {
+        val sdf = SimpleDateFormat("MM/dd/yyyy")
+        val netDate = Date(timestamp)
+        return sdf.format(netDate)
     }
 }
