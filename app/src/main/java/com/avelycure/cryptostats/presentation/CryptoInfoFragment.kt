@@ -58,14 +58,16 @@ private lateinit var adapter: TradeAdapter
     ): View {
         val view = inflater.inflate(R.layout.fragment_crypto_info, container, false)
 
+        cryptoInfoViewModel.context = requireContext()
+
         initViews(view)
 
         swipeRefresh.setOnRefreshListener {
             cryptoInfoViewModel.requestTickerV2("btcusd")
-            cryptoInfoViewModel.requestCandles("btcusd", "1m")
+            /*cryptoInfoViewModel.requestCandles("btcusd", "1m")
             cryptoInfoViewModel.requestPriceFeed("BTCUSD")
             cryptoInfoViewModel.requestTickerV1("btcusd")
-            cryptoInfoViewModel.requestTradeHistory("btcusd", 50)
+            cryptoInfoViewModel.requestTradeHistory("btcusd", 50)*/
             swipeRefresh.isRefreshing = false
         }
 

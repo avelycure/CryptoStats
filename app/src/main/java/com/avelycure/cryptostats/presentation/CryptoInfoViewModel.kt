@@ -1,6 +1,9 @@
 package com.avelycure.cryptostats.presentation
 
+import android.content.Context
+import android.net.NetworkRequest
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,9 +11,11 @@ import com.avelycure.cryptostats.data.models.PriceFeed
 import com.avelycure.cryptostats.data.models.TickerV1
 import com.avelycure.cryptostats.data.models.TickerV2
 import com.avelycure.cryptostats.data.models.TradeHistory
+import com.avelycure.cryptostats.data.network.NetworkStatus
 import com.avelycure.cryptostats.data.repo.ICryptoRepo
 import com.avelycure.cryptostats.domain.*
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 import java.text.SimpleDateFormat
 import java.util.*
@@ -19,6 +24,8 @@ import kotlin.math.roundToInt
 class CryptoInfoViewModel(
     private val repo: ICryptoRepo
 ) : ViewModel() {
+
+    var context: Context? = null
 
     private val _state: MutableLiveData<CryptoInfoState> = MutableLiveData()
     val state: LiveData<CryptoInfoState>
@@ -56,10 +63,28 @@ class CryptoInfoViewModel(
     }
 
     fun requestTickerV2(symbol: String) {
-        repo.getTickerV2(symbol)
+        makeTickerRequest(symbol)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .subscribe({ data -> onResponseTickerV2(data) }, {}, {})
+            .subscribe { data -> onResponseTickerV2(data) }
+    }
+
+    private fun makeTickerRequest(symbol: String): Single<TickerV2> {
+        val networkStatus = NetworkStatus(context!!)
+        return networkStatus.isOnlineSingle().flatMap { isOnline ->
+            if (isOnline) {
+                repo.getTickerV2(symbol)
+                    .flatMap {
+                        Single.fromCallable { it }
+                    }
+            } else {
+                Single.fromCallable {
+                    TickerV2(
+                        "", 0f, 0f, 0f, 0f, emptyList<Float>(), 0f, 0f
+                    )
+                }
+            }
+        }
     }
 
     fun requestPriceFeed(pair: String) {
@@ -141,7 +166,7 @@ class CryptoInfoViewModel(
     }
 
     private fun onResponseCandles(candles: List<List<Float>>) {
-        val dataForChart = arrayListOf<Candle>()
+        /*val dataForChart = arrayListOf<Candle>()
         for (candle in candles)
             dataForChart.add(
                 Candle(
@@ -172,7 +197,7 @@ class CryptoInfoViewModel(
 
         _state.value = state.value?.copy(
             statistic = newStat
-        )
+        )*/
     }
 
     fun unixTimeToStringDate(timestamp: Long): String {

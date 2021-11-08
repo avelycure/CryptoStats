@@ -6,6 +6,7 @@ import com.avelycure.cryptostats.data.models.TickerV1
 import com.avelycure.cryptostats.data.models.TickerV2
 import com.avelycure.cryptostats.data.models.TradeHistory
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
 
 class CryptoRepo(
     private val apiService: GeminiApiService
@@ -15,7 +16,7 @@ class CryptoRepo(
         return apiService.getCandles(symbol, timeFrame)
     }
 
-    override fun getTickerV2(symbol: String): Observable<TickerV2> {
+    override fun getTickerV2(symbol: String): Single<TickerV2> {
         return apiService.getTickerV2(symbol)
     }
 

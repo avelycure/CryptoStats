@@ -5,11 +5,12 @@ import com.avelycure.cryptostats.data.models.TickerV1
 import com.avelycure.cryptostats.data.models.TickerV2
 import com.avelycure.cryptostats.data.models.TradeHistory
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
 
 interface ICryptoRepo {
     fun getCandles(symbol: String, timeFrame: String): Observable<List<List<Float>>>
 
-    fun getTickerV2(symbol: String): Observable<TickerV2>
+    fun getTickerV2(symbol: String): Single<TickerV2>
 
     fun getPriceFeed(): Observable<List<PriceFeed>>
 
