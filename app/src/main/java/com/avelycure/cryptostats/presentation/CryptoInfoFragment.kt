@@ -1,15 +1,22 @@
 package com.avelycure.cryptostats.presentation
 
+import android.content.Context
 import android.graphics.Color
 import android.graphics.Paint
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.AppCompatButton
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorInt
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.avelycure.cryptostats.R
 import com.avelycure.cryptostats.domain.CoinPrice
 import com.avelycure.cryptostats.domain.Statistic24h
@@ -27,12 +34,11 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.roundToInt
 
-
 class CryptoInfoFragment : Fragment() {
     private lateinit var lineChart: LineChart
     private lateinit var candleChart: CandleStickChart
+    private lateinit var swipeRefresh: SwipeRefreshLayout
 
-    private lateinit var btn: AppCompatButton
     private lateinit var tvCoinValue: AppCompatTextView
     private lateinit var tvPercentageChanging24h: AppCompatTextView
     private lateinit var tvLowest24h: AppCompatTextView
@@ -41,8 +47,10 @@ class CryptoInfoFragment : Fragment() {
     private lateinit var tvPriceChange: AppCompatTextView
     private lateinit var currentTvBidPrice: AppCompatTextView
     private lateinit var currentTvAskPrice: AppCompatTextView
+    private lateinit var rvTrades: RecyclerView
 
     private val cryptoInfoViewModel: CryptoInfoViewModel by viewModel()
+private lateinit var adapter: TradeAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,11 +60,13 @@ class CryptoInfoFragment : Fragment() {
 
         initViews(view)
 
-        btn.setOnClickListener {
+        swipeRefresh.setOnRefreshListener {
             cryptoInfoViewModel.requestTickerV2("btcusd")
             cryptoInfoViewModel.requestCandles("btcusd", "1m")
             cryptoInfoViewModel.requestPriceFeed("BTCUSD")
             cryptoInfoViewModel.requestTickerV1("btcusd")
+            cryptoInfoViewModel.requestTradeHistory("btcusd", 50)
+            swipeRefresh.isRefreshing = false
         }
 
         cryptoInfoViewModel.state.observe(viewLifecycleOwner, { state ->
@@ -84,7 +94,8 @@ class CryptoInfoFragment : Fragment() {
                                 it.close
                             )
                         }
-                )
+                ),
+                "Set 1"
             )
 
             updateStats(state.statistic)
@@ -103,6 +114,8 @@ class CryptoInfoFragment : Fragment() {
 
             updatePrice(state.coinPrice)
 
+            adapter.tradeList = state.trades
+            rvTrades.adapter?.notifyDataSetChanged()
         })
 
         return view
@@ -133,7 +146,9 @@ class CryptoInfoFragment : Fragment() {
         candleChart = view.findViewById(R.id.candle_stick_chart)
         setCandleChart()
 
-        btn = view.findViewById(R.id.btn)
+        rvTrades = view.findViewById(R.id.rv_trades)
+        setRv()
+
         tvCoinValue = view.findViewById(R.id.ci_tv_coin_value)
         tvPercentageChanging24h = view.findViewById(R.id.ci_tv_percent_change_in_last_24h)
         tvLowest24h = view.findViewById(R.id.ci_tv_lowest_in_last_24h)
@@ -142,106 +157,87 @@ class CryptoInfoFragment : Fragment() {
         tvPriceChange = view.findViewById(R.id.ci_tv_price_change)
         currentTvBidPrice = view.findViewById(R.id.ci_tv_current_price_bid)
         currentTvAskPrice = view.findViewById(R.id.ci_tv_current_ask)
+        swipeRefresh = view.findViewById(R.id.swipe_refresh_layout)
+
+        (activity as AppCompatActivity).setSupportActionBar(view.findViewById(R.id.ci_toolbar))
+        (activity as AppCompatActivity).supportActionBar?.title = "Crypto stats"
     }
 
-    private fun setCandleChart() {
-        candleChart.apply {
-            setDrawBorders(true)
-            axisLeft.apply {
-                setDrawGridLines(false)
-                setDrawLabels(false)
-            }
-            axisLeft.apply {
-                setDrawGridLines(false)
-                textColor = Color.WHITE
-            }
-            requestDisallowInterceptTouchEvent(true)
-
-
-            xAxis.setDrawGridLines(false)
-
-            xAxis.setDrawLabels(false)
-            xAxis.granularity = 1f
-            xAxis.isGranularityEnabled = true
-            xAxis.setAvoidFirstLastClipping(true)
-
-            legend.isEnabled = false
-        }
-    }
-
-    private fun plotCandleGraphic(data: ArrayList<CandleEntry>) {
-        if (data.isNotEmpty()) {
-            candleChart.apply {
-                description.isEnabled = false
-                legend.isEnabled = false
-                axisRight.isEnabled = false
-                xAxis.labelCount = 6
-
-                setBackgroundColor(Color.DKGRAY)
-                xAxis.setDrawGridLines(false)
-                setDrawGridBackground(false)
-
-                legend.verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
-                axisLeft.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART)
-
-                xAxis.position = XAxis.XAxisPosition.BOTTOM
-                xAxis.setDrawLabels(true)
-                xAxis.setCenterAxisLabels(true)
-            }
-
-
-            val candleDataSet = CandleDataSet(data, "Set 1").apply {
-                color = Color.rgb(80, 80, 80)
-                shadowColor = Color.LTGRAY
-                shadowWidth = 2F
-                decreasingColor = Color.RED
-                decreasingPaintStyle = Paint.Style.FILL
-                increasingPaintStyle = Paint.Style.FILL
-                increasingColor = Color.GREEN
-                neutralColor = Color.BLUE
-                setDrawValues(false)
-            }
-
-            candleChart.data = CandleData(candleDataSet)
-            candleChart.invalidate()
-        }
+    private fun setRv() {
+        adapter = TradeAdapter(cryptoInfoViewModel.state.value?.trades ?: emptyList())
+        rvTrades.adapter = adapter
+        rvTrades.layoutManager = LinearLayoutManager(requireContext())
     }
 
     private fun setLineChart() {
         lineChart.apply {
-            xAxis.setDrawGridLines(false)
-            axisRight.isEnabled = false
-
-            setBackgroundColor(Color.DKGRAY)
-            setPinchZoom(false)
-            setDrawGridBackground(false)
-            isDragEnabled = false
             isScaleXEnabled = false
+            isDragEnabled = false
             isScaleYEnabled = false
 
-            legend.verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
-
+            axisLeft.isEnabled = false
             description.isEnabled = false
             legend.isEnabled = false
-            axisLeft.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART)
+            legend.verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
 
-            xAxis.labelCount = 6
+            setDrawGridBackground(false)
+            setPinchZoom(false)
 
-            xAxis.valueFormatter = object : ValueFormatter() {
-                override fun getFormattedValue(value: Float): String {
-                    return "-${(24F - value).roundToInt()}h"
-                }
+            activity?.getColorFromAttr(R.attr.colorSurface)?.let { setBackgroundColor(it) }
+            activity?.getColorFromAttr(R.attr.colorOnSurface)?.let { setNoDataTextColor(it) }
+
+            axisRight.apply {
+                textColor = activity?.getColorFromAttr(R.attr.colorOnSurface) ?: Color.BLACK
+
+                setDrawGridLines(true)
+                setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART)
             }
 
-            xAxis.position = XAxis.XAxisPosition.BOTTOM
-            xAxis.setDrawLabels(true)
-            xAxis.setCenterAxisLabels(true)
+            xAxis.apply {
+                labelCount = 6
+                position = XAxis.XAxisPosition.BOTTOM
+
+                setDrawGridLines(false)
+                setDrawLabels(true)
+                setCenterAxisLabels(true)
+
+                valueFormatter = object : ValueFormatter() {
+                    override fun getFormattedValue(value: Float): String {
+                        return "-${(24F - value).roundToInt()}h"
+                    }
+                }
+            }
         }
     }
 
-    fun getFormatTimeWithTZ(currentTime: Date): String {
-        val timeZoneDate = SimpleDateFormat("h:mm a", Locale.getDefault())
-        return timeZoneDate.format(currentTime)
+    private fun setCandleChart() {
+        candleChart.apply {
+            description.isEnabled = false
+            legend.isEnabled = false
+
+            activity?.getColorFromAttr(R.attr.colorOnSurface)?.let { setNoDataTextColor(it) }
+            activity?.getColorFromAttr(R.attr.colorSurface)?.let { setBackgroundColor(it) }
+
+            setDrawGridBackground(false)
+            setDrawBorders(false)
+
+            xAxis.apply {
+                labelCount = 6
+                position = XAxis.XAxisPosition.BOTTOM
+                setDrawGridLines(false)
+                setDrawLabels(true)
+                setCenterAxisLabels(true)
+
+                textColor = activity?.getColorFromAttr(R.attr.colorOnSurface) ?: Color.BLACK
+            }
+
+            axisLeft.apply {
+                textColor = activity?.getColorFromAttr(R.attr.colorOnSurface) ?: Color.BLACK
+                setDrawGridLines(false)
+                setDrawLabels(false)
+                setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART)
+            }
+        }
     }
 
     private fun plotLineGraphic(data1: ArrayList<Entry>) {
@@ -254,6 +250,15 @@ class CryptoInfoFragment : Fragment() {
         lineChart.invalidate()
     }
 
+    private fun plotCandleGraphic(data: ArrayList<CandleEntry>, label: String) {
+        if (data.isNotEmpty()) {
+            val candleDataSet = makeCandleSet(data, label)
+
+            candleChart.data = CandleData(candleDataSet)
+            candleChart.invalidate()
+        }
+    }
+
     private fun makeLineSet(data: ArrayList<Entry>, label: String): LineDataSet {
         val set = LineDataSet(data, label)
 
@@ -262,13 +267,43 @@ class CryptoInfoFragment : Fragment() {
             setDrawCircleHole(false)
             setDrawCircles(false)
             setDrawFilled(true)
+            setDrawValues(false)
 
             fillDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.gradient)
-            color = Color.RED
+            color = activity?.getColorFromAttr(R.attr.colorOnSecondary) ?: Color.BLACK
             lineWidth = 2F
             mode = LineDataSet.Mode.CUBIC_BEZIER
-            cubicIntensity = 0.2F
+            cubicIntensity = 0.1F
         }
         return set
+    }
+
+    private fun makeCandleSet(data: ArrayList<CandleEntry>, label: String): CandleDataSet {
+        return CandleDataSet(data, label).apply {
+            color = Color.rgb(80, 80, 80)
+            shadowColor = Color.LTGRAY
+            shadowWidth = 2F
+            decreasingColor = Color.RED
+            decreasingPaintStyle = Paint.Style.FILL
+            increasingPaintStyle = Paint.Style.FILL
+            increasingColor = Color.GREEN
+            neutralColor = Color.BLUE
+            setDrawValues(false)
+        }
+    }
+
+    @ColorInt
+    fun Context.getColorFromAttr(
+        @AttrRes attrColor: Int,
+        typedValue: TypedValue = TypedValue(),
+        resolveRefs: Boolean = true
+    ): Int {
+        theme.resolveAttribute(attrColor, typedValue, resolveRefs)
+        return typedValue.data
+    }
+
+    fun getFormatTimeWithTZ(currentTime: Date): String {
+        val timeZoneDate = SimpleDateFormat("h:mm a", Locale.getDefault())
+        return timeZoneDate.format(currentTime)
     }
 }

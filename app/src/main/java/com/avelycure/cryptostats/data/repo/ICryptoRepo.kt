@@ -3,6 +3,7 @@ package com.avelycure.cryptostats.data.repo
 import com.avelycure.cryptostats.data.models.PriceFeed
 import com.avelycure.cryptostats.data.models.TickerV1
 import com.avelycure.cryptostats.data.models.TickerV2
+import com.avelycure.cryptostats.data.models.TradeHistory
 import io.reactivex.rxjava3.core.Observable
 
 interface ICryptoRepo {
@@ -13,4 +14,6 @@ interface ICryptoRepo {
     fun getPriceFeed(): Observable<List<PriceFeed>>
 
     fun getTickerV1(symbol: String):Observable<TickerV1>
+
+    fun getTrades(symbol: String, limit: Int):Observable<List<TradeHistory>>
 }

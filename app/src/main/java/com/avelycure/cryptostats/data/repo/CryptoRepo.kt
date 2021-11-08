@@ -4,6 +4,7 @@ import com.avelycure.cryptostats.data.api_service.GeminiApiService
 import com.avelycure.cryptostats.data.models.PriceFeed
 import com.avelycure.cryptostats.data.models.TickerV1
 import com.avelycure.cryptostats.data.models.TickerV2
+import com.avelycure.cryptostats.data.models.TradeHistory
 import io.reactivex.rxjava3.core.Observable
 
 class CryptoRepo(
@@ -26,5 +27,7 @@ class CryptoRepo(
         return apiService.getTickerV1(symbol)
     }
 
-
+    override fun getTrades(symbol: String, limit: Int): Observable<List<TradeHistory>> {
+        return apiService.getTradeHistory(symbol, limit)
+    }
 }

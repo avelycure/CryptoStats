@@ -3,8 +3,10 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable/gradient.xml" value="0.20462962962962963" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.12001811594202899" />
         <entry key="app/src/main/res/layout/fragment_crypto_info.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/trade_item.xml" value="0.10597826086956522" />
       </map>
     </option>
   </component>

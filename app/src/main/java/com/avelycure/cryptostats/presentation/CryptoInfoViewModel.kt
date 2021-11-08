@@ -7,10 +7,13 @@ import androidx.lifecycle.ViewModel
 import com.avelycure.cryptostats.data.models.PriceFeed
 import com.avelycure.cryptostats.data.models.TickerV1
 import com.avelycure.cryptostats.data.models.TickerV2
+import com.avelycure.cryptostats.data.models.TradeHistory
 import com.avelycure.cryptostats.data.repo.ICryptoRepo
 import com.avelycure.cryptostats.domain.*
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.math.roundToInt
 
 class CryptoInfoViewModel(
@@ -38,7 +41,8 @@ class CryptoInfoViewModel(
             ticker = Ticker(
                 bid = 0F,
                 ask = 0F
-            )
+            ),
+            trades = emptyList()
         )
     }
 
@@ -46,7 +50,7 @@ class CryptoInfoViewModel(
         repo.getCandles(symbol, timeFrame)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .subscribe({ data -> onResponse(data) }, {
+            .subscribe({ data -> onResponseCandles(data) }, {
                 Log.d("mytag", "error: ${it.message}")
             }, {})
     }
@@ -70,6 +74,29 @@ class CryptoInfoViewModel(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponseTickerV1(data) }, {}, {})
+    }
+
+    fun requestTradeHistory(symbol: String, limit: Int) {
+        repo.getTrades(symbol, limit)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({ data -> onResponseTradeHistory(data) }, {}, {})
+    }
+
+    private fun onResponseTradeHistory(data: List<TradeHistory>) {
+        val trades: List<Trade> = data.map { tradeHistory ->
+            Trade(
+                timestampms = tradeHistory.timestampms,
+                tid = tradeHistory.tid,
+                price = tradeHistory.price,
+                amount = tradeHistory.amount,
+                type = tradeHistory.type
+            )
+        }
+
+        _state.value = _state.value?.copy(
+            trades = trades
+        )
     }
 
     private fun onResponseTickerV1(data: TickerV1) {
@@ -101,8 +128,6 @@ class CryptoInfoViewModel(
 
         dataForChart.sortBy { it.x }
 
-        val newCandles = _state.value?.statistic?.candles?.toList() ?: emptyList()
-
         _state.value = state.value?.copy(
             statistic = Statistic24h(
                 symbol = data.symbol,
@@ -110,12 +135,12 @@ class CryptoInfoViewModel(
                 low = data.low,
                 open = data.open,
                 changes = dataForChart,
-                candles = newCandles
+                candles = _state.value?.statistic?.candles?.toList() ?: emptyList()
             )
         )
     }
 
-    private fun onResponse(candles: List<List<Float>>) {
+    private fun onResponseCandles(candles: List<List<Float>>) {
         val dataForChart = arrayListOf<Candle>()
         for (candle in candles)
             dataForChart.add(
@@ -148,5 +173,11 @@ class CryptoInfoViewModel(
         _state.value = state.value?.copy(
             statistic = newStat
         )
+    }
+
+    fun unixTimeToStringDate(timestamp: Long): String {
+        val sdf = SimpleDateFormat("MM/dd/yyyy")
+        val netDate = Date(timestamp)
+        return sdf.format(netDate)
     }
 }
