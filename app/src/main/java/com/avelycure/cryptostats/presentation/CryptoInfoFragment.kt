@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.Paint
 import android.os.Bundle
+import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -67,7 +68,7 @@ class CryptoInfoFragment : Fragment() {
             cryptoInfoViewModel.requestPriceFeed("BTCUSD")
             cryptoInfoViewModel.requestTickerV1("btcusd")
             cryptoInfoViewModel.requestTradeHistory("btcusd", 50)
-            //cryptoInfoViewModel.requestCandles("btcusd", "1m")
+            cryptoInfoViewModel.requestCandles("btcusd", "1m")
             swipeRefresh.isRefreshing = false
         }
 

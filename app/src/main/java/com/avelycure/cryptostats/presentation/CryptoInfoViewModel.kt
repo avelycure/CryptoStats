@@ -54,12 +54,28 @@ class CryptoInfoViewModel(
     }
 
     fun requestCandles(symbol: String, timeFrame: String) {
-        repo.getCandles(symbol, timeFrame)
+        makeRequestCandles(symbol, timeFrame)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponseCandles(data) }, {
                 Log.d("mytag", "error: ${it.message}")
             }, {})
+    }
+
+    private fun makeRequestCandles(
+        symbol: String,
+        timeFrame: String
+    ): Observable<List<List<Float>>> {
+        val networkStatus = NetworkStatus(context!!)
+        return networkStatus.isOnline().flatMap { isOnline ->
+            if (isOnline)
+                repo.getCandles(symbol, timeFrame)
+                    .repeatWhen { completed -> completed.delay(5, TimeUnit.SECONDS) }
+            else
+                Observable.fromCallable { emptyList<List<Float>>() }
+        }.retryWhen { error ->
+            error.take(3).delay(100, TimeUnit.MILLISECONDS)
+        }
     }
 
     fun requestTickerV2(symbol: String) {
@@ -137,12 +153,15 @@ class CryptoInfoViewModel(
             .subscribe({ data -> onResponseTradeHistory(data) }, {}, {})
     }
 
-    private fun makeRequestTradeHistory(symbol: String, limit: Int):Observable<List<TradeHistory>>{
+    private fun makeRequestTradeHistory(
+        symbol: String,
+        limit: Int
+    ): Observable<List<TradeHistory>> {
         val networkStatus = NetworkStatus(context!!)
         return networkStatus.isOnline().flatMap { isOnline ->
-            if(isOnline)
-                repo.getTrades(symbol, limit).repeatWhen {
-                    completed -> completed.delay(5, TimeUnit.SECONDS)
+            if (isOnline)
+                repo.getTrades(symbol, limit).repeatWhen { completed ->
+                    completed.delay(5, TimeUnit.SECONDS)
                 }
             else
                 Observable.fromCallable { emptyList<TradeHistory>() }
@@ -207,7 +226,7 @@ class CryptoInfoViewModel(
     }
 
     private fun onResponseCandles(candles: List<List<Float>>) {
-        /*val dataForChart = arrayListOf<Candle>()
+        val dataForChart = arrayListOf<Candle>()
         for (candle in candles)
             dataForChart.add(
                 Candle(
@@ -238,7 +257,7 @@ class CryptoInfoViewModel(
 
         _state.value = state.value?.copy(
             statistic = newStat
-        )*/
+        )
     }
 
     fun unixTimeToStringDate(timestamp: Long): String {
