@@ -50,7 +50,7 @@ class CryptoInfoFragment : Fragment() {
     private lateinit var rvTrades: RecyclerView
 
     private val cryptoInfoViewModel: CryptoInfoViewModel by viewModel()
-private lateinit var adapter: TradeAdapter
+    private lateinit var adapter: TradeAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -62,10 +62,10 @@ private lateinit var adapter: TradeAdapter
 
         swipeRefresh.setOnRefreshListener {
             cryptoInfoViewModel.requestTickerV2("btcusd")
-            cryptoInfoViewModel.requestCandles("btcusd", "1m")
             cryptoInfoViewModel.requestPriceFeed("BTCUSD")
             cryptoInfoViewModel.requestTickerV1("btcusd")
             cryptoInfoViewModel.requestTradeHistory("btcusd", 50)
+            cryptoInfoViewModel.requestCandles("btcusd", "1m")
             swipeRefresh.isRefreshing = false
         }
 

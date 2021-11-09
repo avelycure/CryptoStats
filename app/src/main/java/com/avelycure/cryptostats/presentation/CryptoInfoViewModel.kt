@@ -1,23 +1,26 @@
 package com.avelycure.cryptostats.presentation
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.avelycure.cryptostats.data.models.PriceFeed
-import com.avelycure.cryptostats.data.models.TickerV1
-import com.avelycure.cryptostats.data.models.TickerV2
-import com.avelycure.cryptostats.data.models.TradeHistory
+import com.avelycure.cryptostats.data.models.*
+import com.avelycure.cryptostats.data.network.INetworkStatus
+import com.avelycure.cryptostats.data.network.NetworkStatus
 import com.avelycure.cryptostats.data.repo.ICryptoRepo
+import io.reactivex.rxjava3.core.Observable
 import com.avelycure.cryptostats.domain.*
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 
 class CryptoInfoViewModel(
-    private val repo: ICryptoRepo
+    private val repo: ICryptoRepo,
+    private val networkStatus: INetworkStatus
 ) : ViewModel() {
 
     private val _state: MutableLiveData<CryptoInfoState> = MutableLiveData()
@@ -47,7 +50,7 @@ class CryptoInfoViewModel(
     }
 
     fun requestCandles(symbol: String, timeFrame: String) {
-        repo.getCandles(symbol, timeFrame)
+        makeRequestCandles(symbol, timeFrame)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponseCandles(data) }, {
@@ -55,32 +58,105 @@ class CryptoInfoViewModel(
             }, {})
     }
 
+    private fun makeRequestCandles(
+        symbol: String,
+        timeFrame: String
+    ): Observable<List<List<Float>>> {
+        return networkStatus.isOnline().flatMap { isOnline ->
+            if (isOnline)
+                repo.getCandles(symbol, timeFrame)
+                    .repeatWhen { completed -> completed.delay(5, TimeUnit.SECONDS) }
+            else
+                Observable.fromCallable { emptyList<List<Float>>() }
+        }.retryWhen { error ->
+            error.take(3).delay(100, TimeUnit.MILLISECONDS)
+        }
+    }
+
     fun requestTickerV2(symbol: String) {
-        repo.getTickerV2(symbol)
+        makeTickerRequest(symbol)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .subscribe({ data -> onResponseTickerV2(data) }, {}, {})
+            .subscribe({ data -> onResponseTickerV2(data) }, {
+                Log.d("mytag", "Error: ${it.message}")
+            }, {})
+    }
+
+    private fun makeTickerRequest(symbol: String): Observable<TickerV2> {
+        return networkStatus.isOnline().flatMap { isOnline ->
+            if (isOnline)
+                repo.getTickerV2(symbol)
+                    .repeatWhen { completed ->
+                        completed.delay(5, TimeUnit.SECONDS)
+                    }
+            else
+                Observable.fromCallable {
+                    TickerV2(
+                        "", 0f, 0f, 0f, 0f, emptyList<Float>(), 0f, 0f
+                    )
+                }
+        }.retryWhen { error ->
+            error.take(3).delay(100, TimeUnit.MILLISECONDS)
+        }
     }
 
     fun requestPriceFeed(pair: String) {
-        repo.getPriceFeed()
+        makePriceFeedRequest()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .subscribe({ data -> onResponsePriceFeed(data, pair) }, {}, {})
+            .subscribe({ data -> onResponsePriceFeed(data, pair) }, {
+                Log.d("mytag", "Errorpf: ${it.message}")
+            }, {})
+    }
+
+    private fun makePriceFeedRequest(): Observable<List<PriceFeed>> {
+        return networkStatus.isOnline().flatMap { isOnline ->
+            if (isOnline)
+                repo.getPriceFeed()
+                    .repeatWhen { completed -> completed.delay(5, TimeUnit.SECONDS) }
+            else
+                Observable.fromCallable { emptyList<PriceFeed>() }
+        }.retryWhen { error ->
+            error.take(3).delay(100, TimeUnit.MILLISECONDS)
+        }
     }
 
     fun requestTickerV1(symbol: String) {
-        repo.getTickerV1(symbol)
+        makeTickerV1Request(symbol)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponseTickerV1(data) }, {}, {})
     }
 
+    private fun makeTickerV1Request(symbol: String): Observable<TickerV1> {
+        return networkStatus.isOnline().flatMap { isOnline ->
+            if (isOnline)
+                repo.getTickerV1(symbol)
+                    .repeatWhen { completed -> completed.delay(5, TimeUnit.SECONDS) }
+            else
+                Observable.fromCallable { TickerV1(0f, 0f, 0f, VolumeBtcUsd(0f, 0f, 0)) }
+        }.repeatWhen { error -> error.take(3).delay(100, TimeUnit.MILLISECONDS) }
+    }
+
     fun requestTradeHistory(symbol: String, limit: Int) {
-        repo.getTrades(symbol, limit)
+        makeRequestTradeHistory(symbol, limit)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponseTradeHistory(data) }, {}, {})
+    }
+
+    private fun makeRequestTradeHistory(
+        symbol: String,
+        limit: Int
+    ): Observable<List<TradeHistory>> {
+        return networkStatus.isOnline().flatMap { isOnline ->
+            if (isOnline)
+                repo.getTrades(symbol, limit).repeatWhen { completed ->
+                    completed.delay(5, TimeUnit.SECONDS)
+                }
+            else
+                Observable.fromCallable { emptyList<TradeHistory>() }
+        }.repeatWhen { error -> error.take(3).delay(100, TimeUnit.MILLISECONDS) }
     }
 
     private fun onResponseTradeHistory(data: List<TradeHistory>) {
