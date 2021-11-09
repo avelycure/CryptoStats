@@ -94,7 +94,7 @@ class CryptoInfoViewModel(
     }
 
     fun requestPriceFeed(pair: String) {
-        makePriceFeedRequest(pair)
+        makePriceFeedRequest()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponsePriceFeed(data, pair) }, {
@@ -102,16 +102,17 @@ class CryptoInfoViewModel(
             }, {})
     }
 
-    fun makePriceFeedRequest(pair: String): Observable<List<PriceFeed>> {
+    private fun makePriceFeedRequest(): Observable<List<PriceFeed>> {
         val networkStatus = NetworkStatus(context!!)
-        return networkStatus.isOnlineSingle().flatMap { isOnline ->
+        return networkStatus.isOnline().flatMap { isOnline ->
             if (isOnline)
                 repo.getPriceFeed()
+                    .repeatWhen { completed -> completed.delay(5, TimeUnit.SECONDS) }
             else
-                Single.fromCallable { emptyList<PriceFeed>() }
+                Observable.fromCallable { emptyList<PriceFeed>() }
         }.retryWhen { error ->
             error.take(3).delay(100, TimeUnit.MILLISECONDS)
-        }.toObservable()
+        }
     }
 
     fun requestTickerV1(symbol: String) {

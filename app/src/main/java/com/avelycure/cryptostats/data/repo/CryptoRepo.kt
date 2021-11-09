@@ -20,7 +20,7 @@ class CryptoRepo(
         return apiService.getTickerV2(symbol)
     }
 
-    override fun getPriceFeed(): Single<List<PriceFeed>> {
+    override fun getPriceFeed(): Observable<List<PriceFeed>> {
         return apiService.getPriceFeed()
     }
 

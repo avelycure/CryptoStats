@@ -30,5 +30,5 @@ interface GeminiApiService {
     fun getTickerV1(@Path("symbol") symbol: String): Observable<TickerV1>
 
     @GET("v1/pricefeed")
-    fun getPriceFeed(): Single<List<PriceFeed>>
+    fun getPriceFeed(): Observable<List<PriceFeed>>
 }
