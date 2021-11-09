@@ -7,7 +7,7 @@ import com.avelycure.cryptostats.domain.Statistic24h
 import com.avelycure.cryptostats.domain.Ticker
 import com.avelycure.cryptostats.domain.Trade
 
-@Entity
+@Entity(tableName = "screen_state")
 data class ScreenState(
     @PrimaryKey
     val id: Int,
