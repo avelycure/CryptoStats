@@ -7,10 +7,7 @@ import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.avelycure.cryptostats.data.models.PriceFeed
-import com.avelycure.cryptostats.data.models.TickerV1
-import com.avelycure.cryptostats.data.models.TickerV2
-import com.avelycure.cryptostats.data.models.TradeHistory
+import com.avelycure.cryptostats.data.models.*
 import com.avelycure.cryptostats.data.network.NetworkStatus
 import com.avelycure.cryptostats.data.repo.ICryptoRepo
 import io.reactivex.rxjava3.core.Observable
@@ -116,10 +113,21 @@ class CryptoInfoViewModel(
     }
 
     fun requestTickerV1(symbol: String) {
-        repo.getTickerV1(symbol)
+        makeTickerV1Request(symbol)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponseTickerV1(data) }, {}, {})
+    }
+
+    private fun makeTickerV1Request(symbol: String): Observable<TickerV1> {
+        val networkStatus = NetworkStatus(context!!)
+        return networkStatus.isOnline().flatMap { isOnline ->
+            if (isOnline)
+                repo.getTickerV1(symbol)
+                    .repeatWhen { completed -> completed.delay(5, TimeUnit.SECONDS) }
+            else
+                Observable.fromCallable { TickerV1(0f, 0f, 0f, VolumeBtcUsd(0f, 0f, 0)) }
+        }.repeatWhen { error -> error.take(3).delay(100, TimeUnit.MILLISECONDS) }
     }
 
     fun requestTradeHistory(symbol: String, limit: Int) {
