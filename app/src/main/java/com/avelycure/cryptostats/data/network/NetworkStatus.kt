@@ -6,7 +6,6 @@ import android.net.Network
 import android.net.NetworkRequest
 import androidx.core.content.getSystemService
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 
 class NetworkStatus(
@@ -37,9 +36,5 @@ class NetworkStatus(
 
     override fun isOnline(): Observable<Boolean> {
         return statusSubject
-    }
-
-    override fun isOnlineSingle(): Single<Boolean> {
-        return statusSubject.first(false)
     }
 }

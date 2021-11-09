@@ -2,7 +2,6 @@ package com.avelycure.cryptostats.data.api_service
 
 import com.avelycure.cryptostats.data.models.*
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.Single
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query

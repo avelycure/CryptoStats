@@ -2,8 +2,6 @@ package com.avelycure.cryptostats.presentation
 
 import android.content.Context
 import android.util.Log
-import android.util.TimeUtils
-import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,8 +11,6 @@ import com.avelycure.cryptostats.data.repo.ICryptoRepo
 import io.reactivex.rxjava3.core.Observable
 import com.avelycure.cryptostats.domain.*
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 import java.text.SimpleDateFormat
 import java.util.*
