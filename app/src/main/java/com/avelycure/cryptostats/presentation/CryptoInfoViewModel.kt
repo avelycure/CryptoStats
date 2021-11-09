@@ -1,8 +1,8 @@
 package com.avelycure.cryptostats.presentation
 
 import android.content.Context
-import android.net.NetworkRequest
 import android.util.Log
+import android.util.TimeUtils
 import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -13,12 +13,15 @@ import com.avelycure.cryptostats.data.models.TickerV2
 import com.avelycure.cryptostats.data.models.TradeHistory
 import com.avelycure.cryptostats.data.network.NetworkStatus
 import com.avelycure.cryptostats.data.repo.ICryptoRepo
+import io.reactivex.rxjava3.core.Observable
 import com.avelycure.cryptostats.domain.*
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 
 class CryptoInfoViewModel(
@@ -66,25 +69,23 @@ class CryptoInfoViewModel(
         makeTickerRequest(symbol)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .subscribe { data -> onResponseTickerV2(data) }
+            .subscribe({ data -> onResponseTickerV2(data) }, {}, {})
     }
 
-    private fun makeTickerRequest(symbol: String): Single<TickerV2> {
+    private fun makeTickerRequest(symbol: String): Observable<TickerV2> {
         val networkStatus = NetworkStatus(context!!)
         return networkStatus.isOnlineSingle().flatMap { isOnline ->
-            if (isOnline) {
+            if (isOnline)
                 repo.getTickerV2(symbol)
-                    .flatMap {
-                        Single.fromCallable { it }
-                    }
-            } else {
+            else
                 Single.fromCallable {
                     TickerV2(
                         "", 0f, 0f, 0f, 0f, emptyList<Float>(), 0f, 0f
                     )
                 }
-            }
-        }
+        }.retryWhen { error ->
+            error.take(3).delay(100, TimeUnit.MILLISECONDS)
+        }.toObservable()
     }
 
     fun requestPriceFeed(pair: String) {
