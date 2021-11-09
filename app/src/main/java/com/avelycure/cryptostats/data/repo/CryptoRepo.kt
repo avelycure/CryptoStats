@@ -16,11 +16,11 @@ class CryptoRepo(
         return apiService.getCandles(symbol, timeFrame)
     }
 
-    override fun getTickerV2(symbol: String): Single<TickerV2> {
+    override fun getTickerV2(symbol: String): Observable<TickerV2> {
         return apiService.getTickerV2(symbol)
     }
 
-    override fun getPriceFeed(): Observable<List<PriceFeed>> {
+    override fun getPriceFeed(): Single<List<PriceFeed>> {
         return apiService.getPriceFeed()
     }
 

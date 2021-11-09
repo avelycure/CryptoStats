@@ -69,30 +69,49 @@ class CryptoInfoViewModel(
         makeTickerRequest(symbol)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .subscribe({ data -> onResponseTickerV2(data) }, {}, {})
+            .subscribe({ data -> onResponseTickerV2(data) }, {
+                Log.d("mytag", "Error: ${it.message}")
+            }, {})
     }
 
     private fun makeTickerRequest(symbol: String): Observable<TickerV2> {
         val networkStatus = NetworkStatus(context!!)
-        return networkStatus.isOnlineSingle().flatMap { isOnline ->
+        return networkStatus.isOnline().flatMap { isOnline ->
             if (isOnline)
                 repo.getTickerV2(symbol)
+                    .repeatWhen { completed ->
+                        completed.delay(5, TimeUnit.SECONDS)
+                    }
             else
-                Single.fromCallable {
+                Observable.fromCallable {
                     TickerV2(
                         "", 0f, 0f, 0f, 0f, emptyList<Float>(), 0f, 0f
                     )
                 }
         }.retryWhen { error ->
             error.take(3).delay(100, TimeUnit.MILLISECONDS)
-        }.toObservable()
+        }
     }
 
     fun requestPriceFeed(pair: String) {
-        repo.getPriceFeed()
+        makePriceFeedRequest(pair)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .subscribe({ data -> onResponsePriceFeed(data, pair) }, {}, {})
+            .subscribe({ data -> onResponsePriceFeed(data, pair) }, {
+                Log.d("mytag", "Errorpf: ${it.message}")
+            }, {})
+    }
+
+    fun makePriceFeedRequest(pair: String): Observable<List<PriceFeed>> {
+        val networkStatus = NetworkStatus(context!!)
+        return networkStatus.isOnlineSingle().flatMap { isOnline ->
+            if (isOnline)
+                repo.getPriceFeed()
+            else
+                Single.fromCallable { emptyList<PriceFeed>() }
+        }.retryWhen { error ->
+            error.take(3).delay(100, TimeUnit.MILLISECONDS)
+        }.toObservable()
     }
 
     fun requestTickerV1(symbol: String) {
