@@ -131,10 +131,22 @@ class CryptoInfoViewModel(
     }
 
     fun requestTradeHistory(symbol: String, limit: Int) {
-        repo.getTrades(symbol, limit)
+        makeRequestTradeHistory(symbol, limit)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponseTradeHistory(data) }, {}, {})
+    }
+
+    private fun makeRequestTradeHistory(symbol: String, limit: Int):Observable<List<TradeHistory>>{
+        val networkStatus = NetworkStatus(context!!)
+        return networkStatus.isOnline().flatMap { isOnline ->
+            if(isOnline)
+                repo.getTrades(symbol, limit).repeatWhen {
+                    completed -> completed.delay(5, TimeUnit.SECONDS)
+                }
+            else
+                Observable.fromCallable { emptyList<TradeHistory>() }
+        }.repeatWhen { error -> error.take(3).delay(100, TimeUnit.MILLISECONDS) }
     }
 
     private fun onResponseTradeHistory(data: List<TradeHistory>) {
