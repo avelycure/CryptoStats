@@ -1,6 +1,7 @@
 package com.avelycure.cryptostats.presentation
 
 import android.content.Context
+import android.provider.ContactsContract
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,6 +12,7 @@ import com.avelycure.cryptostats.data.network.NetworkStatus
 import com.avelycure.cryptostats.data.repo.ICryptoRepo
 import io.reactivex.rxjava3.core.Observable
 import com.avelycure.cryptostats.domain.*
+import com.avelycure.cryptostats.domain.state.DataState
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 import java.text.SimpleDateFormat
@@ -82,7 +84,7 @@ class CryptoInfoViewModel(
             }, {})
     }
 
-    private fun makeTickerRequest(symbol: String): Observable<TickerV2> {
+    /*private fun makeTickerRequest(symbol: String): Observable<TickerV2> {
         return networkStatus.isOnline().flatMap { isOnline ->
             if (isOnline)
                 repo.getTickerV2(symbol)
@@ -98,6 +100,11 @@ class CryptoInfoViewModel(
         }.retryWhen { error ->
             error.take(3).delay(100, TimeUnit.MILLISECONDS)
         }
+    }*/
+
+
+    private fun makeTickerRequest(symbol: String): Observable<DataState<TickerV2>> {
+        return repo.getTickerV2(symbol)
     }
 
     fun requestPriceFeed(pair: String) {
@@ -197,23 +204,28 @@ class CryptoInfoViewModel(
             }
     }
 
-    private fun onResponseTickerV2(data: TickerV2) {
-        val dataForChart = arrayListOf<Point>()
-        for (i in 0 until data.changes.size)
-            dataForChart.add(Point(24F - i.toFloat(), data.changes[i]))
+    private fun onResponseTickerV2(data: DataState<TickerV2>) {
+        if(data is DataState.DataRemote){
+            val dataForChart = arrayListOf<Point>()
+            for (i in 0 until data.data.changes.size)
+                dataForChart.add(Point(24F - i.toFloat(), data.data.changes[i]))
 
-        dataForChart.sortBy { it.x }
+            dataForChart.sortBy { it.x }
 
-        _state.value = state.value?.copy(
-            statistic = Statistic24h(
-                symbol = data.symbol,
-                high = data.high,
-                low = data.low,
-                open = data.open,
-                changes = dataForChart,
-                candles = _state.value?.statistic?.candles?.toList() ?: emptyList()
+            _state.value = state.value?.copy(
+                statistic = Statistic24h(
+                    symbol = data.data.symbol,
+                    high = data.data.high,
+                    low = data.data.low,
+                    open = data.data.open,
+                    changes = dataForChart,
+                    candles = _state.value?.statistic?.candles?.toList() ?: emptyList()
+                )
             )
-        )
+        }
+        if(data is DataState.DataCache){
+            Log.d("mytag", "I got cache data")
+        }
     }
 
     private fun onResponseCandles(candles: List<List<Float>>) {

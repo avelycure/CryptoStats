@@ -2,11 +2,11 @@ package com.avelycure.cryptostats.domain.state
 
 sealed class DataState<T> {
     data class DataRemote<T>(
-        val data: T? = null
+        val data: T
     ) : DataState<T>()
 
     data class DataCache<T>(
-        val data: T? = null
+        val data: T
     ) : DataState<T>()
 
     data class Response<T>(
