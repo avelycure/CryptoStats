@@ -58,8 +58,6 @@ class CryptoInfoFragment : Fragment() {
     ): View {
         val view = inflater.inflate(R.layout.fragment_crypto_info, container, false)
 
-        cryptoInfoViewModel.context = requireContext()
-
         initViews(view)
 
         swipeRefresh.setOnRefreshListener {

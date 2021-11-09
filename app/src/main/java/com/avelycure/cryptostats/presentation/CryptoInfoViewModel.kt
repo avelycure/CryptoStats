@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.avelycure.cryptostats.data.models.*
+import com.avelycure.cryptostats.data.network.INetworkStatus
 import com.avelycure.cryptostats.data.network.NetworkStatus
 import com.avelycure.cryptostats.data.repo.ICryptoRepo
 import io.reactivex.rxjava3.core.Observable
@@ -18,10 +19,9 @@ import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 
 class CryptoInfoViewModel(
-    private val repo: ICryptoRepo
+    private val repo: ICryptoRepo,
+    private val networkStatus: INetworkStatus
 ) : ViewModel() {
-
-    var context: Context? = null
 
     private val _state: MutableLiveData<CryptoInfoState> = MutableLiveData()
     val state: LiveData<CryptoInfoState>
@@ -62,7 +62,6 @@ class CryptoInfoViewModel(
         symbol: String,
         timeFrame: String
     ): Observable<List<List<Float>>> {
-        val networkStatus = NetworkStatus(context!!)
         return networkStatus.isOnline().flatMap { isOnline ->
             if (isOnline)
                 repo.getCandles(symbol, timeFrame)
@@ -84,7 +83,6 @@ class CryptoInfoViewModel(
     }
 
     private fun makeTickerRequest(symbol: String): Observable<TickerV2> {
-        val networkStatus = NetworkStatus(context!!)
         return networkStatus.isOnline().flatMap { isOnline ->
             if (isOnline)
                 repo.getTickerV2(symbol)
@@ -112,7 +110,6 @@ class CryptoInfoViewModel(
     }
 
     private fun makePriceFeedRequest(): Observable<List<PriceFeed>> {
-        val networkStatus = NetworkStatus(context!!)
         return networkStatus.isOnline().flatMap { isOnline ->
             if (isOnline)
                 repo.getPriceFeed()
@@ -132,7 +129,6 @@ class CryptoInfoViewModel(
     }
 
     private fun makeTickerV1Request(symbol: String): Observable<TickerV1> {
-        val networkStatus = NetworkStatus(context!!)
         return networkStatus.isOnline().flatMap { isOnline ->
             if (isOnline)
                 repo.getTickerV1(symbol)
@@ -153,7 +149,6 @@ class CryptoInfoViewModel(
         symbol: String,
         limit: Int
     ): Observable<List<TradeHistory>> {
-        val networkStatus = NetworkStatus(context!!)
         return networkStatus.isOnline().flatMap { isOnline ->
             if (isOnline)
                 repo.getTrades(symbol, limit).repeatWhen { completed ->
