@@ -1,5 +1,6 @@
 package com.avelycure.cryptostats.di
 
+import android.content.Context
 import com.avelycure.cryptostats.common.Constants
 import com.avelycure.cryptostats.data.api_service.GeminiApiService
 import com.avelycure.cryptostats.data.network.INetworkStatus
@@ -13,11 +14,28 @@ import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import com.avelycure.cryptostats.data.room.AppDatabase
+
+import androidx.room.Room
+import com.avelycure.cryptostats.App
+import com.avelycure.cryptostats.data.room.dao.ScreenDao
+
 
 val appModule = module {
-    single<ICryptoRepo> { CryptoRepo(get(), get()) }
+    single<ICryptoRepo> { CryptoRepo(get(), get(), get()) }
 
     single<INetworkStatus> { NetworkStatus(get()) }
+
+    fun provideAppDatabase(context: Context) =
+        Room.databaseBuilder(context, AppDatabase::class.java, "database")
+            //.allowMainThreadQueries()
+            //.fallbackToDestructiveMigration()
+            .build()
+
+    fun provideScreenDao(appDatabase: AppDatabase) = appDatabase.screenDao()
+
+    single { provideAppDatabase(get()) }
+    single { provideScreenDao(get()) }
 
     viewModel { CryptoInfoViewModel(get(), get()) }
 

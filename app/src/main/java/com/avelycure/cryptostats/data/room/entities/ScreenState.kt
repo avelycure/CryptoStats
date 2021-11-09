@@ -9,11 +9,8 @@ import com.avelycure.cryptostats.domain.Trade
 
 @Entity(tableName = "screen_state")
 data class ScreenState(
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     val id: Int,
     val dateOfSave: Long,
-    val statistic: Statistic24h,
-    val coinPrice: CoinPrice,
-    val ticker: Ticker,
-    val trades: List<Trade>
+    val high: Float
 )

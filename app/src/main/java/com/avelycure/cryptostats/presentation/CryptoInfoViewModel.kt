@@ -1,15 +1,13 @@
 package com.avelycure.cryptostats.presentation
 
-import android.content.Context
-import android.provider.ContactsContract
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.avelycure.cryptostats.data.models.*
 import com.avelycure.cryptostats.data.network.INetworkStatus
-import com.avelycure.cryptostats.data.network.NetworkStatus
 import com.avelycure.cryptostats.data.repo.ICryptoRepo
+import com.avelycure.cryptostats.data.room.dao.ScreenDao
 import io.reactivex.rxjava3.core.Observable
 import com.avelycure.cryptostats.domain.*
 import com.avelycure.cryptostats.domain.state.DataState
@@ -83,25 +81,6 @@ class CryptoInfoViewModel(
                 Log.d("mytag", "Error: ${it.message}")
             }, {})
     }
-
-    /*private fun makeTickerRequest(symbol: String): Observable<TickerV2> {
-        return networkStatus.isOnline().flatMap { isOnline ->
-            if (isOnline)
-                repo.getTickerV2(symbol)
-                    .repeatWhen { completed ->
-                        completed.delay(5, TimeUnit.SECONDS)
-                    }
-            else
-                Observable.fromCallable {
-                    TickerV2(
-                        "", 0f, 0f, 0f, 0f, emptyList<Float>(), 0f, 0f
-                    )
-                }
-        }.retryWhen { error ->
-            error.take(3).delay(100, TimeUnit.MILLISECONDS)
-        }
-    }*/
-
 
     private fun makeTickerRequest(symbol: String): Observable<DataState<TickerV2>> {
         return repo.getTickerV2(symbol)
@@ -224,7 +203,22 @@ class CryptoInfoViewModel(
             )
         }
         if(data is DataState.DataCache){
-            Log.d("mytag", "I got cache data")
+            val dataForChart = arrayListOf<Point>()
+            for (i in 0 until data.data.changes.size)
+                dataForChart.add(Point(24F - i.toFloat(), data.data.changes[i]))
+
+            dataForChart.sortBy { it.x }
+
+            _state.value = state.value?.copy(
+                statistic = Statistic24h(
+                    symbol = data.data.symbol,
+                    high = data.data.high,
+                    low = data.data.low,
+                    open = data.data.open,
+                    changes = dataForChart,
+                    candles = _state.value?.statistic?.candles?.toList() ?: emptyList()
+                )
+            )
         }
     }
 
