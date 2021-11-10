@@ -102,16 +102,8 @@ class CryptoInfoViewModel(
             }, {})
     }
 
-    private fun makePriceFeedRequest(): Observable<List<PriceFeed>> {
-        return networkStatus.isOnline().flatMap { isOnline ->
-            if (isOnline)
-                repo.getPriceFeed()
-                    .repeatWhen { completed -> completed.delay(5, TimeUnit.SECONDS) }
-            else
-                Observable.fromCallable { emptyList<PriceFeed>() }
-        }.retryWhen { error ->
-            error.take(3).delay(100, TimeUnit.MILLISECONDS)
-        }
+    private fun makePriceFeedRequest(): Observable<DataState<List<PriceFeed>>> {
+        return repo.getPriceFeed()
     }
 
     fun requestTickerV1(symbol: String) {
@@ -187,17 +179,33 @@ class CryptoInfoViewModel(
         )
     }
 
-    private fun onResponsePriceFeed(data: List<PriceFeed>, pair: String) {
-        for (i in data)
-            if (i.pair == pair) {
-                _state.value = _state.value?.copy(
-                    coinPrice = CoinPrice(
-                        price = i.price,
-                        percentChange24h = i.percentChange24h
+    private fun onResponsePriceFeed(data: DataState<List<PriceFeed>>, pair: String) {
+        if(data is DataState.DataRemote){
+            Log.d("mytag", "View model remote")
+            for (i in data.data)
+                if (i.pair == pair) {
+                    _state.value = _state.value?.copy(
+                        coinPrice = CoinPrice(
+                            price = i.price,
+                            percentChange24h = i.percentChange24h
+                        )
                     )
-                )
-                break
-            }
+                    break
+                }
+        }
+        if(data is DataState.DataCache){
+            Log.d("mytag", "View model cache")
+            for (i in data.data)
+                if (i.pair == pair) {
+                    _state.value = _state.value?.copy(
+                        coinPrice = CoinPrice(
+                            price = i.price,
+                            percentChange24h = i.percentChange24h
+                        )
+                    )
+                    break
+                }
+        }
     }
 
     private fun onResponseTicker(data: DataState<Ticker>) {

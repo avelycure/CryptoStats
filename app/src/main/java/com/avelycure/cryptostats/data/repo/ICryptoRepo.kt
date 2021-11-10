@@ -13,7 +13,7 @@ interface ICryptoRepo {
 
     fun getTicker(symbol: String): Observable<DataState<Ticker>>
 
-    fun getPriceFeed(): Observable<List<PriceFeed>>
+    fun getPriceFeed(): Observable<DataState<List<PriceFeed>>>
 
     fun getTickerV1(symbol: String):Observable<TickerV1>
 

@@ -17,6 +17,9 @@ interface ScreenDao {
     @Query("SELECT * FROM price_feed")
     fun getPriceFeed(): List<PriceFeedEntity>
 
+    @Query("DELETE FROM price_feed")
+    fun dropPriceFeedTable()
+
     @Query("SELECT * FROM ticker")
     fun getTicker(): List<TickerEntity>
 }
