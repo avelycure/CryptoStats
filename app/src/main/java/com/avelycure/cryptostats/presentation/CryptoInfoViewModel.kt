@@ -42,8 +42,14 @@ class CryptoInfoViewModel(
                 percentChange24h = ""
             ),
             ticker = Ticker(
-                bid = 0F,
-                ask = 0F
+                bid = 0f,
+                ask = 0f,
+                high = 0f,
+                low = 0f,
+                changes = emptyList(),
+                close = 0f,
+                symbol = "",
+                open = 0f
             ),
             trades = emptyList()
         )
@@ -73,17 +79,18 @@ class CryptoInfoViewModel(
         }
     }
 
-    fun requestTickerV2(symbol: String) {
+    fun requestTicker(symbol: String) {
         makeTickerRequest(symbol)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .subscribe({ data -> onResponseTickerV2(data) }, {
+            .subscribe({ data -> onResponseTicker(data) }, {
                 Log.d("mytag", "Error: ${it.message}")
             }, {})
     }
 
-    private fun makeTickerRequest(symbol: String): Observable<DataState<TickerV2>> {
-        return repo.getTickerV2(symbol)
+    private fun makeTickerRequest(symbol: String): Observable<DataState<Ticker>> {
+        Log.d("mytag", "Make request to ticker")
+        return repo.getTicker(symbol)
     }
 
     fun requestPriceFeed(pair: String) {
@@ -162,11 +169,21 @@ class CryptoInfoViewModel(
     }
 
     private fun onResponseTickerV1(data: TickerV1) {
+        val newTicker = _state.value?.ticker?.copy(
+            bid = data.bid,
+            ask = data.ask
+        ) ?: Ticker(
+            bid = 0f,
+            ask = 0f,
+            high = 0f,
+            low = 0f,
+            changes = emptyList(),
+            close = 0f,
+            symbol = "",
+            open = 0f
+        )
         _state.value = _state.value?.copy(
-            ticker = Ticker(
-                bid = data.bid,
-                ask = data.ask
-            )
+            ticker = newTicker
         )
     }
 
@@ -183,8 +200,10 @@ class CryptoInfoViewModel(
             }
     }
 
-    private fun onResponseTickerV2(data: DataState<TickerV2>) {
-        if(data is DataState.DataRemote){
+    private fun onResponseTicker(data: DataState<Ticker>) {
+        Log.d("mytag", "Got response from ticker")
+        if (data is DataState.DataRemote) {
+        Log.d("mytag", "Remote")
             val dataForChart = arrayListOf<Point>()
             for (i in 0 until data.data.changes.size)
                 dataForChart.add(Point(24F - i.toFloat(), data.data.changes[i]))
@@ -202,7 +221,8 @@ class CryptoInfoViewModel(
                 )
             )
         }
-        if(data is DataState.DataCache){
+        if (data is DataState.DataCache) {
+        Log.d("mytag", "Cache")
             val dataForChart = arrayListOf<Point>()
             for (i in 0 until data.data.changes.size)
                 dataForChart.add(Point(24F - i.toFloat(), data.data.changes[i]))

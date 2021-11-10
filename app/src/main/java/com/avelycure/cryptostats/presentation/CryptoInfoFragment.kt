@@ -61,7 +61,7 @@ class CryptoInfoFragment : Fragment() {
         initViews(view)
 
         swipeRefresh.setOnRefreshListener {
-            cryptoInfoViewModel.requestTickerV2("btcusd")
+            cryptoInfoViewModel.requestTicker("btcusd")
             /*cryptoInfoViewModel.requestPriceFeed("BTCUSD")
             cryptoInfoViewModel.requestTickerV1("btcusd")
             cryptoInfoViewModel.requestTradeHistory("btcusd", 50)
