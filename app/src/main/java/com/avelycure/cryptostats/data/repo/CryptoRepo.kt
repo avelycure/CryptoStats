@@ -8,6 +8,7 @@ import com.avelycure.cryptostats.data.room.dao.ScreenDao
 import com.avelycure.cryptostats.data.room.entities.toTicker
 import com.avelycure.cryptostats.domain.Ticker
 import com.avelycure.cryptostats.domain.state.DataState
+import com.avelycure.cryptostats.domain.state.UIComponent
 import io.reactivex.rxjava3.core.Observable
 import java.util.concurrent.TimeUnit
 
