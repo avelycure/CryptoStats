@@ -2,6 +2,8 @@ package com.avelycure.cryptostats.data.room.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
+import com.avelycure.cryptostats.data.room.type_converters.ConverterListFloat
 import com.avelycure.cryptostats.domain.Ticker
 
 @Entity(tableName = "ticker")
@@ -16,6 +18,8 @@ data class TickerEntity(
     val high: Float,
     val low: Float,
     val close: Float,
+    @TypeConverters(ConverterListFloat::class)
+    val changes: List<Float>
 )
 
 fun TickerEntity.toTicker(): Ticker {
@@ -27,6 +31,6 @@ fun TickerEntity.toTicker(): Ticker {
         open = open,
         close = close,
         low = low,
-        changes = emptyList()
+        changes = changes
     )
 }

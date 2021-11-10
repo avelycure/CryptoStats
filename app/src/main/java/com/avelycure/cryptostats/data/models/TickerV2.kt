@@ -24,8 +24,8 @@ fun TickerV2.toTickerEntity(): TickerEntity {
         high = high,
         open = open,
         close = close,
-        low = low
-        //changes = changes
+        low = low,
+        changes = changes
     )
 }
 
