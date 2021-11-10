@@ -5,10 +5,7 @@ import com.avelycure.cryptostats.data.api_service.GeminiApiService
 import com.avelycure.cryptostats.data.models.*
 import com.avelycure.cryptostats.data.network.INetworkStatus
 import com.avelycure.cryptostats.data.room.dao.ScreenDao
-import com.avelycure.cryptostats.data.room.entities.ScreenState
 import com.avelycure.cryptostats.data.room.entities.toTicker
-import com.avelycure.cryptostats.domain.CoinPrice
-import com.avelycure.cryptostats.domain.Statistic24h
 import com.avelycure.cryptostats.domain.Ticker
 import com.avelycure.cryptostats.domain.state.DataState
 import io.reactivex.rxjava3.core.Observable
