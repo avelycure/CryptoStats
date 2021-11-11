@@ -1,5 +1,6 @@
 package com.avelycure.cryptostats.presentation
 
+import android.provider.ContactsContract
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -113,14 +114,8 @@ class CryptoInfoViewModel(
             .subscribe({ data -> onResponseTickerV1(data) }, {}, {})
     }
 
-    private fun makeTickerV1Request(symbol: String): Observable<TickerV1> {
-        return networkStatus.isOnline().flatMap { isOnline ->
-            if (isOnline)
-                repo.getTickerV1(symbol)
-                    .repeatWhen { completed -> completed.delay(5, TimeUnit.SECONDS) }
-            else
-                Observable.fromCallable { TickerV1(0f, 0f, 0f, VolumeBtcUsd(0f, 0f, 0)) }
-        }.repeatWhen { error -> error.take(3).delay(100, TimeUnit.MILLISECONDS) }
+    private fun makeTickerV1Request(symbol: String): Observable<DataState<TickerV1Model>> {
+        return repo.getTickerV1(symbol)
     }
 
     fun requestTradeHistory(symbol: String, limit: Int) {
@@ -160,23 +155,43 @@ class CryptoInfoViewModel(
         )
     }
 
-    private fun onResponseTickerV1(data: TickerV1) {
-        val newTicker = _state.value?.ticker?.copy(
-            bid = data.bid,
-            ask = data.ask
-        ) ?: Ticker(
-            bid = 0f,
-            ask = 0f,
-            high = 0f,
-            low = 0f,
-            changes = emptyList(),
-            close = 0f,
-            symbol = "",
-            open = 0f
-        )
-        _state.value = _state.value?.copy(
-            ticker = newTicker
-        )
+    private fun onResponseTickerV1(data: DataState<TickerV1Model>) {
+        if(data is DataState.DataRemote){
+            val newTicker = _state.value?.ticker?.copy(
+                bid = data.data.bid,
+                ask = data.data.ask
+            ) ?: Ticker(
+                bid = 0f,
+                ask = 0f,
+                high = 0f,
+                low = 0f,
+                changes = emptyList(),
+                close = 0f,
+                symbol = "",
+                open = 0f
+            )
+            _state.value = _state.value?.copy(
+                ticker = newTicker
+            )
+        }
+        if(data is DataState.DataCache){
+            val newTicker = _state.value?.ticker?.copy(
+                bid = data.data.bid,
+                ask = data.data.ask
+            ) ?: Ticker(
+                bid = 0f,
+                ask = 0f,
+                high = 0f,
+                low = 0f,
+                changes = emptyList(),
+                close = 0f,
+                symbol = "",
+                open = 0f
+            )
+            _state.value = _state.value?.copy(
+                ticker = newTicker
+            )
+        }
     }
 
     private fun onResponsePriceFeed(data: DataState<List<PriceFeed>>, pair: String) {

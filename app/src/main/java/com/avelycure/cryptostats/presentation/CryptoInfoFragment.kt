@@ -63,7 +63,8 @@ class CryptoInfoFragment : Fragment() {
         swipeRefresh.setOnRefreshListener {
             cryptoInfoViewModel.requestTicker("btcusd")
             cryptoInfoViewModel.requestPriceFeed("BTCUSD")
-            /*cryptoInfoViewModel.requestTickerV1("btcusd")
+            cryptoInfoViewModel.requestTickerV1("btcusd")
+            /*
             cryptoInfoViewModel.requestTradeHistory("btcusd", 50)
             cryptoInfoViewModel.requestCandles("btcusd", "1m")*/
             swipeRefresh.isRefreshing = false

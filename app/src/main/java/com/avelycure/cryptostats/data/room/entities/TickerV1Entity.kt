@@ -1,8 +1,10 @@
 package com.avelycure.cryptostats.data.room.entities
 
+import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.avelycure.cryptostats.domain.TickerV1Model
 
+@Entity
 data class TickerV1Entity(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
