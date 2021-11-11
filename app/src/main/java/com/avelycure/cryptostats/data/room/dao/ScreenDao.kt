@@ -11,6 +11,9 @@ interface ScreenDao {
     @Insert
     fun insertTicker(ticker: TickerEntity)
 
+    @Query("SELECT * FROM ticker")
+    fun getTicker(): List<TickerEntity>
+
     @Insert
     fun insertPriceFeed(priceFeed: PriceFeedEntity)
 
@@ -19,7 +22,4 @@ interface ScreenDao {
 
     @Query("DELETE FROM price_feed")
     fun dropPriceFeedTable()
-
-    @Query("SELECT * FROM ticker")
-    fun getTicker(): List<TickerEntity>
 }
