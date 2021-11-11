@@ -8,14 +8,14 @@ class ConverterListListFloat {
     @TypeConverter
     fun fromListListFloat(value: List<List<Float>>): String {
         val gson = Gson()
-        val type = object : TypeToken<List<Float>>() {}.type
+        val type = object : TypeToken<List<List<Float>>>() {}.type
         return gson.toJson(value, type)
     }
 
     @TypeConverter
     fun toListListFloat(value: String): List<List<Float>> {
         val gson = Gson()
-        val type = object : TypeToken<List<Float>>() {}.type
+        val type = object : TypeToken<List<List<Float>>>() {}.type
         return gson.fromJson(value, type)
     }
 }

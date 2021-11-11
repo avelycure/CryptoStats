@@ -29,15 +29,15 @@ class CryptoRepo(
                         screenDao.insertCandles(candles.toCandlesEntity())
                         Observable.fromCallable { DataState.DataRemote(data = candles.toCandleList()) }
                     }.repeatWhen { completed ->
-                        Log.d("mytag", "Repeated request")
-                        completed.delay(5, TimeUnit.SECONDS)
+                        Log.d("mytag", "Repeated request candles")
+                        completed.delay(5, TimeUnit.MINUTES)
                     }
             } else {
                 val result = screenDao.getCandles().last().toCandleList()
                 Observable.fromCallable { DataState.DataCache(data = result) }
             }
         }.retryWhen { error ->
-            Log.d("mytag", "Error in repo")
+            Log.d("mytag", "Error in repo candles")
             error.take(3).delay(100, TimeUnit.MILLISECONDS)
             //maybe add throw exception or DataState.Error
         }

@@ -14,8 +14,6 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.TimeUnit
-import kotlin.math.roundToInt
 
 class CryptoInfoViewModel(
     private val repo: ICryptoRepo,
@@ -66,16 +64,8 @@ class CryptoInfoViewModel(
     private fun makeRequestCandles(
         symbol: String,
         timeFrame: String
-    ): Observable<List<List<Float>>> {
-        return networkStatus.isOnline().flatMap { isOnline ->
-            if (isOnline)
-                repo.getCandles(symbol, timeFrame)
-                    .repeatWhen { completed -> completed.delay(5, TimeUnit.SECONDS) }
-            else
-                Observable.fromCallable { emptyList<List<Float>>() }
-        }.retryWhen { error ->
-            error.take(3).delay(100, TimeUnit.MILLISECONDS)
-        }
+    ): Observable<DataState<List<Candle>>> {
+        return repo.getCandles(symbol, timeFrame)
     }
 
     fun requestTicker(symbol: String) {
@@ -272,39 +262,45 @@ class CryptoInfoViewModel(
         }
     }
 
-    private fun onResponseCandles(candles: List<List<Float>>) {
-        val dataForChart = arrayListOf<Candle>()
-        for (candle in candles)
-            dataForChart.add(
-                Candle(
-                    time = (candle[0] / 1000).roundToInt().toFloat(),
-                    open = candle[1],
-                    high = candle[2],
-                    low = candle[3],
-                    close = candle[4],
-                )
+    private fun onResponseCandles(candles: DataState<List<Candle>>) {
+        if(candles is DataState.DataRemote){
+            val dataForChart = candles.data
+
+            val first = dataForChart[0].time
+
+            val dataForChartCopy = arrayListOf<Candle>()
+            for (i in 0 until dataForChart.size)
+                if (i % 3 == 0)
+                    dataForChartCopy.add(dataForChart[i].copy(time = (dataForChart[i].time - first) / 600F))
+
+            val newStat = _state.value?.statistic?.copy(
+                candles = dataForChartCopy
+            ) ?: Statistic24h("", 0F, 0F, 0F, emptyList(), emptyList())
+
+            _state.value = state.value?.copy(
+                statistic = newStat
             )
+        }
+        if (candles is DataState.DataCache){
+            if(candles is DataState.DataRemote){
+                val dataForChart = candles.data
 
-        dataForChart
-            .sortBy { it.time }
+                val first = dataForChart[0].time
 
-        val first = dataForChart[0].time
+                val dataForChartCopy = arrayListOf<Candle>()
+                for (i in 0 until dataForChart.size)
+                    if (i % 3 == 0)
+                        dataForChartCopy.add(dataForChart[i].copy(time = (dataForChart[i].time - first) / 600F))
 
-        val dataForChartCopy = arrayListOf<Candle>()
-        for (i in 0 until dataForChart.size)
-            if (i % 3 == 0)
-                dataForChartCopy.add(dataForChart[i].copy(time = (dataForChart[i].time - first) / 600F))
+                val newStat = _state.value?.statistic?.copy(
+                    candles = dataForChartCopy
+                ) ?: Statistic24h("", 0F, 0F, 0F, emptyList(), emptyList())
 
-        dataForChart
-            .sortBy { it.time }
-
-        val newStat = _state.value?.statistic?.copy(
-            candles = dataForChartCopy
-        ) ?: Statistic24h("", 0F, 0F, 0F, emptyList(), emptyList())
-
-        _state.value = state.value?.copy(
-            statistic = newStat
-        )
+                _state.value = state.value?.copy(
+                    statistic = newStat
+                )
+            }
+        }
     }
 
     fun unixTimeToStringDate(timestamp: Long): String {
