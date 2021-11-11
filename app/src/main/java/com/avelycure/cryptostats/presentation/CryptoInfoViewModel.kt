@@ -5,7 +5,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.avelycure.cryptostats.data.models.*
-import com.avelycure.cryptostats.data.network.INetworkStatus
 import com.avelycure.cryptostats.data.repo.ICryptoRepo
 import io.reactivex.rxjava3.core.Observable
 import com.avelycure.cryptostats.domain.*
@@ -16,8 +15,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class CryptoInfoViewModel(
-    private val repo: ICryptoRepo,
-    private val networkStatus: INetworkStatus
+    private val repo: ICryptoRepo
 ) : ViewModel() {
 
     private val _state: MutableLiveData<CryptoInfoState> = MutableLiveData()
