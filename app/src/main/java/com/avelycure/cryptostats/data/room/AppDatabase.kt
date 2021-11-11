@@ -7,13 +7,15 @@ import com.avelycure.cryptostats.data.room.dao.ScreenDao
 import com.avelycure.cryptostats.data.room.entities.PriceFeedEntity
 import com.avelycure.cryptostats.data.room.entities.TickerEntity
 import com.avelycure.cryptostats.data.room.entities.TickerV1Entity
+import com.avelycure.cryptostats.data.room.entities.TradeHistoryEntity
 import com.avelycure.cryptostats.data.room.type_converters.ConverterListFloat
 
 @Database(
     entities = arrayOf(
         TickerEntity::class,
         PriceFeedEntity::class,
-        TickerV1Entity::class
+        TickerV1Entity::class,
+        TradeHistoryEntity::class
     ), version = 1
 )
 @TypeConverters(value = arrayOf(ConverterListFloat::class))

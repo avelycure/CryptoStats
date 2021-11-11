@@ -1,6 +1,5 @@
 package com.avelycure.cryptostats.presentation
 
-import android.provider.ContactsContract
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import com.avelycure.cryptostats.data.models.*
 import com.avelycure.cryptostats.data.network.INetworkStatus
 import com.avelycure.cryptostats.data.repo.ICryptoRepo
-import com.avelycure.cryptostats.data.room.dao.ScreenDao
 import io.reactivex.rxjava3.core.Observable
 import com.avelycure.cryptostats.domain.*
 import com.avelycure.cryptostats.domain.state.DataState
@@ -128,19 +126,11 @@ class CryptoInfoViewModel(
     private fun makeRequestTradeHistory(
         symbol: String,
         limit: Int
-    ): Observable<List<TradeHistory>> {
-        return networkStatus.isOnline().flatMap { isOnline ->
-            if (isOnline)
-                repo.getTrades(symbol, limit).repeatWhen { completed ->
-                    completed.delay(5, TimeUnit.SECONDS)
-                }
-            else
-                Observable.fromCallable { emptyList<TradeHistory>() }
-        }.repeatWhen { error -> error.take(3).delay(100, TimeUnit.MILLISECONDS) }
-    }
+    ): Observable<DataState<List<Trade>>> {
+        return repo.getTrades(symbol, limit)}
 
-    private fun onResponseTradeHistory(data: List<TradeHistory>) {
-        val trades: List<Trade> = data.map { tradeHistory ->
+    private fun onResponseTradeHistory(data: DataState<List<Trade>>) {
+        /*val trades: List<Trade> = data.map { tradeHistory ->
             Trade(
                 timestampms = tradeHistory.timestampms,
                 tid = tradeHistory.tid,
@@ -152,7 +142,7 @@ class CryptoInfoViewModel(
 
         _state.value = _state.value?.copy(
             trades = trades
-        )
+        )*/
     }
 
     private fun onResponseTickerV1(data: DataState<TickerV1Model>) {

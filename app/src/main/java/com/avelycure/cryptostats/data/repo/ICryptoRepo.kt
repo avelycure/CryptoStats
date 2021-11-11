@@ -6,6 +6,7 @@ import com.avelycure.cryptostats.data.models.TickerV2
 import com.avelycure.cryptostats.data.models.TradeHistory
 import com.avelycure.cryptostats.domain.Ticker
 import com.avelycure.cryptostats.domain.TickerV1Model
+import com.avelycure.cryptostats.domain.Trade
 import com.avelycure.cryptostats.domain.state.DataState
 import io.reactivex.rxjava3.core.Observable
 
@@ -18,5 +19,5 @@ interface ICryptoRepo {
 
     fun getTickerV1(symbol: String): Observable<DataState<TickerV1Model>>
 
-    fun getTrades(symbol: String, limit: Int):Observable<List<TradeHistory>>
+    fun getTrades(symbol: String, limit: Int): Observable<DataState<List<Trade>>>
 }

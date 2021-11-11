@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.avelycure.cryptostats.domain.TickerV1Model
 
-@Entity
+@Entity(tableName = "ticker_v1")
 data class TickerV1Entity(
     @PrimaryKey(autoGenerate = true)
     val id: Int,

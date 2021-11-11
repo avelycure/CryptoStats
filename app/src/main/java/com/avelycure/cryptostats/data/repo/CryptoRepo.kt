@@ -8,10 +8,11 @@ import com.avelycure.cryptostats.data.room.dao.ScreenDao
 import com.avelycure.cryptostats.data.room.entities.toPriceFeed
 import com.avelycure.cryptostats.data.room.entities.toTicker
 import com.avelycure.cryptostats.data.room.entities.toTickerV1Model
+import com.avelycure.cryptostats.data.room.entities.toTrade
 import com.avelycure.cryptostats.domain.Ticker
 import com.avelycure.cryptostats.domain.TickerV1Model
+import com.avelycure.cryptostats.domain.Trade
 import com.avelycure.cryptostats.domain.state.DataState
-import com.avelycure.cryptostats.domain.state.UIComponent
 import io.reactivex.rxjava3.core.Observable
 import java.util.concurrent.TimeUnit
 
@@ -96,7 +97,28 @@ class CryptoRepo(
         }
     }
 
-    override fun getTrades(symbol: String, limit: Int): Observable<List<TradeHistory>> {
-        return apiService.getTradeHistory(symbol, limit)
+    override fun getTrades(symbol: String, limit: Int): Observable<DataState<List<Trade>>> {
+        return networkStatus.isOnline().flatMap { isOnline ->
+            if (isOnline) {
+                apiService
+                    .getTradeHistory(symbol, limit)
+                    .flatMap { trades ->
+                        screenDao.dropTradeHistoryTable()
+                        for (trade in trades)
+                            screenDao.insertTradeHistory(trade.toTradeHistoryEntity())
+                        Observable.fromCallable { DataState.DataRemote(data = trades.map { it.toTrade() }) }
+                    }.repeatWhen { completed ->
+                        Log.d("mytag", "Repeated request")
+                        completed.delay(5, TimeUnit.SECONDS)
+                    }
+            } else {
+                val result = screenDao.getTradeHistory().map { it.toTrade() }
+                Observable.fromCallable { DataState.DataCache(data = result) }
+            }
+        }.retryWhen { error ->
+            Log.d("mytag", "Error in repo")
+            error.take(3).delay(100, TimeUnit.MILLISECONDS)
+            //maybe add throw exception or DataState.Error
+        }
     }
 }
