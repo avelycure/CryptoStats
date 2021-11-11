@@ -6,10 +6,17 @@ import androidx.room.TypeConverters
 import com.avelycure.cryptostats.data.room.dao.ScreenDao
 import com.avelycure.cryptostats.data.room.entities.PriceFeedEntity
 import com.avelycure.cryptostats.data.room.entities.TickerEntity
+import com.avelycure.cryptostats.data.room.entities.TickerV1Entity
 import com.avelycure.cryptostats.data.room.type_converters.ConverterListFloat
 
-@Database(entities = arrayOf(TickerEntity::class, PriceFeedEntity::class), version = 1)
+@Database(
+    entities = arrayOf(
+        TickerEntity::class,
+        PriceFeedEntity::class,
+        TickerV1Entity::class
+    ), version = 1
+)
 @TypeConverters(value = arrayOf(ConverterListFloat::class))
-abstract class AppDatabase:RoomDatabase() {
+abstract class AppDatabase : RoomDatabase() {
     abstract fun screenDao(): ScreenDao
 }

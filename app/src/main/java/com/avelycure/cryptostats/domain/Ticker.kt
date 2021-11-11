@@ -1,7 +1,5 @@
 package com.avelycure.cryptostats.domain
 
-import androidx.room.Entity
-
 data class Ticker(
     val symbol: String,
     val bid: Float,

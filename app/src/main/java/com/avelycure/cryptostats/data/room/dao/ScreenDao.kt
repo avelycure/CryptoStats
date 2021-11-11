@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import com.avelycure.cryptostats.data.room.entities.PriceFeedEntity
 import com.avelycure.cryptostats.data.room.entities.TickerEntity
+import com.avelycure.cryptostats.data.room.entities.TickerV1Entity
 
 @Dao
 interface ScreenDao {
@@ -13,6 +14,12 @@ interface ScreenDao {
 
     @Query("SELECT * FROM ticker")
     fun getTicker(): List<TickerEntity>
+
+    @Insert
+    fun insertTickerV1(tickerV1: TickerV1Entity)
+
+    @Query("SELECT * FROM ticker")
+    fun getTickerV1(): List<TickerV1Entity>
 
     @Insert
     fun insertPriceFeed(priceFeed: PriceFeedEntity)
