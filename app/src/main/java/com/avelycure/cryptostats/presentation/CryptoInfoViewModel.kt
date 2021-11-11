@@ -130,19 +130,36 @@ class CryptoInfoViewModel(
         return repo.getTrades(symbol, limit)}
 
     private fun onResponseTradeHistory(data: DataState<List<Trade>>) {
-        /*val trades: List<Trade> = data.map { tradeHistory ->
-            Trade(
-                timestampms = tradeHistory.timestampms,
-                tid = tradeHistory.tid,
-                price = tradeHistory.price,
-                amount = tradeHistory.amount,
-                type = tradeHistory.type
+        if(data is DataState.DataRemote){
+            val trades: List<Trade> = data.data.map { tradeHistory ->
+                Trade(
+                    timestampms = tradeHistory.timestampms,
+                    tid = tradeHistory.tid,
+                    price = tradeHistory.price,
+                    amount = tradeHistory.amount,
+                    type = tradeHistory.type
+                )
+            }
+
+            _state.value = _state.value?.copy(
+                trades = trades
             )
         }
+        if(data is DataState.DataCache){
+            val trades: List<Trade> = data.data.map { tradeHistory ->
+                Trade(
+                    timestampms = tradeHistory.timestampms,
+                    tid = tradeHistory.tid,
+                    price = tradeHistory.price,
+                    amount = tradeHistory.amount,
+                    type = tradeHistory.type
+                )
+            }
 
-        _state.value = _state.value?.copy(
-            trades = trades
-        )*/
+            _state.value = _state.value?.copy(
+                trades = trades
+            )
+        }
     }
 
     private fun onResponseTickerV1(data: DataState<TickerV1Model>) {
