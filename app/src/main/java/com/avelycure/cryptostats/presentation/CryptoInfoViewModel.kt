@@ -24,14 +24,7 @@ class CryptoInfoViewModel(
 
     init {
         _state.value = CryptoInfoState(
-            statistic = Statistic24h(
-                symbol = "",
-                high = 0F,
-                low = 0F,
-                open = 0F,
-                emptyList(),
-                emptyList()
-            ),
+            statistic = Statistic24h(),
             coinPrice = CoinPrice(
                 price = "",
                 percentChange24h = ""
@@ -273,7 +266,7 @@ class CryptoInfoViewModel(
 
             val newStat = _state.value?.statistic?.copy(
                 candles = dataForChartCopy
-            ) ?: Statistic24h("", 0F, 0F, 0F, emptyList(), emptyList())
+            ) ?: Statistic24h()
 
             _state.value = state.value?.copy(
                 statistic = newStat
@@ -292,7 +285,7 @@ class CryptoInfoViewModel(
 
                 val newStat = _state.value?.statistic?.copy(
                     candles = dataForChartCopy
-                ) ?: Statistic24h("", 0F, 0F, 0F, emptyList(), emptyList())
+                ) ?: Statistic24h()
 
                 _state.value = state.value?.copy(
                     statistic = newStat
