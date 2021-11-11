@@ -29,16 +29,7 @@ class CryptoInfoViewModel(
                 price = "",
                 percentChange24h = ""
             ),
-            ticker = Ticker(
-                bid = 0f,
-                ask = 0f,
-                high = 0f,
-                low = 0f,
-                changes = emptyList(),
-                close = 0f,
-                symbol = "",
-                open = 0f
-            ),
+            ticker = Ticker(),
             trades = emptyList()
         )
     }
