@@ -5,10 +5,8 @@ import com.avelycure.cryptostats.data.api_service.GeminiApiService
 import com.avelycure.cryptostats.data.models.*
 import com.avelycure.cryptostats.data.network.INetworkStatus
 import com.avelycure.cryptostats.data.room.dao.ScreenDao
-import com.avelycure.cryptostats.data.room.entities.toPriceFeed
-import com.avelycure.cryptostats.data.room.entities.toTicker
-import com.avelycure.cryptostats.data.room.entities.toTickerV1Model
-import com.avelycure.cryptostats.data.room.entities.toTrade
+import com.avelycure.cryptostats.data.room.entities.*
+import com.avelycure.cryptostats.domain.Candle
 import com.avelycure.cryptostats.domain.Ticker
 import com.avelycure.cryptostats.domain.TickerV1Model
 import com.avelycure.cryptostats.domain.Trade
@@ -22,8 +20,27 @@ class CryptoRepo(
     private val screenDao: ScreenDao
 ) : ICryptoRepo {
 
-    override fun getCandles(symbol: String, timeFrame: String): Observable<List<List<Float>>> {
-        return apiService.getCandles(symbol, timeFrame)
+    override fun getCandles(symbol: String, timeFrame: String): Observable<DataState<List<Candle>>> {
+        return networkStatus.isOnline().flatMap { isOnline ->
+            if (isOnline) {
+                apiService
+                    .getCandles(symbol, timeFrame)
+                    .flatMap { candles ->
+                        screenDao.insertCandles(candles.toCandlesEntity())
+                        Observable.fromCallable { DataState.DataRemote(data = candles.toCandleList()) }
+                    }.repeatWhen { completed ->
+                        Log.d("mytag", "Repeated request")
+                        completed.delay(5, TimeUnit.SECONDS)
+                    }
+            } else {
+                val result = screenDao.getCandles().last().toCandleList()
+                Observable.fromCallable { DataState.DataCache(data = result) }
+            }
+        }.retryWhen { error ->
+            Log.d("mytag", "Error in repo")
+            error.take(3).delay(100, TimeUnit.MILLISECONDS)
+            //maybe add throw exception or DataState.Error
+        }
     }
 
     override fun getTicker(symbol: String): Observable<DataState<Ticker>> {
