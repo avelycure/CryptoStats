@@ -282,10 +282,4 @@ class CryptoInfoViewModel(
             }
         }
     }
-
-    fun unixTimeToStringDate(timestamp: Long): String {
-        val sdf = SimpleDateFormat("MM/dd/yyyy")
-        val netDate = Date(timestamp)
-        return sdf.format(netDate)
-    }
 }
