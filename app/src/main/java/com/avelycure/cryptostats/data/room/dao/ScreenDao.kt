@@ -3,10 +3,7 @@ package com.avelycure.cryptostats.data.room.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import com.avelycure.cryptostats.data.room.entities.PriceFeedEntity
-import com.avelycure.cryptostats.data.room.entities.TickerEntity
-import com.avelycure.cryptostats.data.room.entities.TickerV1Entity
-import com.avelycure.cryptostats.data.room.entities.TradeHistoryEntity
+import com.avelycure.cryptostats.data.room.entities.*
 
 @Dao
 interface ScreenDao {
@@ -16,11 +13,13 @@ interface ScreenDao {
     @Query("SELECT * FROM ticker")
     fun getTicker(): List<TickerEntity>
 
+
     @Insert
     fun insertTickerV1(tickerV1: TickerV1Entity)
 
     @Query("SELECT * FROM ticker_v1")
     fun getTickerV1(): List<TickerV1Entity>
+
 
     @Insert
     fun insertTradeHistory(trade: TradeHistoryEntity)
@@ -31,6 +30,7 @@ interface ScreenDao {
     @Query("SELECT * FROM trade_history")
     fun getTradeHistory(): List<TradeHistoryEntity>
 
+
     @Insert
     fun insertPriceFeed(priceFeed: PriceFeedEntity)
 
@@ -39,4 +39,14 @@ interface ScreenDao {
 
     @Query("DELETE FROM price_feed")
     fun dropPriceFeedTable()
+
+
+    @Insert
+    fun insertCandles(candle: CandlesEntity)
+
+    @Query("SELECT * FROM candles")
+    fun getCandles(): List<CandlesEntity>
+
+    @Query("DELETE FROM candles")
+    fun dropCandlesTable()
 }
