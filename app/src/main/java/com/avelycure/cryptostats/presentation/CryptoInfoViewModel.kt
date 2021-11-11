@@ -25,10 +25,7 @@ class CryptoInfoViewModel(
     init {
         _state.value = CryptoInfoState(
             statistic = Statistic24h(),
-            coinPrice = CoinPrice(
-                price = "",
-                percentChange24h = ""
-            ),
+            coinPrice = CoinPrice(),
             ticker = Ticker(),
             trades = emptyList()
         )
@@ -99,10 +96,11 @@ class CryptoInfoViewModel(
         symbol: String,
         limit: Int
     ): Observable<DataState<List<Trade>>> {
-        return repo.getTrades(symbol, limit)}
+        return repo.getTrades(symbol, limit)
+    }
 
     private fun onResponseTradeHistory(data: DataState<List<Trade>>) {
-        if(data is DataState.DataRemote){
+        if (data is DataState.DataRemote) {
             val trades: List<Trade> = data.data.map { tradeHistory ->
                 Trade(
                     timestampms = tradeHistory.timestampms,
@@ -117,7 +115,7 @@ class CryptoInfoViewModel(
                 trades = trades
             )
         }
-        if(data is DataState.DataCache){
+        if (data is DataState.DataCache) {
             val trades: List<Trade> = data.data.map { tradeHistory ->
                 Trade(
                     timestampms = tradeHistory.timestampms,
@@ -135,7 +133,7 @@ class CryptoInfoViewModel(
     }
 
     private fun onResponseTickerV1(data: DataState<TickerV1Model>) {
-        if(data is DataState.DataRemote){
+        if (data is DataState.DataRemote) {
             val newTicker = _state.value?.ticker?.copy(
                 bid = data.data.bid,
                 ask = data.data.ask
@@ -153,7 +151,7 @@ class CryptoInfoViewModel(
                 ticker = newTicker
             )
         }
-        if(data is DataState.DataCache){
+        if (data is DataState.DataCache) {
             val newTicker = _state.value?.ticker?.copy(
                 bid = data.data.bid,
                 ask = data.data.ask
@@ -174,7 +172,7 @@ class CryptoInfoViewModel(
     }
 
     private fun onResponsePriceFeed(data: DataState<List<PriceFeed>>, pair: String) {
-        if(data is DataState.DataRemote){
+        if (data is DataState.DataRemote) {
             Log.d("mytag", "View model remote")
             for (i in data.data)
                 if (i.pair == pair) {
@@ -187,7 +185,7 @@ class CryptoInfoViewModel(
                     break
                 }
         }
-        if(data is DataState.DataCache){
+        if (data is DataState.DataCache) {
             Log.d("mytag", "View model cache")
             for (i in data.data)
                 if (i.pair == pair) {
@@ -205,7 +203,7 @@ class CryptoInfoViewModel(
     private fun onResponseTicker(data: DataState<Ticker>) {
         Log.d("mytag", "Got response from ticker")
         if (data is DataState.DataRemote) {
-        Log.d("mytag", "Remote")
+            Log.d("mytag", "Remote")
             val dataForChart = arrayListOf<Point>()
             for (i in 0 until data.data.changes.size)
                 dataForChart.add(Point(24F - i.toFloat(), data.data.changes[i]))
@@ -224,7 +222,7 @@ class CryptoInfoViewModel(
             )
         }
         if (data is DataState.DataCache) {
-        Log.d("mytag", "Cache")
+            Log.d("mytag", "Cache")
             val dataForChart = arrayListOf<Point>()
             for (i in 0 until data.data.changes.size)
                 dataForChart.add(Point(24F - i.toFloat(), data.data.changes[i]))
@@ -245,7 +243,7 @@ class CryptoInfoViewModel(
     }
 
     private fun onResponseCandles(candles: DataState<List<Candle>>) {
-        if(candles is DataState.DataRemote){
+        if (candles is DataState.DataRemote) {
             val dataForChart = candles.data
 
             val first = dataForChart[0].time
@@ -263,8 +261,8 @@ class CryptoInfoViewModel(
                 statistic = newStat
             )
         }
-        if (candles is DataState.DataCache){
-            if(candles is DataState.DataRemote){
+        if (candles is DataState.DataCache) {
+            if (candles is DataState.DataRemote) {
                 val dataForChart = candles.data
 
                 val first = dataForChart[0].time
