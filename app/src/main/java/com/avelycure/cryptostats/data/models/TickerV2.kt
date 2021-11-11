@@ -1,5 +1,8 @@
 package com.avelycure.cryptostats.data.models
 
+import com.avelycure.cryptostats.data.room.entities.TickerEntity
+import com.avelycure.cryptostats.domain.Ticker
+
 data class TickerV2(
     val symbol: String,
     val open: Float,
@@ -10,3 +13,31 @@ data class TickerV2(
     val bid: Float,
     val ask: Float
 )
+
+fun TickerV2.toTickerEntity(): TickerEntity {
+    return TickerEntity(
+        id = 0,
+        dateOfSave = 0L,
+        symbol = symbol,
+        bid = bid,
+        ask = ask,
+        high = high,
+        open = open,
+        close = close,
+        low = low,
+        changes = changes
+    )
+}
+
+fun TickerV2.toTicker(): Ticker {
+    return Ticker(
+        symbol = symbol,
+        bid = bid,
+        ask = ask,
+        high = high,
+        open = open,
+        close = close,
+        low = low,
+        changes = changes
+    )
+}

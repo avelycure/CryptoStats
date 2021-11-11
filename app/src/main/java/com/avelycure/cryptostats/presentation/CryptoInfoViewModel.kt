@@ -1,22 +1,19 @@
 package com.avelycure.cryptostats.presentation
 
-import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.avelycure.cryptostats.data.models.*
 import com.avelycure.cryptostats.data.network.INetworkStatus
-import com.avelycure.cryptostats.data.network.NetworkStatus
 import com.avelycure.cryptostats.data.repo.ICryptoRepo
 import io.reactivex.rxjava3.core.Observable
 import com.avelycure.cryptostats.domain.*
+import com.avelycure.cryptostats.domain.state.DataState
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.TimeUnit
-import kotlin.math.roundToInt
 
 class CryptoInfoViewModel(
     private val repo: ICryptoRepo,
@@ -42,8 +39,14 @@ class CryptoInfoViewModel(
                 percentChange24h = ""
             ),
             ticker = Ticker(
-                bid = 0F,
-                ask = 0F
+                bid = 0f,
+                ask = 0f,
+                high = 0f,
+                low = 0f,
+                changes = emptyList(),
+                close = 0f,
+                symbol = "",
+                open = 0f
             ),
             trades = emptyList()
         )
@@ -61,43 +64,22 @@ class CryptoInfoViewModel(
     private fun makeRequestCandles(
         symbol: String,
         timeFrame: String
-    ): Observable<List<List<Float>>> {
-        return networkStatus.isOnline().flatMap { isOnline ->
-            if (isOnline)
-                repo.getCandles(symbol, timeFrame)
-                    .repeatWhen { completed -> completed.delay(5, TimeUnit.SECONDS) }
-            else
-                Observable.fromCallable { emptyList<List<Float>>() }
-        }.retryWhen { error ->
-            error.take(3).delay(100, TimeUnit.MILLISECONDS)
-        }
+    ): Observable<DataState<List<Candle>>> {
+        return repo.getCandles(symbol, timeFrame)
     }
 
-    fun requestTickerV2(symbol: String) {
+    fun requestTicker(symbol: String) {
         makeTickerRequest(symbol)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .subscribe({ data -> onResponseTickerV2(data) }, {
+            .subscribe({ data -> onResponseTicker(data) }, {
                 Log.d("mytag", "Error: ${it.message}")
             }, {})
     }
 
-    private fun makeTickerRequest(symbol: String): Observable<TickerV2> {
-        return networkStatus.isOnline().flatMap { isOnline ->
-            if (isOnline)
-                repo.getTickerV2(symbol)
-                    .repeatWhen { completed ->
-                        completed.delay(5, TimeUnit.SECONDS)
-                    }
-            else
-                Observable.fromCallable {
-                    TickerV2(
-                        "", 0f, 0f, 0f, 0f, emptyList<Float>(), 0f, 0f
-                    )
-                }
-        }.retryWhen { error ->
-            error.take(3).delay(100, TimeUnit.MILLISECONDS)
-        }
+    private fun makeTickerRequest(symbol: String): Observable<DataState<Ticker>> {
+        Log.d("mytag", "Make request to ticker")
+        return repo.getTicker(symbol)
     }
 
     fun requestPriceFeed(pair: String) {
@@ -109,16 +91,8 @@ class CryptoInfoViewModel(
             }, {})
     }
 
-    private fun makePriceFeedRequest(): Observable<List<PriceFeed>> {
-        return networkStatus.isOnline().flatMap { isOnline ->
-            if (isOnline)
-                repo.getPriceFeed()
-                    .repeatWhen { completed -> completed.delay(5, TimeUnit.SECONDS) }
-            else
-                Observable.fromCallable { emptyList<PriceFeed>() }
-        }.retryWhen { error ->
-            error.take(3).delay(100, TimeUnit.MILLISECONDS)
-        }
+    private fun makePriceFeedRequest(): Observable<DataState<List<PriceFeed>>> {
+        return repo.getPriceFeed()
     }
 
     fun requestTickerV1(symbol: String) {
@@ -128,14 +102,8 @@ class CryptoInfoViewModel(
             .subscribe({ data -> onResponseTickerV1(data) }, {}, {})
     }
 
-    private fun makeTickerV1Request(symbol: String): Observable<TickerV1> {
-        return networkStatus.isOnline().flatMap { isOnline ->
-            if (isOnline)
-                repo.getTickerV1(symbol)
-                    .repeatWhen { completed -> completed.delay(5, TimeUnit.SECONDS) }
-            else
-                Observable.fromCallable { TickerV1(0f, 0f, 0f, VolumeBtcUsd(0f, 0f, 0)) }
-        }.repeatWhen { error -> error.take(3).delay(100, TimeUnit.MILLISECONDS) }
+    private fun makeTickerV1Request(symbol: String): Observable<DataState<TickerV1Model>> {
+        return repo.getTickerV1(symbol)
     }
 
     fun requestTradeHistory(symbol: String, limit: Int) {
@@ -148,107 +116,191 @@ class CryptoInfoViewModel(
     private fun makeRequestTradeHistory(
         symbol: String,
         limit: Int
-    ): Observable<List<TradeHistory>> {
-        return networkStatus.isOnline().flatMap { isOnline ->
-            if (isOnline)
-                repo.getTrades(symbol, limit).repeatWhen { completed ->
-                    completed.delay(5, TimeUnit.SECONDS)
-                }
-            else
-                Observable.fromCallable { emptyList<TradeHistory>() }
-        }.repeatWhen { error -> error.take(3).delay(100, TimeUnit.MILLISECONDS) }
-    }
+    ): Observable<DataState<List<Trade>>> {
+        return repo.getTrades(symbol, limit)}
 
-    private fun onResponseTradeHistory(data: List<TradeHistory>) {
-        val trades: List<Trade> = data.map { tradeHistory ->
-            Trade(
-                timestampms = tradeHistory.timestampms,
-                tid = tradeHistory.tid,
-                price = tradeHistory.price,
-                amount = tradeHistory.amount,
-                type = tradeHistory.type
+    private fun onResponseTradeHistory(data: DataState<List<Trade>>) {
+        if(data is DataState.DataRemote){
+            val trades: List<Trade> = data.data.map { tradeHistory ->
+                Trade(
+                    timestampms = tradeHistory.timestampms,
+                    tid = tradeHistory.tid,
+                    price = tradeHistory.price,
+                    amount = tradeHistory.amount,
+                    type = tradeHistory.type
+                )
+            }
+
+            _state.value = _state.value?.copy(
+                trades = trades
             )
         }
-
-        _state.value = _state.value?.copy(
-            trades = trades
-        )
-    }
-
-    private fun onResponseTickerV1(data: TickerV1) {
-        _state.value = _state.value?.copy(
-            ticker = Ticker(
-                bid = data.bid,
-                ask = data.ask
-            )
-        )
-    }
-
-    private fun onResponsePriceFeed(data: List<PriceFeed>, pair: String) {
-        for (i in data)
-            if (i.pair == pair) {
-                _state.value = _state.value?.copy(
-                    coinPrice = CoinPrice(
-                        price = i.price,
-                        percentChange24h = i.percentChange24h
-                    )
+        if(data is DataState.DataCache){
+            val trades: List<Trade> = data.data.map { tradeHistory ->
+                Trade(
+                    timestampms = tradeHistory.timestampms,
+                    tid = tradeHistory.tid,
+                    price = tradeHistory.price,
+                    amount = tradeHistory.amount,
+                    type = tradeHistory.type
                 )
-                break
             }
-    }
 
-    private fun onResponseTickerV2(data: TickerV2) {
-        val dataForChart = arrayListOf<Point>()
-        for (i in 0 until data.changes.size)
-            dataForChart.add(Point(24F - i.toFloat(), data.changes[i]))
-
-        dataForChart.sortBy { it.x }
-
-        _state.value = state.value?.copy(
-            statistic = Statistic24h(
-                symbol = data.symbol,
-                high = data.high,
-                low = data.low,
-                open = data.open,
-                changes = dataForChart,
-                candles = _state.value?.statistic?.candles?.toList() ?: emptyList()
+            _state.value = _state.value?.copy(
+                trades = trades
             )
-        )
+        }
     }
 
-    private fun onResponseCandles(candles: List<List<Float>>) {
-        val dataForChart = arrayListOf<Candle>()
-        for (candle in candles)
-            dataForChart.add(
-                Candle(
-                    time = (candle[0] / 1000).roundToInt().toFloat(),
-                    open = candle[1],
-                    high = candle[2],
-                    low = candle[3],
-                    close = candle[4],
+    private fun onResponseTickerV1(data: DataState<TickerV1Model>) {
+        if(data is DataState.DataRemote){
+            val newTicker = _state.value?.ticker?.copy(
+                bid = data.data.bid,
+                ask = data.data.ask
+            ) ?: Ticker(
+                bid = 0f,
+                ask = 0f,
+                high = 0f,
+                low = 0f,
+                changes = emptyList(),
+                close = 0f,
+                symbol = "",
+                open = 0f
+            )
+            _state.value = _state.value?.copy(
+                ticker = newTicker
+            )
+        }
+        if(data is DataState.DataCache){
+            val newTicker = _state.value?.ticker?.copy(
+                bid = data.data.bid,
+                ask = data.data.ask
+            ) ?: Ticker(
+                bid = 0f,
+                ask = 0f,
+                high = 0f,
+                low = 0f,
+                changes = emptyList(),
+                close = 0f,
+                symbol = "",
+                open = 0f
+            )
+            _state.value = _state.value?.copy(
+                ticker = newTicker
+            )
+        }
+    }
+
+    private fun onResponsePriceFeed(data: DataState<List<PriceFeed>>, pair: String) {
+        if(data is DataState.DataRemote){
+            Log.d("mytag", "View model remote")
+            for (i in data.data)
+                if (i.pair == pair) {
+                    _state.value = _state.value?.copy(
+                        coinPrice = CoinPrice(
+                            price = i.price,
+                            percentChange24h = i.percentChange24h
+                        )
+                    )
+                    break
+                }
+        }
+        if(data is DataState.DataCache){
+            Log.d("mytag", "View model cache")
+            for (i in data.data)
+                if (i.pair == pair) {
+                    _state.value = _state.value?.copy(
+                        coinPrice = CoinPrice(
+                            price = i.price,
+                            percentChange24h = i.percentChange24h
+                        )
+                    )
+                    break
+                }
+        }
+    }
+
+    private fun onResponseTicker(data: DataState<Ticker>) {
+        Log.d("mytag", "Got response from ticker")
+        if (data is DataState.DataRemote) {
+        Log.d("mytag", "Remote")
+            val dataForChart = arrayListOf<Point>()
+            for (i in 0 until data.data.changes.size)
+                dataForChart.add(Point(24F - i.toFloat(), data.data.changes[i]))
+
+            dataForChart.sortBy { it.x }
+
+            _state.value = state.value?.copy(
+                statistic = Statistic24h(
+                    symbol = data.data.symbol,
+                    high = data.data.high,
+                    low = data.data.low,
+                    open = data.data.open,
+                    changes = dataForChart,
+                    candles = _state.value?.statistic?.candles?.toList() ?: emptyList()
                 )
             )
+        }
+        if (data is DataState.DataCache) {
+        Log.d("mytag", "Cache")
+            val dataForChart = arrayListOf<Point>()
+            for (i in 0 until data.data.changes.size)
+                dataForChart.add(Point(24F - i.toFloat(), data.data.changes[i]))
 
-        dataForChart
-            .sortBy { it.time }
+            dataForChart.sortBy { it.x }
 
-        val first = dataForChart[0].time
+            _state.value = state.value?.copy(
+                statistic = Statistic24h(
+                    symbol = data.data.symbol,
+                    high = data.data.high,
+                    low = data.data.low,
+                    open = data.data.open,
+                    changes = dataForChart,
+                    candles = _state.value?.statistic?.candles?.toList() ?: emptyList()
+                )
+            )
+        }
+    }
 
-        val dataForChartCopy = arrayListOf<Candle>()
-        for (i in 0 until dataForChart.size)
-            if (i % 3 == 0)
-                dataForChartCopy.add(dataForChart[i].copy(time = (dataForChart[i].time - first) / 600F))
+    private fun onResponseCandles(candles: DataState<List<Candle>>) {
+        if(candles is DataState.DataRemote){
+            val dataForChart = candles.data
 
-        dataForChart
-            .sortBy { it.time }
+            val first = dataForChart[0].time
 
-        val newStat = _state.value?.statistic?.copy(
-            candles = dataForChartCopy
-        ) ?: Statistic24h("", 0F, 0F, 0F, emptyList(), emptyList())
+            val dataForChartCopy = arrayListOf<Candle>()
+            for (i in 0 until dataForChart.size)
+                if (i % 3 == 0)
+                    dataForChartCopy.add(dataForChart[i].copy(time = (dataForChart[i].time - first) / 600F))
 
-        _state.value = state.value?.copy(
-            statistic = newStat
-        )
+            val newStat = _state.value?.statistic?.copy(
+                candles = dataForChartCopy
+            ) ?: Statistic24h("", 0F, 0F, 0F, emptyList(), emptyList())
+
+            _state.value = state.value?.copy(
+                statistic = newStat
+            )
+        }
+        if (candles is DataState.DataCache){
+            if(candles is DataState.DataRemote){
+                val dataForChart = candles.data
+
+                val first = dataForChart[0].time
+
+                val dataForChartCopy = arrayListOf<Candle>()
+                for (i in 0 until dataForChart.size)
+                    if (i % 3 == 0)
+                        dataForChartCopy.add(dataForChart[i].copy(time = (dataForChart[i].time - first) / 600F))
+
+                val newStat = _state.value?.statistic?.copy(
+                    candles = dataForChartCopy
+                ) ?: Statistic24h("", 0F, 0F, 0F, emptyList(), emptyList())
+
+                _state.value = state.value?.copy(
+                    statistic = newStat
+                )
+            }
+        }
     }
 
     fun unixTimeToStringDate(timestamp: Long): String {
