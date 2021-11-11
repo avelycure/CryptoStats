@@ -4,13 +4,9 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class CandesEntity (
+data class CandlesEntity (
     @PrimaryKey(autoGenerate = true)
     val id:Int,
     val dateOfSave: Long,
-    val time: Float,
-    val open: Float,
-    val high: Float,
-    val low: Float,
-    val close: Float
+    val candles: List<List<Float>>
 )
