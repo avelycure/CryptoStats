@@ -1,4 +1,4 @@
-package com.avelycure.cryptostats.data.room.type_converters
+package com.avelycure.cryptostats.data.local.type_converters
 
 import androidx.room.TypeConverter
 import com.google.gson.Gson

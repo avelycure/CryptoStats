@@ -1,6 +1,6 @@
-package com.avelycure.cryptostats.data.models
+package com.avelycure.cryptostats.data.remote.models
 
-import com.avelycure.cryptostats.data.room.entities.TickerEntity
+import com.avelycure.cryptostats.data.local.entities.TickerEntity
 import com.avelycure.cryptostats.domain.Ticker
 
 data class TickerV2(

@@ -1,6 +1,6 @@
-package com.avelycure.cryptostats.data.models
+package com.avelycure.cryptostats.data.remote.models
 
-import com.avelycure.cryptostats.data.room.entities.PriceFeedEntity
+import com.avelycure.cryptostats.data.local.entities.PriceFeedEntity
 
 data class PriceFeed(
     val pair: String,

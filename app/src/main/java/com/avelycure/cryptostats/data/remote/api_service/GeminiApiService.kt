@@ -1,6 +1,6 @@
-package com.avelycure.cryptostats.data.api_service
+package com.avelycure.cryptostats.data.remote.api_service
 
-import com.avelycure.cryptostats.data.models.*
+import com.avelycure.cryptostats.data.remote.models.*
 import io.reactivex.rxjava3.core.Observable
 import retrofit2.http.GET
 import retrofit2.http.Path

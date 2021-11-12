@@ -1,8 +1,8 @@
-package com.avelycure.cryptostats.data.room.entities
+package com.avelycure.cryptostats.data.local.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.avelycure.cryptostats.data.models.PriceFeed
+import com.avelycure.cryptostats.data.remote.models.PriceFeed
 
 @Entity(tableName = "price_feed")
 data class PriceFeedEntity(

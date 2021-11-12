@@ -1,11 +1,11 @@
 package com.avelycure.cryptostats.data.repo
 
 import android.util.Log
-import com.avelycure.cryptostats.data.api_service.GeminiApiService
-import com.avelycure.cryptostats.data.models.*
-import com.avelycure.cryptostats.data.network.INetworkStatus
-import com.avelycure.cryptostats.data.room.dao.ScreenDao
-import com.avelycure.cryptostats.data.room.entities.*
+import com.avelycure.cryptostats.data.remote.api_service.GeminiApiService
+import com.avelycure.cryptostats.data.remote.models.*
+import com.avelycure.cryptostats.utils.network_utils.INetworkStatus
+import com.avelycure.cryptostats.data.local.dao.ScreenDao
+import com.avelycure.cryptostats.data.local.entities.*
 import com.avelycure.cryptostats.domain.Candle
 import com.avelycure.cryptostats.domain.Ticker
 import com.avelycure.cryptostats.domain.TickerV1Model

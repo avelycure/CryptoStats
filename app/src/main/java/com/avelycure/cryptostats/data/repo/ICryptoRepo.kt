@@ -1,9 +1,6 @@
 package com.avelycure.cryptostats.data.repo
 
-import com.avelycure.cryptostats.data.models.PriceFeed
-import com.avelycure.cryptostats.data.models.TickerV1
-import com.avelycure.cryptostats.data.models.TickerV2
-import com.avelycure.cryptostats.data.models.TradeHistory
+import com.avelycure.cryptostats.data.remote.models.PriceFeed
 import com.avelycure.cryptostats.domain.Candle
 import com.avelycure.cryptostats.domain.Ticker
 import com.avelycure.cryptostats.domain.TickerV1Model

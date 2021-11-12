@@ -1,4 +1,4 @@
-package com.avelycure.cryptostats.data.models
+package com.avelycure.cryptostats.data.remote.models
 
 data class CandleResponse(
     val time: Long,

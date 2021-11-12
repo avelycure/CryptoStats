@@ -1,7 +1,6 @@
-package com.avelycure.cryptostats.data.network
+package com.avelycure.cryptostats.utils.network_utils
 
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.Single
 
 interface INetworkStatus {
     fun isOnline(): Observable<Boolean>

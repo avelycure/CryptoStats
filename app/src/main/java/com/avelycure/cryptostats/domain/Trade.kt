@@ -1,6 +1,6 @@
 package com.avelycure.cryptostats.domain
 
-import com.avelycure.cryptostats.data.room.entities.TradeHistoryEntity
+import com.avelycure.cryptostats.data.local.entities.TradeHistoryEntity
 
 data class Trade(
     val timestampms: Long,

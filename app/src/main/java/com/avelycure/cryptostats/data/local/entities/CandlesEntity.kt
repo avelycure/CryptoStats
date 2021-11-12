@@ -1,9 +1,9 @@
-package com.avelycure.cryptostats.data.room.entities
+package com.avelycure.cryptostats.data.local.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import com.avelycure.cryptostats.data.room.type_converters.ConverterListListFloat
+import com.avelycure.cryptostats.data.local.type_converters.ConverterListListFloat
 import com.avelycure.cryptostats.domain.Candle
 import kotlin.math.roundToInt
 

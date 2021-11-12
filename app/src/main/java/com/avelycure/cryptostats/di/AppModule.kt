@@ -2,23 +2,20 @@ package com.avelycure.cryptostats.di
 
 import android.content.Context
 import com.avelycure.cryptostats.common.Constants
-import com.avelycure.cryptostats.data.api_service.GeminiApiService
-import com.avelycure.cryptostats.data.network.INetworkStatus
-import com.avelycure.cryptostats.data.network.NetworkStatus
+import com.avelycure.cryptostats.data.remote.api_service.GeminiApiService
+import com.avelycure.cryptostats.utils.network_utils.INetworkStatus
+import com.avelycure.cryptostats.utils.network_utils.NetworkStatus
 import com.avelycure.cryptostats.data.repo.CryptoRepo
 import com.avelycure.cryptostats.data.repo.ICryptoRepo
 import com.avelycure.cryptostats.presentation.CryptoInfoViewModel
-import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-import com.avelycure.cryptostats.data.room.AppDatabase
+import com.avelycure.cryptostats.data.local.AppDatabase
 
 import androidx.room.Room
-import com.avelycure.cryptostats.App
-import com.avelycure.cryptostats.data.room.dao.ScreenDao
 
 
 val appModule = module {
@@ -37,7 +34,7 @@ val appModule = module {
     single { provideAppDatabase(get()) }
     single { provideScreenDao(get()) }
 
-    viewModel { CryptoInfoViewModel(get(), get()) }
+    viewModel { CryptoInfoViewModel(get()) }
 
     single<GeminiApiService> {
         Retrofit.Builder()

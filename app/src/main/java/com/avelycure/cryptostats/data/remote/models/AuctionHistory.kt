@@ -1,4 +1,4 @@
-package com.avelycure.cryptostats.data.models
+package com.avelycure.cryptostats.data.remote.models
 
 data class AuctionHistory(
     val timestamp: Long,

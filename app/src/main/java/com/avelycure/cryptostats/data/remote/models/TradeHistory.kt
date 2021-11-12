@@ -1,6 +1,6 @@
-package com.avelycure.cryptostats.data.models
+package com.avelycure.cryptostats.data.remote.models
 
-import com.avelycure.cryptostats.data.room.entities.TradeHistoryEntity
+import com.avelycure.cryptostats.data.local.entities.TradeHistoryEntity
 import com.avelycure.cryptostats.domain.Trade
 
 data class TradeHistory(

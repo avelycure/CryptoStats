@@ -1,4 +1,4 @@
-package com.avelycure.cryptostats.data.network
+package com.avelycure.cryptostats.utils.network_utils
 
 import android.content.Context
 import android.net.ConnectivityManager
