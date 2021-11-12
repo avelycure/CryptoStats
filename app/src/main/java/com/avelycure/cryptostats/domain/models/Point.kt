@@ -1,4 +1,4 @@
-package com.avelycure.cryptostats.domain
+package com.avelycure.cryptostats.domain.models
 
 import androidx.room.Entity
 

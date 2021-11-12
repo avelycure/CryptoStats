@@ -1,4 +1,4 @@
-package com.avelycure.cryptostats.domain
+package com.avelycure.cryptostats.domain.models
 
 data class Statistic24h(
     val symbol: String = "",

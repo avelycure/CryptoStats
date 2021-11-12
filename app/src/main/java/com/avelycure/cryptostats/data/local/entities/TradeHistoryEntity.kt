@@ -2,7 +2,7 @@ package com.avelycure.cryptostats.data.local.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.avelycure.cryptostats.domain.Trade
+import com.avelycure.cryptostats.domain.models.Trade
 
 @Entity(tableName = "trade_history")
 data class TradeHistoryEntity(

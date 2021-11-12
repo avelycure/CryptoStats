@@ -1,7 +1,7 @@
 package com.avelycure.cryptostats.data.remote.models
 
 import com.avelycure.cryptostats.data.local.entities.TradeHistoryEntity
-import com.avelycure.cryptostats.domain.Trade
+import com.avelycure.cryptostats.domain.models.Trade
 
 data class TradeHistory(
     val timestamp: Long,

@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.avelycure.cryptostats.data.local.type_converters.ConverterListListFloat
-import com.avelycure.cryptostats.domain.Candle
+import com.avelycure.cryptostats.domain.models.Candle
 import kotlin.math.roundToInt
 
 @Entity(tableName = "candles")

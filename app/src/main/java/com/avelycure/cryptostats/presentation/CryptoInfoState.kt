@@ -1,9 +1,9 @@
 package com.avelycure.cryptostats.presentation
 
-import com.avelycure.cryptostats.domain.CoinPrice
-import com.avelycure.cryptostats.domain.Statistic24h
-import com.avelycure.cryptostats.domain.Ticker
-import com.avelycure.cryptostats.domain.Trade
+import com.avelycure.cryptostats.domain.models.CoinPrice
+import com.avelycure.cryptostats.domain.models.Statistic24h
+import com.avelycure.cryptostats.domain.models.Ticker
+import com.avelycure.cryptostats.domain.models.Trade
 
 data class CryptoInfoState(
     val statistic: Statistic24h,

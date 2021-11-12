@@ -18,8 +18,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.avelycure.cryptostats.R
-import com.avelycure.cryptostats.domain.CoinPrice
-import com.avelycure.cryptostats.domain.Statistic24h
+import com.avelycure.cryptostats.domain.models.CoinPrice
+import com.avelycure.cryptostats.domain.models.Statistic24h
 import com.github.mikephil.charting.charts.CandleStickChart
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.Legend

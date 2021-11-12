@@ -1,7 +1,7 @@
 package com.avelycure.cryptostats.data.remote.models
 
 import com.avelycure.cryptostats.data.local.entities.TickerV1Entity
-import com.avelycure.cryptostats.domain.TickerV1Model
+import com.avelycure.cryptostats.domain.models.TickerV1Model
 
 data class TickerV1(
     val bid: Float,

@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.avelycure.cryptostats.data.local.type_converters.ConverterListFloat
-import com.avelycure.cryptostats.domain.Ticker
+import com.avelycure.cryptostats.domain.models.Ticker
 
 @Entity(tableName = "ticker")
 data class TickerEntity(

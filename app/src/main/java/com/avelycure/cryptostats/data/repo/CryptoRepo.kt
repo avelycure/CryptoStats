@@ -6,10 +6,10 @@ import com.avelycure.cryptostats.data.remote.models.*
 import com.avelycure.cryptostats.utils.network_utils.INetworkStatus
 import com.avelycure.cryptostats.data.local.dao.ScreenDao
 import com.avelycure.cryptostats.data.local.entities.*
-import com.avelycure.cryptostats.domain.Candle
-import com.avelycure.cryptostats.domain.Ticker
-import com.avelycure.cryptostats.domain.TickerV1Model
-import com.avelycure.cryptostats.domain.Trade
+import com.avelycure.cryptostats.domain.models.Candle
+import com.avelycure.cryptostats.domain.models.Ticker
+import com.avelycure.cryptostats.domain.models.TickerV1Model
+import com.avelycure.cryptostats.domain.models.Trade
 import com.avelycure.cryptostats.domain.state.DataState
 import io.reactivex.rxjava3.core.Observable
 import java.util.concurrent.TimeUnit

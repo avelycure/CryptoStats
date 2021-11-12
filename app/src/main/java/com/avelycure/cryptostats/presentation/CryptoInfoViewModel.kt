@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.avelycure.cryptostats.data.remote.models.*
 import com.avelycure.cryptostats.data.repo.ICryptoRepo
 import io.reactivex.rxjava3.core.Observable
-import com.avelycure.cryptostats.domain.*
+import com.avelycure.cryptostats.domain.models.*
 import com.avelycure.cryptostats.domain.state.DataState
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers

@@ -1,10 +1,10 @@
 package com.avelycure.cryptostats.data.repo
 
 import com.avelycure.cryptostats.data.remote.models.PriceFeed
-import com.avelycure.cryptostats.domain.Candle
-import com.avelycure.cryptostats.domain.Ticker
-import com.avelycure.cryptostats.domain.TickerV1Model
-import com.avelycure.cryptostats.domain.Trade
+import com.avelycure.cryptostats.domain.models.Candle
+import com.avelycure.cryptostats.domain.models.Ticker
+import com.avelycure.cryptostats.domain.models.TickerV1Model
+import com.avelycure.cryptostats.domain.models.Trade
 import com.avelycure.cryptostats.domain.state.DataState
 import io.reactivex.rxjava3.core.Observable
 

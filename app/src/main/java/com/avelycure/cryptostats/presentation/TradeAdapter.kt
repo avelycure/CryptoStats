@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.RecyclerView
 import com.avelycure.cryptostats.R
-import com.avelycure.cryptostats.domain.Trade
+import com.avelycure.cryptostats.domain.models.Trade
 import java.text.SimpleDateFormat
 import java.util.*
 

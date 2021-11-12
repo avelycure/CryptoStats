@@ -1,7 +1,7 @@
 package com.avelycure.cryptostats.data.remote.models
 
 import com.avelycure.cryptostats.data.local.entities.TickerEntity
-import com.avelycure.cryptostats.domain.Ticker
+import com.avelycure.cryptostats.domain.models.Ticker
 
 data class TickerV2(
     val symbol: String,
