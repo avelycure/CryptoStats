@@ -1,4 +1,4 @@
-package com.avelycure.cryptostats.presentation
+package com.avelycure.cryptostats.presentation.home
 
 import android.view.LayoutInflater
 import android.view.View

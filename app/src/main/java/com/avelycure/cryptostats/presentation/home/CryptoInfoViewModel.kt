@@ -1,10 +1,9 @@
-package com.avelycure.cryptostats.presentation
+package com.avelycure.cryptostats.presentation.home
 
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.avelycure.cryptostats.data.remote.models.*
 import com.avelycure.cryptostats.data.repo.ICryptoRepo
 import io.reactivex.rxjava3.core.Observable
 import com.avelycure.cryptostats.domain.models.*

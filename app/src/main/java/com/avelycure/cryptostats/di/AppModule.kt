@@ -7,7 +7,7 @@ import com.avelycure.cryptostats.utils.network_utils.INetworkStatus
 import com.avelycure.cryptostats.utils.network_utils.NetworkStatus
 import com.avelycure.cryptostats.data.repo.CryptoRepo
 import com.avelycure.cryptostats.data.repo.ICryptoRepo
-import com.avelycure.cryptostats.presentation.CryptoInfoViewModel
+import com.avelycure.cryptostats.presentation.home.CryptoInfoViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import retrofit2.Retrofit

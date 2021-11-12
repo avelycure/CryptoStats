@@ -1,4 +1,4 @@
-package com.avelycure.cryptostats.presentation
+package com.avelycure.cryptostats.presentation.home
 
 import com.avelycure.cryptostats.domain.models.CoinPrice
 import com.avelycure.cryptostats.domain.models.Statistic24h
