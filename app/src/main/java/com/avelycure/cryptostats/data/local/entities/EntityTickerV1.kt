@@ -2,10 +2,10 @@ package com.avelycure.cryptostats.data.local.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.avelycure.cryptostats.domain.models.TickerV1Model
+import com.avelycure.cryptostats.domain.models.TickerV1
 
 @Entity(tableName = "ticker_v1")
-data class TickerV1Entity(
+data class EntityTickerV1(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
     val dateOfSave: Long,
@@ -13,8 +13,8 @@ data class TickerV1Entity(
     val ask: Float,
 )
 
-fun TickerV1Entity.toTickerV1Model(): TickerV1Model {
-    return TickerV1Model(
+fun EntityTickerV1.toTickerV1(): TickerV1 {
+    return TickerV1(
         bid = bid,
         ask = ask
     )

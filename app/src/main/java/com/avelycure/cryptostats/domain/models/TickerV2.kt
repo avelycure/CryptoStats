@@ -1,6 +1,6 @@
 package com.avelycure.cryptostats.domain.models
 
-data class Ticker(
+data class TickerV2(
     val symbol: String = "",
     val bid: Float = 0f,
     val ask: Float = 0f,

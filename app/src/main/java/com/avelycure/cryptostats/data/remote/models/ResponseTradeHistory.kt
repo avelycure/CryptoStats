@@ -1,9 +1,9 @@
 package com.avelycure.cryptostats.data.remote.models
 
-import com.avelycure.cryptostats.data.local.entities.TradeHistoryEntity
+import com.avelycure.cryptostats.data.local.entities.EntityTradeHistory
 import com.avelycure.cryptostats.domain.models.Trade
 
-data class TradeHistory(
+data class ResponseTradeHistory(
     val timestamp: Long,
     val timestampms: Long,
     val tid: Long,
@@ -13,8 +13,8 @@ data class TradeHistory(
     val type: String
 )
 
-fun TradeHistory.toTradeHistoryEntity(): TradeHistoryEntity {
-    return TradeHistoryEntity(
+fun ResponseTradeHistory.toTradeHistoryEntity(): EntityTradeHistory {
+    return EntityTradeHistory(
         id = 0,
         dataOfSave = 0L,
         timestampms = timestampms,
@@ -25,7 +25,7 @@ fun TradeHistory.toTradeHistoryEntity(): TradeHistoryEntity {
     )
 }
 
-fun TradeHistory.toTrade(): Trade {
+fun ResponseTradeHistory.toTrade(): Trade {
     return Trade(
         timestampms = timestampms,
         tid = tid,

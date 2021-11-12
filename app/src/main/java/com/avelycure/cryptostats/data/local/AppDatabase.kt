@@ -3,18 +3,18 @@ package com.avelycure.cryptostats.data.local
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.avelycure.cryptostats.data.local.dao.ScreenDao
+import com.avelycure.cryptostats.data.local.dao.CacheDao
 import com.avelycure.cryptostats.data.local.entities.*
 import com.avelycure.cryptostats.data.local.type_converters.ConverterListFloat
 import com.avelycure.cryptostats.data.local.type_converters.ConverterListListFloat
 
 @Database(
     entities = arrayOf(
-        TickerEntity::class,
-        PriceFeedEntity::class,
-        TickerV1Entity::class,
-        TradeHistoryEntity::class,
-        CandlesEntity::class
+        EntityTickerV2::class,
+        EntityPriceFeed::class,
+        EntityTickerV1::class,
+        EntityTradeHistory::class,
+        EntityCandles::class
     ), version = 1
 )
 @TypeConverters(
@@ -24,5 +24,5 @@ import com.avelycure.cryptostats.data.local.type_converters.ConverterListListFlo
     )
 )
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun screenDao(): ScreenDao
+    abstract fun cacheDao(): CacheDao
 }

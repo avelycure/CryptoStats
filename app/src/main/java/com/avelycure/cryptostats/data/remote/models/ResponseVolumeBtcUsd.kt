@@ -1,6 +1,6 @@
 package com.avelycure.cryptostats.data.remote.models
 
-data class VolumeBtcUsd(
+data class ResponseVolumeBtcUsd(
     val BTC: Float,
     val USD: Float,
     val timestamp: Long

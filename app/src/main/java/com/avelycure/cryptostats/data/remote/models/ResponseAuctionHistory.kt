@@ -1,6 +1,6 @@
 package com.avelycure.cryptostats.data.remote.models
 
-data class AuctionHistory(
+data class ResponseAuctionHistory(
     val timestamp: Long,
     val timestampms: Long,
     val auction_id: Long,

@@ -4,10 +4,10 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.avelycure.cryptostats.data.local.type_converters.ConverterListFloat
-import com.avelycure.cryptostats.domain.models.Ticker
+import com.avelycure.cryptostats.domain.models.TickerV2
 
 @Entity(tableName = "ticker")
-data class TickerEntity(
+data class EntityTickerV2(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
     val dateOfSave: Long,
@@ -22,8 +22,8 @@ data class TickerEntity(
     val changes: List<Float>
 )
 
-fun TickerEntity.toTicker(): Ticker {
-    return Ticker(
+fun EntityTickerV2.toTickerV2(): TickerV2 {
+    return TickerV2(
         symbol = symbol,
         bid = bid,
         ask = ask,

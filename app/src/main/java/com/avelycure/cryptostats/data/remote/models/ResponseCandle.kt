@@ -1,6 +1,6 @@
 package com.avelycure.cryptostats.data.remote.models
 
-data class CandleResponse(
+data class ResponseCandle(
     val time: Long,
     val open: Float,
     val high: Float,

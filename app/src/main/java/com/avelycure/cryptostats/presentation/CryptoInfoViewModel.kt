@@ -8,6 +8,7 @@ import com.avelycure.cryptostats.data.remote.models.*
 import com.avelycure.cryptostats.data.repo.ICryptoRepo
 import io.reactivex.rxjava3.core.Observable
 import com.avelycure.cryptostats.domain.models.*
+import com.avelycure.cryptostats.domain.models.TickerV2
 import com.avelycure.cryptostats.domain.state.DataState
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -24,7 +25,7 @@ class CryptoInfoViewModel(
         _state.value = CryptoInfoState(
             statistic = Statistic24h(),
             coinPrice = CoinPrice(),
-            ticker = Ticker(),
+            tickerV2 = TickerV2(),
             trades = emptyList()
         )
     }
@@ -54,9 +55,9 @@ class CryptoInfoViewModel(
             }, {})
     }
 
-    private fun makeTickerRequest(symbol: String): Observable<DataState<Ticker>> {
+    private fun makeTickerRequest(symbol: String): Observable<DataState<TickerV2>> {
         Log.d("mytag", "Make request to ticker")
-        return repo.getTicker(symbol)
+        return repo.getTickerV2(symbol)
     }
 
     fun requestPriceFeed(pair: String) {
@@ -68,7 +69,7 @@ class CryptoInfoViewModel(
             }, {})
     }
 
-    private fun makePriceFeedRequest(): Observable<DataState<List<PriceFeed>>> {
+    private fun makePriceFeedRequest(): Observable<DataState<List<CoinPrice>>> {
         return repo.getPriceFeed()
     }
 
@@ -79,7 +80,7 @@ class CryptoInfoViewModel(
             .subscribe({ data -> onResponseTickerV1(data) }, {}, {})
     }
 
-    private fun makeTickerV1Request(symbol: String): Observable<DataState<TickerV1Model>> {
+    private fun makeTickerV1Request(symbol: String): Observable<DataState<TickerV1>> {
         return repo.getTickerV1(symbol)
     }
 
@@ -130,12 +131,12 @@ class CryptoInfoViewModel(
         }
     }
 
-    private fun onResponseTickerV1(data: DataState<TickerV1Model>) {
+    private fun onResponseTickerV1(data: DataState<TickerV1>) {
         if (data is DataState.DataRemote) {
-            val newTicker = _state.value?.ticker?.copy(
+            val newTicker = _state.value?.tickerV2?.copy(
                 bid = data.data.bid,
                 ask = data.data.ask
-            ) ?: Ticker(
+            ) ?: TickerV2(
                 bid = 0f,
                 ask = 0f,
                 high = 0f,
@@ -146,14 +147,14 @@ class CryptoInfoViewModel(
                 open = 0f
             )
             _state.value = _state.value?.copy(
-                ticker = newTicker
+                tickerV2 = newTicker
             )
         }
         if (data is DataState.DataCache) {
-            val newTicker = _state.value?.ticker?.copy(
+            val newTicker = _state.value?.tickerV2?.copy(
                 bid = data.data.bid,
                 ask = data.data.ask
-            ) ?: Ticker(
+            ) ?: TickerV2(
                 bid = 0f,
                 ask = 0f,
                 high = 0f,
@@ -164,12 +165,12 @@ class CryptoInfoViewModel(
                 open = 0f
             )
             _state.value = _state.value?.copy(
-                ticker = newTicker
+                tickerV2 = newTicker
             )
         }
     }
 
-    private fun onResponsePriceFeed(data: DataState<List<PriceFeed>>, pair: String) {
+    private fun onResponsePriceFeed(data: DataState<List<CoinPrice>>, pair: String) {
         if (data is DataState.DataRemote) {
             Log.d("mytag", "View model remote")
             for (i in data.data)
@@ -198,7 +199,7 @@ class CryptoInfoViewModel(
         }
     }
 
-    private fun onResponseTicker(data: DataState<Ticker>) {
+    private fun onResponseTicker(data: DataState<TickerV2>) {
         Log.d("mytag", "Got response from ticker")
         if (data is DataState.DataRemote) {
             Log.d("mytag", "Remote")

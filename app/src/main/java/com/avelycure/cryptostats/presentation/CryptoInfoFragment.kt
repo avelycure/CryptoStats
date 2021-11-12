@@ -108,8 +108,8 @@ class CryptoInfoFragment : Fragment() {
                 else
                     tvPriceChange.setTextColor(Color.RED)
 
-                currentTvAskPrice.text = state.ticker.ask.toString()
-                currentTvBidPrice.text = state.ticker.bid.toString()
+                currentTvAskPrice.text = state.tickerV2.ask.toString()
+                currentTvBidPrice.text = state.tickerV2.bid.toString()
             }
 
             updatePrice(state.coinPrice)

@@ -1,9 +1,9 @@
 package com.avelycure.cryptostats.data.remote.models
 
-import com.avelycure.cryptostats.data.local.entities.TickerEntity
-import com.avelycure.cryptostats.domain.models.Ticker
+import com.avelycure.cryptostats.data.local.entities.EntityTickerV2
+import com.avelycure.cryptostats.domain.models.TickerV2
 
-data class TickerV2(
+data class ResponseTickerV2(
     val symbol: String,
     val open: Float,
     val high: Float,
@@ -14,8 +14,8 @@ data class TickerV2(
     val ask: Float
 )
 
-fun TickerV2.toTickerEntity(): TickerEntity {
-    return TickerEntity(
+fun ResponseTickerV2.toEntityTickerV2(): EntityTickerV2 {
+    return EntityTickerV2(
         id = 0,
         dateOfSave = 0L,
         symbol = symbol,
@@ -29,8 +29,8 @@ fun TickerV2.toTickerEntity(): TickerEntity {
     )
 }
 
-fun TickerV2.toTicker(): Ticker {
-    return Ticker(
+fun ResponseTickerV2.toTickerV2(): TickerV2 {
+    return TickerV2(
         symbol = symbol,
         bid = bid,
         ask = ask,

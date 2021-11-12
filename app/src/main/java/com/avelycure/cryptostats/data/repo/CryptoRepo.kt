@@ -4,12 +4,9 @@ import android.util.Log
 import com.avelycure.cryptostats.data.remote.api_service.GeminiApiService
 import com.avelycure.cryptostats.data.remote.models.*
 import com.avelycure.cryptostats.utils.network_utils.INetworkStatus
-import com.avelycure.cryptostats.data.local.dao.ScreenDao
+import com.avelycure.cryptostats.data.local.dao.CacheDao
 import com.avelycure.cryptostats.data.local.entities.*
-import com.avelycure.cryptostats.domain.models.Candle
-import com.avelycure.cryptostats.domain.models.Ticker
-import com.avelycure.cryptostats.domain.models.TickerV1Model
-import com.avelycure.cryptostats.domain.models.Trade
+import com.avelycure.cryptostats.domain.models.*
 import com.avelycure.cryptostats.domain.state.DataState
 import io.reactivex.rxjava3.core.Observable
 import java.util.concurrent.TimeUnit
@@ -17,23 +14,26 @@ import java.util.concurrent.TimeUnit
 class CryptoRepo(
     private val apiService: GeminiApiService,
     private val networkStatus: INetworkStatus,
-    private val screenDao: ScreenDao
+    private val cacheDao: CacheDao
 ) : ICryptoRepo {
 
-    override fun getCandles(symbol: String, timeFrame: String): Observable<DataState<List<Candle>>> {
+    override fun getCandles(
+        symbol: String,
+        timeFrame: String
+    ): Observable<DataState<List<Candle>>> {
         return networkStatus.isOnline().flatMap { isOnline ->
             if (isOnline) {
                 apiService
                     .getCandles(symbol, timeFrame)
                     .flatMap { candles ->
-                        screenDao.insertCandles(candles.toCandlesEntity())
+                        cacheDao.insertCandles(candles.toEntityCandles())
                         Observable.fromCallable { DataState.DataRemote(data = candles.toCandleList()) }
                     }.repeatWhen { completed ->
                         Log.d("mytag", "Repeated request candles")
                         completed.delay(5, TimeUnit.MINUTES)
                     }
             } else {
-                val result = screenDao.getCandles().last().toCandleList()
+                val result = cacheDao.getCandles().last().toCandleList()
                 Observable.fromCallable { DataState.DataCache(data = result) }
             }
         }.retryWhen { error ->
@@ -43,20 +43,20 @@ class CryptoRepo(
         }
     }
 
-    override fun getTicker(symbol: String): Observable<DataState<Ticker>> {
+    override fun getTickerV2(symbol: String): Observable<DataState<TickerV2>> {
         return networkStatus.isOnline().flatMap { isOnline ->
             if (isOnline) {
                 apiService
                     .getTickerV2(symbol)
                     .flatMap { tickerV2 ->
-                        screenDao.insertTicker(tickerV2.toTickerEntity())
-                        Observable.fromCallable { DataState.DataRemote(data = tickerV2.toTicker()) }
+                        cacheDao.insertTickerV2(tickerV2.toEntityTickerV2())
+                        Observable.fromCallable { DataState.DataRemote(data = tickerV2.toTickerV2()) }
                     }.repeatWhen { completed ->
                         Log.d("mytag", "Repeated request")
                         completed.delay(5, TimeUnit.SECONDS)
                     }
             } else {
-                val result = screenDao.getTicker().last().toTicker()
+                val result = cacheDao.getTickerV2().last().toTickerV2()
                 Observable.fromCallable { DataState.DataCache(data = result) }
             }
         }.retryWhen { error ->
@@ -66,22 +66,22 @@ class CryptoRepo(
         }
     }
 
-    override fun getPriceFeed(): Observable<DataState<List<PriceFeed>>> {
+    override fun getPriceFeed(): Observable<DataState<List<CoinPrice>>> {
         return networkStatus.isOnline().flatMap { isOnline ->
             if (isOnline) {
                 apiService
                     .getPriceFeed()
                     .flatMap { priceFeed ->
-                        screenDao.dropPriceFeedTable()
+                        cacheDao.dropPriceFeedTable()
                         for (price in priceFeed)
-                            screenDao.insertPriceFeed(price.toPriceFeedEntity())
-                        Observable.fromCallable { DataState.DataRemote(data = priceFeed) }
+                            cacheDao.insertPriceFeed(price.toEntityPriceFeed())
+                        Observable.fromCallable { DataState.DataRemote(data = priceFeed.map { it.toCoinPrice() }) }
                     }.repeatWhen { completed ->
                         Log.d("mytag", "Repeated request")
                         completed.delay(5, TimeUnit.SECONDS)
                     }
             } else {
-                val result = screenDao.getPriceFeed().map { it.toPriceFeed() }
+                val result = cacheDao.getPriceFeed().map { it.toCoinPrice() }
                 Observable.fromCallable { DataState.DataCache(data = result) }
             }
         }.retryWhen { error ->
@@ -91,20 +91,20 @@ class CryptoRepo(
         }
     }
 
-    override fun getTickerV1(symbol: String): Observable<DataState<TickerV1Model>> {
+    override fun getTickerV1(symbol: String): Observable<DataState<TickerV1>> {
         return networkStatus.isOnline().flatMap { isOnline ->
             if (isOnline) {
                 apiService
                     .getTickerV1(symbol)
                     .flatMap { tickerV1 ->
-                        screenDao.insertTickerV1(tickerV1.toTickerV1Entity())
-                        Observable.fromCallable { DataState.DataRemote(data = tickerV1.toTickerV1Model()) }
+                        cacheDao.insertTickerV1(tickerV1.toEntityTickerV1())
+                        Observable.fromCallable { DataState.DataRemote(data = tickerV1.toTickerV1()) }
                     }.repeatWhen { completed ->
                         Log.d("mytag", "Repeated request")
                         completed.delay(5, TimeUnit.SECONDS)
                     }
             } else {
-                val result = screenDao.getTickerV1().last().toTickerV1Model()
+                val result = cacheDao.getTickerV1().last().toTickerV1()
                 Observable.fromCallable { DataState.DataCache(data = result) }
             }
         }.retryWhen { error ->
@@ -120,16 +120,16 @@ class CryptoRepo(
                 apiService
                     .getTradeHistory(symbol, limit)
                     .flatMap { trades ->
-                        screenDao.dropTradeHistoryTable()
+                        cacheDao.dropTradeHistoryTable()
                         for (trade in trades)
-                            screenDao.insertTradeHistory(trade.toTradeHistoryEntity())
+                            cacheDao.insertTradeHistory(trade.toTradeHistoryEntity())
                         Observable.fromCallable { DataState.DataRemote(data = trades.map { it.toTrade() }) }
                     }.repeatWhen { completed ->
                         Log.d("mytag", "Repeated request")
                         completed.delay(5, TimeUnit.SECONDS)
                     }
             } else {
-                val result = screenDao.getTradeHistory().map { it.toTrade() }
+                val result = cacheDao.getTradeHistory().map { it.toTrade() }
                 Observable.fromCallable { DataState.DataCache(data = result) }
             }
         }.retryWhen { error ->

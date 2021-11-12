@@ -8,7 +8,7 @@ import com.avelycure.cryptostats.domain.models.Candle
 import kotlin.math.roundToInt
 
 @Entity(tableName = "candles")
-data class CandlesEntity(
+data class EntityCandles(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
     val dateOfSave: Long,
@@ -33,8 +33,8 @@ fun List<List<Float>>.toCandleList(): List<Candle> {
     return candleList
 }
 
-fun List<List<Float>>.toCandlesEntity(): CandlesEntity {
-    return CandlesEntity(
+fun List<List<Float>>.toEntityCandles(): EntityCandles {
+    return EntityCandles(
         id = 0,
         dateOfSave = 0L,
         candles = this.toList()
@@ -42,7 +42,7 @@ fun List<List<Float>>.toCandlesEntity(): CandlesEntity {
     )
 }
 
-fun CandlesEntity.toCandleList(): List<Candle> {
+fun EntityCandles.toCandleList(): List<Candle> {
     val candleList = mutableListOf<Candle>()
     for (candle in this.candles)
         candleList.add(

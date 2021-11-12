@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import com.avelycure.cryptostats.domain.models.Trade
 
 @Entity(tableName = "trade_history")
-data class TradeHistoryEntity(
+data class EntityTradeHistory(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
     val dataOfSave: Long,
@@ -16,7 +16,7 @@ data class TradeHistoryEntity(
     val type: String
 )
 
-fun TradeHistoryEntity.toTrade(): Trade {
+fun EntityTradeHistory.toTrade(): Trade {
     return Trade(
         timestampms = timestampms,
         tid = tid,

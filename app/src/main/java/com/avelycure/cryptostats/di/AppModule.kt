@@ -29,7 +29,7 @@ val appModule = module {
             //.fallbackToDestructiveMigration()
             .build()
 
-    fun provideScreenDao(appDatabase: AppDatabase) = appDatabase.screenDao()
+    fun provideScreenDao(appDatabase: AppDatabase) = appDatabase.cacheDao()
 
     single { provideAppDatabase(get()) }
     single { provideScreenDao(get()) }
