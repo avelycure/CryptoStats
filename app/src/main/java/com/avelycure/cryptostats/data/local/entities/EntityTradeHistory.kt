@@ -2,7 +2,6 @@ package com.avelycure.cryptostats.data.local.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.avelycure.cryptostats.domain.models.Trade
 
 @Entity(tableName = "trade_history")
 data class EntityTradeHistory(
@@ -15,13 +14,3 @@ data class EntityTradeHistory(
     val amount: Float,
     val type: String
 )
-
-fun EntityTradeHistory.toTrade(): Trade {
-    return Trade(
-        timestampms = timestampms,
-        tid = tid,
-        price = price,
-        amount = amount,
-        type = type
-    )
-}
