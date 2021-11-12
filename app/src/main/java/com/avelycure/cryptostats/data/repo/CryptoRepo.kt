@@ -2,10 +2,10 @@ package com.avelycure.cryptostats.data.repo
 
 import android.util.Log
 import com.avelycure.cryptostats.data.remote.api_service.GeminiApiService
-import com.avelycure.cryptostats.data.remote.models.*
 import com.avelycure.cryptostats.utils.network_utils.INetworkStatus
 import com.avelycure.cryptostats.data.local.dao.CacheDao
 import com.avelycure.cryptostats.data.local.entities.*
+import com.avelycure.cryptostats.data.remote.models.mappers.*
 import com.avelycure.cryptostats.domain.models.*
 import com.avelycure.cryptostats.domain.state.DataState
 import io.reactivex.rxjava3.core.Observable
