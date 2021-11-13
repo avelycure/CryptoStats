@@ -57,98 +57,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/toolbar_layout" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/container_stat24"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                app:layout_constraintTop_toBottomOf="@+id/ci_tv_coin_name">
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/ci_tv_coin_value"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:textColor="?attr/textFillColor"
-                    android:textSize="40sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/ci_last24_stats"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <RelativeLayout
-                    android:id="@+id/ci_last24_stats"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/ci_tv_coin_value"
-                    app:layout_constraintTop_toTopOf="@+id/ci_tv_coin_value">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/tv24percent"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentStart="true"
-                        android:text="24H%"
-                        android:textColor="?attr/titleTextColor"
-                        android:textSize="16sp" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/tv24low"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/tv24percent"
-                        android:layout_alignParentStart="true"
-                        android:layout_marginEnd="4dp"
-                        android:text="24H Low"
-                        android:textColor="?attr/titleTextColor"
-                        android:textSize="16sp" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/tv24low"
-                        android:layout_alignParentStart="true"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginEnd="4dp"
-                        android:text="24H High"
-                        android:textColor="?attr/titleTextColor"
-                        android:textSize="16sp" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/ci_tv_percent_change_in_last_24h"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:textColor="?attr/textFillColor"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/ci_tv_lowest_in_last_24h"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/ci_tv_percent_change_in_last_24h"
-                        android:layout_alignParentEnd="true"
-                        android:textColor="?attr/textFillColor"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/ci_tv_highest_in_last_24h"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/ci_tv_lowest_in_last_24h"
-                        android:layout_alignParentEnd="true"
-                        android:textColor="?attr/textFillColor"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                </RelativeLayout>
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            <include layout="@layout/stat24" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/price"
@@ -369,21 +278,22 @@
                 android:id="@+id/horizontal_sv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/trades"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintTop_toBottomOf="@id/trades">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
+
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/rv_labels"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
                         android:layout_marginBottom="4dp"
-                        android:background="?attr/colorSecondary"
-                        android:layout_gravity="center_horizontal">
+                        android:background="?attr/colorSecondary">
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/rv_trade_date"
@@ -456,8 +366,8 @@
                         android:id="@+id/rv_trades"
                         android:layout_width="wrap_content"
                         android:layout_height="480dp"
-                        android:orientation="vertical"
-                        android:layout_gravity="center_horizontal"/>
+                        android:layout_gravity="center_horizontal"
+                        android:orientation="vertical" />
 
                 </LinearLayout>
 

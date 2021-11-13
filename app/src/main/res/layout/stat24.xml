@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="8dp"
+    android:id="@+id/container_stat24"
+    app:layout_constraintTop_toBottomOf="@+id/ci_tv_coin_name"
+    android:layout_marginEnd="8dp">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/ci_tv_coin_value"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textColor="?attr/textFillColor"
+        android:textSize="40sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/ci_last24_stats"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <RelativeLayout
+        android:id="@+id/ci_last24_stats"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/ci_tv_coin_value"
+        app:layout_constraintTop_toTopOf="@+id/ci_tv_coin_value">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv24percent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:text="24H%"
+            android:textColor="?attr/titleTextColor"
+            android:textSize="16sp" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv24low"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv24percent"
+            android:layout_alignParentStart="true"
+            android:layout_marginEnd="4dp"
+            android:text="24H Low"
+            android:textColor="?attr/titleTextColor"
+            android:textSize="16sp" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv24low"
+            android:layout_alignParentStart="true"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="4dp"
+            android:text="24H High"
+            android:textColor="?attr/titleTextColor"
+            android:textSize="16sp" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/ci_tv_percent_change_in_last_24h"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:textColor="?attr/textFillColor"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/ci_tv_lowest_in_last_24h"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ci_tv_percent_change_in_last_24h"
+            android:layout_alignParentEnd="true"
+            android:textColor="?attr/textFillColor"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/ci_tv_highest_in_last_24h"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ci_tv_lowest_in_last_24h"
+            android:layout_alignParentEnd="true"
+            android:textColor="?attr/textFillColor"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
