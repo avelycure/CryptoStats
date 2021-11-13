@@ -29,7 +29,8 @@ class CryptoInfoViewModel(
             statistic = Statistic24h(),
             coinPrice = CoinPrice(),
             tickerV2 = TickerV2(),
-            trades = emptyList()
+            trades = emptyList(),
+            remoteData = true
         )
     }
 
@@ -94,186 +95,137 @@ class CryptoInfoViewModel(
     }
 
     private fun onResponseTradeHistory(data: DataState<List<Trade>>) {
-        if (data is DataState.DataRemote) {
-            val trades: List<Trade> = data.data.map { tradeHistory ->
-                Trade(
-                    timestampms = tradeHistory.timestampms,
-                    tid = tradeHistory.tid,
-                    price = tradeHistory.price,
-                    amount = tradeHistory.amount,
-                    type = tradeHistory.type
-                )
-            }
+        if (data is DataState.DataRemote)
+            handleTradeHistory(data.data, true)
+        if (data is DataState.DataCache)
+            handleTradeHistory(data.data, false)
+    }
 
-            _state.value = _state.value?.copy(
-                trades = trades
+    private fun handleTradeHistory(data: List<Trade>, remoteData: Boolean) {
+        val trades: List<Trade> = data.map { tradeHistory ->
+            Trade(
+                timestampms = tradeHistory.timestampms,
+                tid = tradeHistory.tid,
+                price = tradeHistory.price,
+                amount = tradeHistory.amount,
+                type = tradeHistory.type
             )
         }
-        if (data is DataState.DataCache) {
-            val trades: List<Trade> = data.data.map { tradeHistory ->
-                Trade(
-                    timestampms = tradeHistory.timestampms,
-                    tid = tradeHistory.tid,
-                    price = tradeHistory.price,
-                    amount = tradeHistory.amount,
-                    type = tradeHistory.type
-                )
-            }
 
-            _state.value = _state.value?.copy(
-                trades = trades
-            )
-        }
+        _state.value = _state.value?.copy(
+            trades = trades,
+            remoteData = remoteData
+        )
     }
 
     private fun onResponseTickerV1(data: DataState<TickerV1>) {
-        if (data is DataState.DataRemote) {
-            val newTicker = _state.value?.tickerV2?.copy(
-                bid = data.data.bid,
-                ask = data.data.ask
-            ) ?: TickerV2(
-                bid = 0f,
-                ask = 0f,
-                high = 0f,
-                low = 0f,
-                changes = emptyList(),
-                close = 0f,
-                symbol = "",
-                open = 0f
-            )
-            _state.value = _state.value?.copy(
-                tickerV2 = newTicker
-            )
-        }
-        if (data is DataState.DataCache) {
-            val newTicker = _state.value?.tickerV2?.copy(
-                bid = data.data.bid,
-                ask = data.data.ask
-            ) ?: TickerV2(
-                bid = 0f,
-                ask = 0f,
-                high = 0f,
-                low = 0f,
-                changes = emptyList(),
-                close = 0f,
-                symbol = "",
-                open = 0f
-            )
-            _state.value = _state.value?.copy(
-                tickerV2 = newTicker
-            )
-        }
+        if (data is DataState.DataRemote)
+            handleTickerV1(data.data, true)
+        if (data is DataState.DataCache)
+            handleTickerV1(data.data, false)
+    }
+
+    private fun handleTickerV1(data: TickerV1, remoteData: Boolean) {
+        val newTicker = _state.value?.tickerV2?.copy(
+            bid = data.bid,
+            ask = data.ask
+        ) ?: TickerV2(
+            bid = 0f,
+            ask = 0f,
+            high = 0f,
+            low = 0f,
+            changes = emptyList(),
+            close = 0f,
+            symbol = "",
+            open = 0f
+        )
+        _state.value = _state.value?.copy(
+            tickerV2 = newTicker,
+            remoteData = true
+        )
     }
 
     private fun onResponsePriceFeed(data: DataState<List<CoinPrice>>, pair: String) {
         if (data is DataState.DataRemote) {
             Log.d("mytag", "View model remote")
-            for (i in data.data)
-                if (i.pair == pair) {
-                    _state.value = _state.value?.copy(
-                        coinPrice = CoinPrice(
-                            price = i.price,
-                            percentChange24h = i.percentChange24h
-                        )
-                    )
-                    break
-                }
+            handlePriceFeed(data.data, pair, true)
         }
         if (data is DataState.DataCache) {
             Log.d("mytag", "View model cache")
-            for (i in data.data)
-                if (i.pair == pair) {
-                    _state.value = _state.value?.copy(
-                        coinPrice = CoinPrice(
-                            price = i.price,
-                            percentChange24h = i.percentChange24h
-                        )
-                    )
-                    break
-                }
+            handlePriceFeed(data.data, pair, false)
         }
+    }
+
+    private fun handlePriceFeed(data: List<CoinPrice>, pair: String, remoteData: Boolean) {
+        for (i in data)
+            if (i.pair == pair) {
+                _state.value = _state.value?.copy(
+                    coinPrice = CoinPrice(
+                        price = i.price,
+                        percentChange24h = i.percentChange24h
+                    ),
+                    remoteData = remoteData
+                )
+                break
+            }
     }
 
     private fun onResponseTickerV2(data: DataState<TickerV2>) {
         Log.d("mytag", "Got response from ticker")
         if (data is DataState.DataRemote) {
             Log.d("mytag", "Remote")
-            val dataForChart = arrayListOf<Point>()
-            for (i in 0 until data.data.changes.size)
-                dataForChart.add(Point(24F - i.toFloat(), data.data.changes[i]))
-
-            dataForChart.sortBy { it.x }
-
-            _state.value = state.value?.copy(
-                statistic = Statistic24h(
-                    symbol = data.data.symbol,
-                    high = data.data.high,
-                    low = data.data.low,
-                    open = data.data.open,
-                    changes = dataForChart,
-                    candles = _state.value?.statistic?.candles?.toList() ?: emptyList()
-                )
-            )
+            handleTickerV2(data.data, true)
         }
         if (data is DataState.DataCache) {
             Log.d("mytag", "Cache")
-            val dataForChart = arrayListOf<Point>()
-            for (i in 0 until data.data.changes.size)
-                dataForChart.add(Point(24F - i.toFloat(), data.data.changes[i]))
-
-            dataForChart.sortBy { it.x }
-
-            _state.value = state.value?.copy(
-                statistic = Statistic24h(
-                    symbol = data.data.symbol,
-                    high = data.data.high,
-                    low = data.data.low,
-                    open = data.data.open,
-                    changes = dataForChart,
-                    candles = _state.value?.statistic?.candles?.toList() ?: emptyList()
-                )
-            )
+            handleTickerV2(data.data, false)
         }
     }
 
+    private fun handleTickerV2(data: TickerV2, remoteData: Boolean) {
+        val dataForChart = arrayListOf<Point>()
+        for (i in 0 until data.changes.size)
+            dataForChart.add(Point(24F - i.toFloat(), data.changes[i]))
+
+        dataForChart.sortBy { it.x }
+
+        _state.value = state.value?.copy(
+            statistic = Statistic24h(
+                symbol = data.symbol,
+                high = data.high,
+                low = data.low,
+                open = data.open,
+                changes = dataForChart,
+                candles = _state.value?.statistic?.candles?.toList() ?: emptyList()
+            ),
+            remoteData = remoteData
+        )
+    }
+
     private fun onResponseCandles(candles: DataState<List<Candle>>) {
-        if (candles is DataState.DataRemote) {
-            val dataForChart = candles.data
+        if (candles is DataState.DataRemote)
+            handleCandles(candles.data, true)
+        if (candles is DataState.DataCache)
+            handleCandles(candles.data, false)
+    }
 
-            val first = dataForChart[0].time
+    private fun handleCandles(data: List<Candle>, remoteData: Boolean) {
+        val dataForChart = data
 
-            val dataForChartCopy = arrayListOf<Candle>()
-            for (i in 0 until dataForChart.size)
-                if (i % 3 == 0)
-                    dataForChartCopy.add(dataForChart[i].copy(time = (dataForChart[i].time - first) / 600F))
+        val first = dataForChart[0].time
 
-            val newStat = _state.value?.statistic?.copy(
-                candles = dataForChartCopy
-            ) ?: Statistic24h()
+        val dataForChartCopy = arrayListOf<Candle>()
+        for (i in 0 until dataForChart.size)
+            if (i % 3 == 0)
+                dataForChartCopy.add(dataForChart[i].copy(time = (dataForChart[i].time - first) / 600F))
 
-            _state.value = state.value?.copy(
-                statistic = newStat
-            )
-        }
-        if (candles is DataState.DataCache) {
-            if (candles is DataState.DataRemote) {
-                val dataForChart = candles.data
+        val newStat = _state.value?.statistic?.copy(
+            candles = dataForChartCopy
+        ) ?: Statistic24h()
 
-                val first = dataForChart[0].time
-
-                val dataForChartCopy = arrayListOf<Candle>()
-                for (i in 0 until dataForChart.size)
-                    if (i % 3 == 0)
-                        dataForChartCopy.add(dataForChart[i].copy(time = (dataForChart[i].time - first) / 600F))
-
-                val newStat = _state.value?.statistic?.copy(
-                    candles = dataForChartCopy
-                ) ?: Statistic24h()
-
-                _state.value = state.value?.copy(
-                    statistic = newStat
-                )
-            }
-        }
+        _state.value = state.value?.copy(
+            statistic = newStat,
+            remoteData = remoteData
+        )
     }
 }

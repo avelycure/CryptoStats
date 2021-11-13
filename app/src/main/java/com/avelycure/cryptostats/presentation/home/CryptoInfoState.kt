@@ -9,5 +9,6 @@ data class CryptoInfoState(
     val statistic: Statistic24h,
     val coinPrice: CoinPrice,
     val tickerV2: TickerV2,
-    val trades: List<Trade>
+    val trades: List<Trade>,
+    val remoteData: Boolean
 )
