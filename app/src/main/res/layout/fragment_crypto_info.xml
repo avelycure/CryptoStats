@@ -72,57 +72,7 @@
 
             <include layout="@layout/price24"/>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/current_price_stats"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_width="match_parent"
-                app:layout_constraintTop_toBottomOf="@+id/price_stats">
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/current_price_bid"
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
-                    android:text="Current bid"
-                    android:textColor="?attr/titleTextColor"
-                    android:textSize="16sp"
-                    app:layout_constraintEnd_toStartOf="@+id/current_ask"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/ci_tv_current_price_bid"
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
-                    android:textColor="?attr/textFillColor"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toStartOf="@+id/ci_tv_current_ask"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/current_price_bid" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/current_ask"
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
-                    android:text="Current ask"
-                    android:textColor="?attr/titleTextColor"
-                    android:textSize="16sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/current_price_bid"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/ci_tv_current_ask"
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
-                    android:textColor="?attr/textFillColor"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/ci_tv_current_price_bid"
-                    app:layout_constraintTop_toBottomOf="@+id/current_ask" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            <include layout="@layout/price"/>
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/changes"
