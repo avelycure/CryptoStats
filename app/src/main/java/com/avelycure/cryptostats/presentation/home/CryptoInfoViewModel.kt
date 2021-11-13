@@ -10,6 +10,8 @@ import com.avelycure.cryptostats.domain.models.*
 import com.avelycure.cryptostats.domain.models.TickerV2
 import com.avelycure.cryptostats.domain.state.DataState
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 
 class CryptoInfoViewModel(
@@ -20,6 +22,8 @@ class CryptoInfoViewModel(
     val state: LiveData<CryptoInfoState>
         get() = _state
 
+    private val compositeDisposable = CompositeDisposable()
+
     init {
         _state.value = CryptoInfoState(
             statistic = Statistic24h(),
@@ -29,8 +33,27 @@ class CryptoInfoViewModel(
         )
     }
 
-    fun requestCandles(symbol: String, timeFrame: String) {
-        makeRequestCandles(symbol, timeFrame)
+    data class RequestParameters(
+        val symbol: String,
+        val timeFrame: String,
+        val limit: Int,
+        val pair: String
+    )
+
+    fun requestData(requestParameters: RequestParameters) {
+        with(requestParameters) {
+            compositeDisposable.addAll(
+                requestPriceFeed(pair),
+                requestCandles(symbol, timeFrame),
+                requestTickerV1(symbol),
+                requestTickerV2(symbol),
+                requestTradeHistory(symbol, limit),
+            )
+        }
+    }
+
+    private fun requestCandles(symbol: String, timeFrame: String): Disposable {
+        return repo.getCandles(symbol, timeFrame)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponseCandles(data) }, {
@@ -38,29 +61,17 @@ class CryptoInfoViewModel(
             }, {})
     }
 
-    private fun makeRequestCandles(
-        symbol: String,
-        timeFrame: String
-    ): Observable<DataState<List<Candle>>> {
-        return repo.getCandles(symbol, timeFrame)
-    }
-
-    fun requestTicker(symbol: String) {
-        makeTickerRequest(symbol)
+    private fun requestTickerV2(symbol: String): Disposable {
+        return repo.getTickerV2(symbol)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .subscribe({ data -> onResponseTicker(data) }, {
+            .subscribe({ data -> onResponseTickerV2(data) }, {
                 Log.d("mytag", "Error: ${it.message}")
             }, {})
     }
 
-    private fun makeTickerRequest(symbol: String): Observable<DataState<TickerV2>> {
-        Log.d("mytag", "Make request to ticker")
-        return repo.getTickerV2(symbol)
-    }
-
-    fun requestPriceFeed(pair: String) {
-        makePriceFeedRequest()
+    private fun requestPriceFeed(pair: String): Disposable {
+        return repo.getPriceFeed()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponsePriceFeed(data, pair) }, {
@@ -68,33 +79,18 @@ class CryptoInfoViewModel(
             }, {})
     }
 
-    private fun makePriceFeedRequest(): Observable<DataState<List<CoinPrice>>> {
-        return repo.getPriceFeed()
-    }
-
-    fun requestTickerV1(symbol: String) {
-        makeTickerV1Request(symbol)
+    private fun requestTickerV1(symbol: String): Disposable {
+        return repo.getTickerV1(symbol)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponseTickerV1(data) }, {}, {})
     }
 
-    private fun makeTickerV1Request(symbol: String): Observable<DataState<TickerV1>> {
-        return repo.getTickerV1(symbol)
-    }
-
-    fun requestTradeHistory(symbol: String, limit: Int) {
-        makeRequestTradeHistory(symbol, limit)
+    private fun requestTradeHistory(symbol: String, limit: Int): Disposable {
+        return repo.getTrades(symbol, limit)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponseTradeHistory(data) }, {}, {})
-    }
-
-    private fun makeRequestTradeHistory(
-        symbol: String,
-        limit: Int
-    ): Observable<DataState<List<Trade>>> {
-        return repo.getTrades(symbol, limit)
     }
 
     private fun onResponseTradeHistory(data: DataState<List<Trade>>) {
@@ -198,7 +194,7 @@ class CryptoInfoViewModel(
         }
     }
 
-    private fun onResponseTicker(data: DataState<TickerV2>) {
+    private fun onResponseTickerV2(data: DataState<TickerV2>) {
         Log.d("mytag", "Got response from ticker")
         if (data is DataState.DataRemote) {
             Log.d("mytag", "Remote")
