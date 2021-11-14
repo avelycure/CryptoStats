@@ -16,6 +16,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import com.avelycure.cryptostats.data.local.AppDatabase
 
 import androidx.room.Room
+import com.avelycure.cryptostats.domain.interactors.GetCandles
 
 
 val appModule = module {
@@ -33,8 +34,9 @@ val appModule = module {
 
     single { provideAppDatabase(get()) }
     single { provideScreenDao(get()) }
+    single<GetCandles> { GetCandles(get(), get()) }
 
-    viewModel { CryptoInfoViewModel(get()) }
+    viewModel { CryptoInfoViewModel(get(), get()) }
 
     single<GeminiApiService> {
         Retrofit.Builder()
