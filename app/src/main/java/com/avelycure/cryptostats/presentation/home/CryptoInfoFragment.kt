@@ -47,6 +47,7 @@ class CryptoInfoFragment : Fragment() {
     private lateinit var tvPriceChange: AppCompatTextView
     private lateinit var currentTvBidPrice: AppCompatTextView
     private lateinit var currentTvAskPrice: AppCompatTextView
+    private lateinit var tvActuality: AppCompatTextView
     private lateinit var rvTrades: RecyclerView
 
     private val cryptoInfoViewModel: CryptoInfoViewModel by viewModel()
@@ -73,6 +74,12 @@ class CryptoInfoFragment : Fragment() {
         }
 
         cryptoInfoViewModel.state.observe(viewLifecycleOwner, { state ->
+
+            if(state.remoteData)
+                tvActuality.text = "actual"
+            else
+                tvActuality.text = "cached"
+
             plotLineGraphic(
                 ArrayList(
                     state
@@ -161,6 +168,7 @@ class CryptoInfoFragment : Fragment() {
         currentTvBidPrice = view.findViewById(R.id.ci_tv_current_price_bid)
         currentTvAskPrice = view.findViewById(R.id.ci_tv_current_ask)
         swipeRefresh = view.findViewById(R.id.swipe_refresh_layout)
+        tvActuality = view.findViewById(R.id.data_actuality)
 
         (activity as AppCompatActivity).setSupportActionBar(view.findViewById(R.id.ci_toolbar))
         (activity as AppCompatActivity).supportActionBar?.title = "Crypto stats"

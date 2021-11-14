@@ -44,6 +44,17 @@
                 app:layout_constraintTop_toBottomOf="@+id/toolbar_layout" />
 
             <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/data_actuality"
+                android:textColor="?attr/titleTextColor"
+                android:textSize="20sp"
+                android:textStyle="bold|italic"
+                app:layout_constraintTop_toTopOf="@id/ci_tv_coin_name"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/ci_tv_coin_value_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

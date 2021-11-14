@@ -10,6 +10,8 @@ import io.reactivex.rxjava3.core.Observable
 import com.avelycure.cryptostats.domain.models.*
 import com.avelycure.cryptostats.domain.models.TickerV2
 import com.avelycure.cryptostats.domain.state.DataState
+import com.avelycure.cryptostats.domain.state.Queue
+import com.avelycure.cryptostats.domain.state.UIComponent
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
@@ -35,7 +37,8 @@ class CryptoInfoViewModel(
             coinPrice = CoinPrice(),
             tickerV2 = TickerV2(),
             trades = emptyList(),
-            remoteData = true
+            remoteData = true,
+            errorQueue = Queue(mutableListOf())
         )
     }
 
@@ -67,15 +70,6 @@ class CryptoInfoViewModel(
             }, {})
     }
 
-    private fun requestTickerV2(symbol: String): Disposable {
-        return getTickerV2.execute(symbol)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .subscribe({ data -> onResponseTickerV2(data) }, {
-                Log.d("mytag", "Error: ${it.message}")
-            }, {})
-    }
-
     private fun requestPriceFeed(pair: String): Disposable {
         return getCoinPrice.execute()
             .observeOn(AndroidSchedulers.mainThread())
@@ -92,11 +86,57 @@ class CryptoInfoViewModel(
             .subscribe({ data -> onResponseTickerV1(data) }, {}, {})
     }
 
+    private fun requestTickerV2(symbol: String): Disposable {
+        return getTickerV2.execute(symbol)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({ data -> onResponseTickerV2(data) }, {
+                Log.d("mytag", "Error: ${it.message}")
+            }, {})
+    }
+
     private fun requestTradeHistory(symbol: String, limit: Int): Disposable {
         return getTrades.execute(symbol, limit)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponseTradeHistory(data) }, {}, {})
+    }
+
+    private fun onResponseCandles(candles: DataState<List<Candle>>) {
+        if (candles is DataState.DataRemote)
+            handleCandles(candles.data, true)
+        if (candles is DataState.DataCache)
+            handleCandles(candles.data, false)
+    }
+
+    private fun onResponsePriceFeed(data: DataState<List<CoinPrice>>, pair: String) {
+        if (data is DataState.DataRemote) {
+            Log.d("mytag", "View model remote")
+            handlePriceFeed(data.data, pair, true)
+        }
+        if (data is DataState.DataCache) {
+            Log.d("mytag", "View model cache")
+            handlePriceFeed(data.data, pair, false)
+        }
+    }
+
+    private fun onResponseTickerV1(data: DataState<TickerV1>) {
+        if (data is DataState.DataRemote)
+            handleTickerV1(data.data, true)
+        if (data is DataState.DataCache)
+            handleTickerV1(data.data, false)
+    }
+
+    private fun onResponseTickerV2(data: DataState<TickerV2>) {
+        Log.d("mytag", "Got response from ticker")
+        if (data is DataState.DataRemote) {
+            Log.d("mytag", "Remote")
+            handleTickerV2(data.data, true)
+        }
+        if (data is DataState.DataCache) {
+            Log.d("mytag", "Cache")
+            handleTickerV2(data.data, false)
+        }
     }
 
     private fun onResponseTradeHistory(data: DataState<List<Trade>>) {
@@ -106,28 +146,38 @@ class CryptoInfoViewModel(
             handleTradeHistory(data.data, false)
     }
 
-    private fun handleTradeHistory(data: List<Trade>, remoteData: Boolean) {
-        val trades: List<Trade> = data.map { tradeHistory ->
-            Trade(
-                timestampms = tradeHistory.timestampms,
-                tid = tradeHistory.tid,
-                price = tradeHistory.price,
-                amount = tradeHistory.amount,
-                type = tradeHistory.type
-            )
-        }
+    private fun handleCandles(data: List<Candle>, remoteData: Boolean) {
+        val dataForChart = data
 
-        _state.value = _state.value?.copy(
-            trades = trades,
+        val first = dataForChart[0].time
+
+        val dataForChartCopy = arrayListOf<Candle>()
+        for (i in 0 until dataForChart.size)
+            if (i % 3 == 0)
+                dataForChartCopy.add(dataForChart[i].copy(time = (dataForChart[i].time - first) / 600F))
+
+        val newStat = _state.value?.statistic?.copy(
+            candles = dataForChartCopy
+        ) ?: Statistic24h()
+
+        _state.value = state.value?.copy(
+            statistic = newStat,
             remoteData = remoteData
         )
     }
 
-    private fun onResponseTickerV1(data: DataState<TickerV1>) {
-        if (data is DataState.DataRemote)
-            handleTickerV1(data.data, true)
-        if (data is DataState.DataCache)
-            handleTickerV1(data.data, false)
+    private fun handlePriceFeed(data: List<CoinPrice>, pair: String, remoteData: Boolean) {
+        for (i in data)
+            if (i.pair == pair) {
+                _state.value = _state.value?.copy(
+                    coinPrice = CoinPrice(
+                        price = i.price,
+                        percentChange24h = i.percentChange24h
+                    ),
+                    remoteData = remoteData
+                )
+                break
+            }
     }
 
     private fun handleTickerV1(data: TickerV1, remoteData: Boolean) {
@@ -150,43 +200,6 @@ class CryptoInfoViewModel(
         )
     }
 
-    private fun onResponsePriceFeed(data: DataState<List<CoinPrice>>, pair: String) {
-        if (data is DataState.DataRemote) {
-            Log.d("mytag", "View model remote")
-            handlePriceFeed(data.data, pair, true)
-        }
-        if (data is DataState.DataCache) {
-            Log.d("mytag", "View model cache")
-            handlePriceFeed(data.data, pair, false)
-        }
-    }
-
-    private fun handlePriceFeed(data: List<CoinPrice>, pair: String, remoteData: Boolean) {
-        for (i in data)
-            if (i.pair == pair) {
-                _state.value = _state.value?.copy(
-                    coinPrice = CoinPrice(
-                        price = i.price,
-                        percentChange24h = i.percentChange24h
-                    ),
-                    remoteData = remoteData
-                )
-                break
-            }
-    }
-
-    private fun onResponseTickerV2(data: DataState<TickerV2>) {
-        Log.d("mytag", "Got response from ticker")
-        if (data is DataState.DataRemote) {
-            Log.d("mytag", "Remote")
-            handleTickerV2(data.data, true)
-        }
-        if (data is DataState.DataCache) {
-            Log.d("mytag", "Cache")
-            handleTickerV2(data.data, false)
-        }
-    }
-
     private fun handleTickerV2(data: TickerV2, remoteData: Boolean) {
         val dataForChart = arrayListOf<Point>()
         for (i in 0 until data.changes.size)
@@ -207,30 +220,38 @@ class CryptoInfoViewModel(
         )
     }
 
-    private fun onResponseCandles(candles: DataState<List<Candle>>) {
-        if (candles is DataState.DataRemote)
-            handleCandles(candles.data, true)
-        if (candles is DataState.DataCache)
-            handleCandles(candles.data, false)
-    }
+    private fun handleTradeHistory(data: List<Trade>, remoteData: Boolean) {
+        val trades: List<Trade> = data.map { tradeHistory ->
+            Trade(
+                timestampms = tradeHistory.timestampms,
+                tid = tradeHistory.tid,
+                price = tradeHistory.price,
+                amount = tradeHistory.amount,
+                type = tradeHistory.type
+            )
+        }
 
-    private fun handleCandles(data: List<Candle>, remoteData: Boolean) {
-        val dataForChart = data
-
-        val first = dataForChart[0].time
-
-        val dataForChartCopy = arrayListOf<Candle>()
-        for (i in 0 until dataForChart.size)
-            if (i % 3 == 0)
-                dataForChartCopy.add(dataForChart[i].copy(time = (dataForChart[i].time - first) / 600F))
-
-        val newStat = _state.value?.statistic?.copy(
-            candles = dataForChartCopy
-        ) ?: Statistic24h()
-
-        _state.value = state.value?.copy(
-            statistic = newStat,
+        _state.value = _state.value?.copy(
+            trades = trades,
             remoteData = remoteData
         )
+    }
+
+    private fun appendToMessageQueue(uiComponent: UIComponent) {
+        val queue: Queue<UIComponent> = Queue(mutableListOf())
+        for (i in 0 until _state.value!!.errorQueue.count())
+            _state.value!!.errorQueue.poll()?.let { queue.add(it) }
+        queue.add(uiComponent)
+        _state.value = _state.value!!.copy(errorQueue = queue)
+    }
+
+    private fun removeHeadMessage() {
+        try {
+            val queue = _state.value!!.errorQueue
+            queue.remove()
+            _state.value = _state.value!!.copy(errorQueue = queue)
+        } catch (e: Exception) {
+            Log.d("mytag", "Nothing to remove from MessageQueue")
+        }
     }
 }
