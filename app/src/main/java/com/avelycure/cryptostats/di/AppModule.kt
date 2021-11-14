@@ -17,6 +17,7 @@ import com.avelycure.cryptostats.data.local.AppDatabase
 
 import androidx.room.Room
 import com.avelycure.cryptostats.domain.interactors.GetCandles
+import com.avelycure.cryptostats.domain.interactors.GetTickerV2
 
 
 val appModule = module {
@@ -35,8 +36,9 @@ val appModule = module {
     single { provideAppDatabase(get()) }
     single { provideScreenDao(get()) }
     single<GetCandles> { GetCandles(get(), get()) }
+    single<GetTickerV2> { GetTickerV2(get(), get()) }
 
-    viewModel { CryptoInfoViewModel(get(), get()) }
+    viewModel { CryptoInfoViewModel(get(), get(), get()) }
 
     single<GeminiApiService> {
         Retrofit.Builder()

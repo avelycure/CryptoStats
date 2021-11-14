@@ -6,6 +6,7 @@ import com.avelycure.cryptostats.utils.network_utils.INetworkStatus
 import com.avelycure.cryptostats.data.local.dao.CacheDao
 import com.avelycure.cryptostats.data.local.entities.EntityCandles
 import com.avelycure.cryptostats.data.local.entities.mappers.*
+import com.avelycure.cryptostats.data.remote.models.ResponseTickerV2
 import com.avelycure.cryptostats.data.remote.models.mappers.*
 import com.avelycure.cryptostats.domain.models.*
 import com.avelycure.cryptostats.domain.state.DataState
@@ -17,33 +18,6 @@ class CryptoRepo(
     private val networkStatus: INetworkStatus,
     private val cacheDao: CacheDao
 ) : ICryptoRepo {
-
-    override fun getCandles(
-        symbol: String,
-        timeFrame: String
-    ): Observable<DataState<List<Candle>>> {
-        return networkStatus.isOnline().flatMap { isOnline ->
-            if (isOnline) {
-                apiService
-                    .getCandles(symbol, timeFrame)
-                    .flatMap { candles ->
-                        cacheDao.insertCandles(candles.toEntityCandles())
-                        Observable.fromCallable { DataState.DataRemote(data = candles.toCandleList()) }
-                    }.repeatWhen { completed ->
-                        Log.d("mytag", "Repeated request candles")
-                        completed.delay(5, TimeUnit.MINUTES)
-                    }
-            } else {
-                val result = cacheDao.getCandles().last().toCandleList()
-                Observable.fromCallable { DataState.DataCache(data = result) }
-            }
-        }.retryWhen { error ->
-            Log.d("mytag", "Error in repo candles")
-            error.take(3).delay(100, TimeUnit.MILLISECONDS)
-            //maybe add throw exception or DataState.Error
-        }
-    }
-
     override fun getCandlesFromRemote(
         symbol: String,
         timeFrame: String
@@ -85,6 +59,20 @@ class CryptoRepo(
             //maybe add throw exception or DataState.Error
         }
     }
+
+    override fun getTickerV2FromRemote(symbol: String): Observable<ResponseTickerV2>{
+        return apiService
+            .getTickerV2(symbol)
+            .flatMap { tickerV2 ->
+                cacheDao.insertTickerV2(tickerV2.toEntityTickerV2())
+                Observable.fromCallable { tickerV2 }
+            }.repeatWhen { completed ->
+                Log.d("mytag", "Repeated request")
+                completed.delay(5, TimeUnit.SECONDS)
+            }
+    }
+
+    override fun getTickerV2FromCache() = cacheDao.getTickerV2().last()
 
     override fun getPriceFeed(): Observable<DataState<List<CoinPrice>>> {
         return networkStatus.isOnline().flatMap { isOnline ->
