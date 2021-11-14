@@ -4,6 +4,7 @@ import android.util.Log
 import com.avelycure.cryptostats.data.remote.api_service.GeminiApiService
 import com.avelycure.cryptostats.utils.network_utils.INetworkStatus
 import com.avelycure.cryptostats.data.local.dao.CacheDao
+import com.avelycure.cryptostats.data.local.entities.EntityCandles
 import com.avelycure.cryptostats.data.local.entities.mappers.*
 import com.avelycure.cryptostats.data.remote.models.mappers.*
 import com.avelycure.cryptostats.domain.models.*
@@ -41,6 +42,25 @@ class CryptoRepo(
             error.take(3).delay(100, TimeUnit.MILLISECONDS)
             //maybe add throw exception or DataState.Error
         }
+    }
+
+    override fun getCandlesFromRemote(
+        symbol: String,
+        timeFrame: String
+    ): Observable<List<List<Float>>> {
+        return apiService
+            .getCandles(symbol, timeFrame)
+            .flatMap { candles ->
+                cacheDao.insertCandles(candles.toEntityCandles())
+                Observable.fromCallable { candles }
+            }.repeatWhen { completed ->
+                Log.d("mytag", "Repeated request candles")
+                completed.delay(5, TimeUnit.MINUTES)
+            }
+    }
+
+    override fun getCandlesFromCache(): Observable<EntityCandles> {
+        return Observable.fromCallable { cacheDao.getCandles().last()}
     }
 
     override fun getTickerV2(symbol: String): Observable<DataState<TickerV2>> {
