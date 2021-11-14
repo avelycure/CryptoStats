@@ -61,6 +61,10 @@ class CryptoInfoViewModel(
         }
     }
 
+    fun onDestroy(){
+        compositeDisposable.dispose()
+    }
+
     private fun requestCandles(symbol: String, timeFrame: String): Disposable {
         return getCandles.execute(symbol, timeFrame)
             .observeOn(AndroidSchedulers.mainThread())

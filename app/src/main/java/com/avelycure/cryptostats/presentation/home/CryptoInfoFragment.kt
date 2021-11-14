@@ -131,6 +131,11 @@ class CryptoInfoFragment : Fragment() {
         return view
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        cryptoInfoViewModel.onDestroy()
+    }
+
     private fun updateStats(stats: Statistic24h) {
         tvLowest24h.text = stats.low.toString()
         tvHighest24h.text = stats.high.toString()
