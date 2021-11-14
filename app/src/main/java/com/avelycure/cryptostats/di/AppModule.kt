@@ -18,9 +18,13 @@ import com.avelycure.cryptostats.data.local.AppDatabase
 import androidx.room.Room
 import com.avelycure.cryptostats.domain.interactors.*
 
-
 val appModule = module {
-    single<ICryptoRepo> { CryptoRepo(get(), get(), get()) }
+    single<ICryptoRepo> {
+        CryptoRepo(
+            apiService = get(),
+            cacheDao = get()
+        )
+    }
 
     single<INetworkStatus> { NetworkStatus(get()) }
 

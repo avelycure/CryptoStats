@@ -20,8 +20,10 @@ class GetCandles(
                     Observable.fromCallable { DataState.DataRemote(data = candles.toCandleList()) }
                 }
             } else
-                repo.getCandlesFromCache().flatMap { candles ->
-                    Observable.fromCallable { DataState.DataCache(data = candles.toCandleList()) }
+                Observable.fromCallable {
+                    DataState.DataCache(
+                        data = repo.getCandlesFromCache().toCandleList()
+                    )
                 }
         }.retryWhen { error ->
             Log.d("mytag", "Error in repo candles")

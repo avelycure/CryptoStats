@@ -12,7 +12,7 @@ import io.reactivex.rxjava3.core.Observable
 interface ICryptoRepo {
     fun getCandlesFromRemote(symbol: String, timeFrame: String): Observable<List<List<Float>>>
 
-    fun getCandlesFromCache(): Observable<EntityCandles>
+    fun getCandlesFromCache(): EntityCandles
 
     fun getPriceFeedFromRemote(): Observable<List<ResponsePriceFeed>>
 

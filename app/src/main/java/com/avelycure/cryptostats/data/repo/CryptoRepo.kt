@@ -2,26 +2,26 @@ package com.avelycure.cryptostats.data.repo
 
 import android.util.Log
 import com.avelycure.cryptostats.data.remote.api_service.GeminiApiService
-import com.avelycure.cryptostats.utils.network_utils.INetworkStatus
 import com.avelycure.cryptostats.data.local.dao.CacheDao
-import com.avelycure.cryptostats.data.local.entities.EntityCandles
-import com.avelycure.cryptostats.data.local.entities.EntityPriceFeed
 import com.avelycure.cryptostats.data.local.entities.mappers.*
 import com.avelycure.cryptostats.data.remote.models.ResponsePriceFeed
 import com.avelycure.cryptostats.data.remote.models.ResponseTickerV1
 import com.avelycure.cryptostats.data.remote.models.ResponseTickerV2
 import com.avelycure.cryptostats.data.remote.models.ResponseTradeHistory
 import com.avelycure.cryptostats.data.remote.models.mappers.*
-import com.avelycure.cryptostats.domain.models.*
-import com.avelycure.cryptostats.domain.state.DataState
 import io.reactivex.rxjava3.core.Observable
 import java.util.concurrent.TimeUnit
 
 class CryptoRepo(
     private val apiService: GeminiApiService,
-    private val networkStatus: INetworkStatus,
     private val cacheDao: CacheDao
 ) : ICryptoRepo {
+    override fun getCandlesFromCache() = cacheDao.getCandles().last()
+    override fun getTickerV2FromCache() = cacheDao.getTickerV2().last()
+    override fun getPriceFeedFromCache() = cacheDao.getPriceFeed()
+    override fun getTickerV1FromCache() = cacheDao.getTickerV1().last()
+    override fun getTradesFromCache() = cacheDao.getTradeHistory()
+
     override fun getCandlesFromRemote(
         symbol: String,
         timeFrame: String
@@ -37,10 +37,6 @@ class CryptoRepo(
             }
     }
 
-    override fun getCandlesFromCache(): Observable<EntityCandles> {
-        return Observable.fromCallable { cacheDao.getCandles().last() }
-    }
-
     override fun getTickerV2FromRemote(symbol: String): Observable<ResponseTickerV2> {
         return apiService
             .getTickerV2(symbol)
@@ -52,8 +48,6 @@ class CryptoRepo(
                 completed.delay(5, TimeUnit.SECONDS)
             }
     }
-
-    override fun getTickerV2FromCache() = cacheDao.getTickerV2().last()
 
     override fun getPriceFeedFromRemote(): Observable<List<ResponsePriceFeed>> {
         return apiService
@@ -69,10 +63,6 @@ class CryptoRepo(
             }
     }
 
-    override fun getPriceFeedFromCache(): List<EntityPriceFeed> {
-        return cacheDao.getPriceFeed()
-    }
-
     override fun getTickerV1FromRemote(symbol: String): Observable<ResponseTickerV1> {
         return apiService
             .getTickerV1(symbol)
@@ -84,8 +74,6 @@ class CryptoRepo(
                 completed.delay(5, TimeUnit.SECONDS)
             }
     }
-
-    override fun getTickerV1FromCache() = cacheDao.getTickerV1().last()
 
     override fun getTradesFromRemote(
         symbol: String,
@@ -103,6 +91,4 @@ class CryptoRepo(
                 completed.delay(5, TimeUnit.SECONDS)
             }
     }
-
-    override fun getTradesFromCache() = cacheDao.getTradeHistory()
 }
