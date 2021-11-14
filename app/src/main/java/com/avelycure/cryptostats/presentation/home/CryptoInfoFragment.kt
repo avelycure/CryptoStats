@@ -47,6 +47,7 @@ class CryptoInfoFragment : Fragment() {
     private lateinit var tvPriceChange: AppCompatTextView
     private lateinit var currentTvBidPrice: AppCompatTextView
     private lateinit var currentTvAskPrice: AppCompatTextView
+    private lateinit var tvActuality: AppCompatTextView
     private lateinit var rvTrades: RecyclerView
 
     private val cryptoInfoViewModel: CryptoInfoViewModel by viewModel()
@@ -61,15 +62,24 @@ class CryptoInfoFragment : Fragment() {
         initViews(view)
 
         swipeRefresh.setOnRefreshListener {
-            cryptoInfoViewModel.requestTicker("btcusd")
-            cryptoInfoViewModel.requestPriceFeed("BTCUSD")
-            cryptoInfoViewModel.requestTickerV1("btcusd")
-            cryptoInfoViewModel.requestTradeHistory("btcusd", 50)
-            cryptoInfoViewModel.requestCandles("btcusd", "1m")
+            cryptoInfoViewModel.requestData(
+                CryptoInfoViewModel.RequestParameters(
+                    symbol = "btcusd",
+                    limit = 50,
+                    timeFrame = "1m",
+                    pair = "BTCUSD"
+                )
+            )
             swipeRefresh.isRefreshing = false
         }
 
         cryptoInfoViewModel.state.observe(viewLifecycleOwner, { state ->
+
+            if(state.remoteData)
+                tvActuality.text = "actual"
+            else
+                tvActuality.text = "cached"
+
             plotLineGraphic(
                 ArrayList(
                     state
@@ -121,6 +131,11 @@ class CryptoInfoFragment : Fragment() {
         return view
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        cryptoInfoViewModel.onDestroy()
+    }
+
     private fun updateStats(stats: Statistic24h) {
         tvLowest24h.text = stats.low.toString()
         tvHighest24h.text = stats.high.toString()
@@ -158,6 +173,7 @@ class CryptoInfoFragment : Fragment() {
         currentTvBidPrice = view.findViewById(R.id.ci_tv_current_price_bid)
         currentTvAskPrice = view.findViewById(R.id.ci_tv_current_ask)
         swipeRefresh = view.findViewById(R.id.swipe_refresh_layout)
+        tvActuality = view.findViewById(R.id.data_actuality)
 
         (activity as AppCompatActivity).setSupportActionBar(view.findViewById(R.id.ci_toolbar))
         (activity as AppCompatActivity).supportActionBar?.title = "Crypto stats"

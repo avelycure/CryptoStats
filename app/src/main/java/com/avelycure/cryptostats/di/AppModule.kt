@@ -16,10 +16,15 @@ import retrofit2.converter.gson.GsonConverterFactory
 import com.avelycure.cryptostats.data.local.AppDatabase
 
 import androidx.room.Room
-
+import com.avelycure.cryptostats.domain.interactors.*
 
 val appModule = module {
-    single<ICryptoRepo> { CryptoRepo(get(), get(), get()) }
+    single<ICryptoRepo> {
+        CryptoRepo(
+            apiService = get(),
+            cacheDao = get()
+        )
+    }
 
     single<INetworkStatus> { NetworkStatus(get()) }
 
@@ -33,8 +38,21 @@ val appModule = module {
 
     single { provideAppDatabase(get()) }
     single { provideScreenDao(get()) }
+    single<GetCandles> { GetCandles(get(), get()) }
+    single<GetTickerV2> { GetTickerV2(get(), get()) }
+    single<GetCoinPrice> { GetCoinPrice(get(), get()) }
+    single<GetTickerV1> { GetTickerV1(get(), get()) }
+    single<GetTrades> { GetTrades(get(), get()) }
 
-    viewModel { CryptoInfoViewModel(get()) }
+    viewModel {
+        CryptoInfoViewModel(
+            getCandles = get(),
+            getTickerV2 = get(),
+            getCoinPrice = get(),
+            getTickerV1 = get(),
+            getTrades = get()
+        )
+    }
 
     single<GeminiApiService> {
         Retrofit.Builder()

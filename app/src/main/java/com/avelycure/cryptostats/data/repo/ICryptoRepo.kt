@@ -1,17 +1,32 @@
 package com.avelycure.cryptostats.data.repo
 
+import com.avelycure.cryptostats.data.local.entities.*
+import com.avelycure.cryptostats.data.remote.models.ResponsePriceFeed
+import com.avelycure.cryptostats.data.remote.models.ResponseTickerV1
+import com.avelycure.cryptostats.data.remote.models.ResponseTickerV2
+import com.avelycure.cryptostats.data.remote.models.ResponseTradeHistory
 import com.avelycure.cryptostats.domain.models.*
 import com.avelycure.cryptostats.domain.state.DataState
 import io.reactivex.rxjava3.core.Observable
 
 interface ICryptoRepo {
-    fun getCandles(symbol: String, timeFrame: String): Observable<DataState<List<Candle>>>
+    fun getCandlesFromRemote(symbol: String, timeFrame: String): Observable<List<List<Float>>>
 
-    fun getPriceFeed(): Observable<DataState<List<CoinPrice>>>
+    fun getCandlesFromCache(): EntityCandles
 
-    fun getTickerV1(symbol: String): Observable<DataState<TickerV1>>
+    fun getPriceFeedFromRemote(): Observable<List<ResponsePriceFeed>>
 
-    fun getTickerV2(symbol: String): Observable<DataState<TickerV2>>
+    fun getPriceFeedFromCache(): List<EntityPriceFeed>
 
-    fun getTrades(symbol: String, limit: Int): Observable<DataState<List<Trade>>>
+    fun getTradesFromCache(): List<EntityTradeHistory>
+
+    fun getTradesFromRemote(symbol: String, limit: Int): Observable<List<ResponseTradeHistory>>
+
+    fun getTickerV1FromRemote(symbol: String): Observable<ResponseTickerV1>
+
+    fun getTickerV1FromCache(): EntityTickerV1
+
+    fun getTickerV2FromRemote(symbol: String): Observable<ResponseTickerV2>
+
+    fun getTickerV2FromCache(): EntityTickerV2
 }

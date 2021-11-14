@@ -6,8 +6,7 @@
     android:layout_height="match_parent"
     android:theme="@style/Theme.CryptoStats">
 
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:theme="@style/Theme.CryptoStats">
@@ -45,6 +44,17 @@
                 app:layout_constraintTop_toBottomOf="@+id/toolbar_layout" />
 
             <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/data_actuality"
+                android:textColor="?attr/titleTextColor"
+                android:textSize="20sp"
+                android:textStyle="bold|italic"
+                app:layout_constraintTop_toTopOf="@id/ci_tv_coin_name"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/ci_tv_coin_value_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -57,98 +67,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/toolbar_layout" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/container_stat24"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                app:layout_constraintTop_toBottomOf="@+id/ci_tv_coin_name">
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/ci_tv_coin_value"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:textColor="?attr/textFillColor"
-                    android:textSize="40sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/ci_last24_stats"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <RelativeLayout
-                    android:id="@+id/ci_last24_stats"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/ci_tv_coin_value"
-                    app:layout_constraintTop_toTopOf="@+id/ci_tv_coin_value">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/tv24percent"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentStart="true"
-                        android:text="24H%"
-                        android:textColor="?attr/titleTextColor"
-                        android:textSize="16sp" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/tv24low"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/tv24percent"
-                        android:layout_alignParentStart="true"
-                        android:layout_marginEnd="4dp"
-                        android:text="24H Low"
-                        android:textColor="?attr/titleTextColor"
-                        android:textSize="16sp" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/tv24low"
-                        android:layout_alignParentStart="true"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginEnd="4dp"
-                        android:text="24H High"
-                        android:textColor="?attr/titleTextColor"
-                        android:textSize="16sp" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/ci_tv_percent_change_in_last_24h"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:textColor="?attr/textFillColor"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/ci_tv_lowest_in_last_24h"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/ci_tv_percent_change_in_last_24h"
-                        android:layout_alignParentEnd="true"
-                        android:textColor="?attr/textFillColor"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/ci_tv_highest_in_last_24h"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/ci_tv_lowest_in_last_24h"
-                        android:layout_alignParentEnd="true"
-                        android:textColor="?attr/textFillColor"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                </RelativeLayout>
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            <include layout="@layout/stat24" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/price"
@@ -161,109 +80,9 @@
                 android:textSize="40sp"
                 app:layout_constraintTop_toBottomOf="@+id/container_stat24" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/price_stats"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:layout_constraintTop_toBottomOf="@+id/price">
+            <include layout="@layout/price24"/>
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/price_open"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="24H Open"
-                    android:textColor="?attr/titleTextColor"
-                    android:textSize="16sp"
-                    app:layout_constraintEnd_toStartOf="@+id/price_change"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/ci_tv_open_price"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="?attr/textFillColor"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toStartOf="@+id/ci_tv_price_change"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/price_open" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/price_change"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="24H Change"
-                    android:textColor="?attr/titleTextColor"
-                    android:textSize="16sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/price_open"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/ci_tv_price_change"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="?attr/textFillColor"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/ci_tv_open_price"
-                    app:layout_constraintTop_toBottomOf="@+id/price_change" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/current_price_stats"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:layout_constraintTop_toBottomOf="@+id/price_stats">
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/current_price_bid"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Current bid"
-                    android:textColor="?attr/titleTextColor"
-                    android:textSize="16sp"
-                    app:layout_constraintEnd_toStartOf="@+id/current_ask"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/ci_tv_current_price_bid"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="?attr/textFillColor"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toStartOf="@+id/ci_tv_current_ask"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/current_price_bid" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/current_ask"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Current ask"
-                    android:textColor="?attr/titleTextColor"
-                    android:textSize="16sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/current_price_bid"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/ci_tv_current_ask"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="?attr/textFillColor"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/ci_tv_current_price_bid"
-                    app:layout_constraintTop_toBottomOf="@+id/current_ask" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            <include layout="@layout/price"/>
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/changes"
@@ -301,57 +120,7 @@
                 android:layout_height="256dp"
                 app:layout_constraintTop_toBottomOf="@+id/candles" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/btn_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:layout_constraintTop_toBottomOf="@id/candle_stick_chart">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn24h"
-                    style="@style/ButtonCryptoChange"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="24h"
-                    android:textColor="?attr/titleTextColor"
-                    android:textSize="10sp"
-                    app:cornerRadius="8dp"
-                    app:layout_constraintEnd_toStartOf="@+id/btn6h"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:rippleColor="#33AAAAAA"
-                    app:strokeColor="?attr/strokeColor" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn6h"
-                    style="@style/ButtonCryptoChange"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="6"
-                    android:textColor="?attr/titleTextColor"
-                    android:textSize="10sp"
-                    app:cornerRadius="8dp"
-                    app:layout_constraintEnd_toStartOf="@+id/btn15m"
-                    app:layout_constraintStart_toEndOf="@+id/btn24h"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:rippleColor="#33AAAAAA"
-                    app:strokeColor="?attr/strokeColor" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn15m"
-                    style="@style/ButtonCryptoChange"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="15m"
-                    android:textColor="?attr/titleTextColor"
-                    android:textSize="10sp"
-                    app:cornerRadius="8dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/btn6h"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:rippleColor="#33AAAAAA" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            <include layout="@layout/change_buttons"/>
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/trades"
@@ -365,103 +134,7 @@
                 android:textSize="40sp"
                 app:layout_constraintTop_toBottomOf="@+id/btn_container" />
 
-            <HorizontalScrollView
-                android:id="@+id/horizontal_sv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/trades"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/rv_labels"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp"
-                        android:background="?attr/colorSecondary"
-                        android:layout_gravity="center_horizontal">
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/rv_trade_date"
-                            android:layout_width="120dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="2dp"
-                            android:layout_marginEnd="2dp"
-                            android:text="Date"
-                            android:textSize="20sp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@id/rv_trade_id"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/rv_trade_id"
-                            android:layout_width="120dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="2dp"
-                            android:layout_marginEnd="2dp"
-                            android:text="Trade id"
-                            android:textSize="20sp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@id/rv_trade_price"
-                            app:layout_constraintStart_toEndOf="@id/rv_trade_date"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/rv_trade_price"
-                            android:layout_width="120dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="2dp"
-                            android:layout_marginEnd="2dp"
-                            android:text="Price"
-                            android:textSize="20sp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@id/rv_trade_amount"
-                            app:layout_constraintStart_toEndOf="@id/rv_trade_id"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/rv_trade_amount"
-                            android:layout_width="120dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="2dp"
-                            android:layout_marginEnd="2dp"
-                            android:text="Amount"
-                            android:textSize="20sp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@id/rv_trade_type"
-                            app:layout_constraintStart_toEndOf="@id/rv_trade_price"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/rv_trade_type"
-                            android:layout_width="120dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="2dp"
-                            android:layout_marginEnd="2dp"
-                            android:text="Type"
-                            android:textSize="20sp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@id/rv_trade_amount"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rv_trades"
-                        android:layout_width="wrap_content"
-                        android:layout_height="480dp"
-                        android:orientation="vertical"
-                        android:layout_gravity="center_horizontal"/>
-
-                </LinearLayout>
-
-            </HorizontalScrollView>
+            <include layout="@layout/trades"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
