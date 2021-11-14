@@ -5,10 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.avelycure.cryptostats.data.repo.ICryptoRepo
-import com.avelycure.cryptostats.domain.interactors.GetCandles
-import com.avelycure.cryptostats.domain.interactors.GetCoinPrice
-import com.avelycure.cryptostats.domain.interactors.GetTickerV1
-import com.avelycure.cryptostats.domain.interactors.GetTickerV2
+import com.avelycure.cryptostats.domain.interactors.*
 import io.reactivex.rxjava3.core.Observable
 import com.avelycure.cryptostats.domain.models.*
 import com.avelycure.cryptostats.domain.models.TickerV2
@@ -19,11 +16,11 @@ import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 
 class CryptoInfoViewModel(
-    private val repo: ICryptoRepo,
     private val getCandles: GetCandles,
     private val getTickerV2: GetTickerV2,
     private val getCoinPrice: GetCoinPrice,
-    private val getTickerV1: GetTickerV1
+    private val getTickerV1: GetTickerV1,
+    private val getTrades: GetTrades
 ) : ViewModel() {
 
     private val _state: MutableLiveData<CryptoInfoState> = MutableLiveData()
@@ -96,7 +93,7 @@ class CryptoInfoViewModel(
     }
 
     private fun requestTradeHistory(symbol: String, limit: Int): Disposable {
-        return repo.getTrades(symbol, limit)
+        return getTrades.execute(symbol, limit)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponseTradeHistory(data) }, {}, {})

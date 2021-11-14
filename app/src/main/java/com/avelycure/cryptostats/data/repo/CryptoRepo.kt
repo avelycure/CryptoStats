@@ -10,6 +10,7 @@ import com.avelycure.cryptostats.data.local.entities.mappers.*
 import com.avelycure.cryptostats.data.remote.models.ResponsePriceFeed
 import com.avelycure.cryptostats.data.remote.models.ResponseTickerV1
 import com.avelycure.cryptostats.data.remote.models.ResponseTickerV2
+import com.avelycure.cryptostats.data.remote.models.ResponseTradeHistory
 import com.avelycure.cryptostats.data.remote.models.mappers.*
 import com.avelycure.cryptostats.domain.models.*
 import com.avelycure.cryptostats.domain.state.DataState
@@ -72,29 +73,6 @@ class CryptoRepo(
         return cacheDao.getPriceFeed()
     }
 
-    override fun getTickerV1(symbol: String): Observable<DataState<TickerV1>> {
-        return networkStatus.isOnline().flatMap { isOnline ->
-            if (isOnline) {
-                apiService
-                    .getTickerV1(symbol)
-                    .flatMap { tickerV1 ->
-                        cacheDao.insertTickerV1(tickerV1.toEntityTickerV1())
-                        Observable.fromCallable { DataState.DataRemote(data = tickerV1.toTickerV1()) }
-                    }.repeatWhen { completed ->
-                        Log.d("mytag", "Repeated request")
-                        completed.delay(5, TimeUnit.SECONDS)
-                    }
-            } else {
-                val result = cacheDao.getTickerV1().last().toTickerV1()
-                Observable.fromCallable { DataState.DataCache(data = result) }
-            }
-        }.retryWhen { error ->
-            Log.d("mytag", "Error in repo")
-            error.take(3).delay(100, TimeUnit.MILLISECONDS)
-            //maybe add throw exception or DataState.Error
-        }
-    }
-
     override fun getTickerV1FromRemote(symbol: String): Observable<ResponseTickerV1> {
         return apiService
             .getTickerV1(symbol)
@@ -109,28 +87,22 @@ class CryptoRepo(
 
     override fun getTickerV1FromCache() = cacheDao.getTickerV1().last()
 
-    override fun getTrades(symbol: String, limit: Int): Observable<DataState<List<Trade>>> {
-        return networkStatus.isOnline().flatMap { isOnline ->
-            if (isOnline) {
-                apiService
-                    .getTradeHistory(symbol, limit)
-                    .flatMap { trades ->
-                        cacheDao.dropTradeHistoryTable()
-                        for (trade in trades)
-                            cacheDao.insertTradeHistory(trade.toTradeHistoryEntity())
-                        Observable.fromCallable { DataState.DataRemote(data = trades.map { it.toTrade() }) }
-                    }.repeatWhen { completed ->
-                        Log.d("mytag", "Repeated request")
-                        completed.delay(5, TimeUnit.SECONDS)
-                    }
-            } else {
-                val result = cacheDao.getTradeHistory().map { it.toTrade() }
-                Observable.fromCallable { DataState.DataCache(data = result) }
+    override fun getTradesFromRemote(
+        symbol: String,
+        limit: Int
+    ): Observable<List<ResponseTradeHistory>> {
+        return apiService
+            .getTradeHistory(symbol, limit)
+            .flatMap { trades ->
+                cacheDao.dropTradeHistoryTable()
+                for (trade in trades)
+                    cacheDao.insertTradeHistory(trade.toTradeHistoryEntity())
+                Observable.fromCallable { trades }
+            }.repeatWhen { completed ->
+                Log.d("mytag", "Repeated request")
+                completed.delay(5, TimeUnit.SECONDS)
             }
-        }.retryWhen { error ->
-            Log.d("mytag", "Error in repo")
-            error.take(3).delay(100, TimeUnit.MILLISECONDS)
-            //maybe add throw exception or DataState.Error
-        }
     }
+
+    override fun getTradesFromCache() = cacheDao.getTradeHistory()
 }

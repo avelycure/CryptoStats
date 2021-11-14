@@ -3,7 +3,6 @@ package com.avelycure.cryptostats.domain.interactors
 import android.util.Log
 import com.avelycure.cryptostats.data.local.entities.mappers.toCoinPrice
 import com.avelycure.cryptostats.data.remote.models.mappers.toCoinPrice
-import com.avelycure.cryptostats.data.remote.models.mappers.toEntityPriceFeed
 import com.avelycure.cryptostats.data.repo.ICryptoRepo
 import com.avelycure.cryptostats.domain.models.CoinPrice
 import com.avelycure.cryptostats.domain.state.DataState

@@ -19,11 +19,10 @@ class GetCandles(
                 repo.getCandlesFromRemote(symbol, timeFrame).flatMap { candles ->
                     Observable.fromCallable { DataState.DataRemote(data = candles.toCandleList()) }
                 }
-            } else {
+            } else
                 repo.getCandlesFromCache().flatMap { candles ->
                     Observable.fromCallable { DataState.DataCache(data = candles.toCandleList()) }
                 }
-            }
         }.retryWhen { error ->
             Log.d("mytag", "Error in repo candles")
             error.take(3).delay(100, TimeUnit.MILLISECONDS)

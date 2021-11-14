@@ -16,10 +16,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import com.avelycure.cryptostats.data.local.AppDatabase
 
 import androidx.room.Room
-import com.avelycure.cryptostats.domain.interactors.GetCandles
-import com.avelycure.cryptostats.domain.interactors.GetCoinPrice
-import com.avelycure.cryptostats.domain.interactors.GetTickerV1
-import com.avelycure.cryptostats.domain.interactors.GetTickerV2
+import com.avelycure.cryptostats.domain.interactors.*
 
 
 val appModule = module {
@@ -41,14 +38,15 @@ val appModule = module {
     single<GetTickerV2> { GetTickerV2(get(), get()) }
     single<GetCoinPrice> { GetCoinPrice(get(), get()) }
     single<GetTickerV1> { GetTickerV1(get(), get()) }
+    single<GetTrades> { GetTrades(get(), get()) }
 
     viewModel {
         CryptoInfoViewModel(
-            repo = get(),
             getCandles = get(),
             getTickerV2 = get(),
             getCoinPrice = get(),
-            getTickerV1 = get()
+            getTickerV1 = get(),
+            getTrades = get()
         )
     }
 

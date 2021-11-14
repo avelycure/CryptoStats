@@ -11,7 +11,7 @@ import io.reactivex.rxjava3.core.Observable
 import java.util.concurrent.TimeUnit
 
 class GetTickerV2(
-    private val repo:ICryptoRepo,
+    private val repo: ICryptoRepo,
     private val networkStatus: INetworkStatus
 ) {
     fun execute(symbol: String): Observable<DataState<TickerV2>> {
@@ -20,9 +20,12 @@ class GetTickerV2(
                 repo.getTickerV2FromRemote(symbol).flatMap { tickerV2 ->
                     Observable.fromCallable { DataState.DataRemote(data = tickerV2.toTickerV2()) }
                 }
-            } else {
-                Observable.fromCallable { DataState.DataCache(data = repo.getTickerV2FromCache().toTickerV2()) }
-            }
+            } else
+                Observable.fromCallable {
+                    DataState.DataCache(
+                        data = repo.getTickerV2FromCache().toTickerV2()
+                    )
+                }
         }.retryWhen { error ->
             Log.d("mytag", "Error in repo")
             error.take(3).delay(100, TimeUnit.MILLISECONDS)
