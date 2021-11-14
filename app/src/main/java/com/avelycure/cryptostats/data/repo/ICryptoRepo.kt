@@ -1,7 +1,9 @@
 package com.avelycure.cryptostats.data.repo
 
 import com.avelycure.cryptostats.data.local.entities.EntityCandles
+import com.avelycure.cryptostats.data.local.entities.EntityPriceFeed
 import com.avelycure.cryptostats.data.local.entities.EntityTickerV2
+import com.avelycure.cryptostats.data.remote.models.ResponsePriceFeed
 import com.avelycure.cryptostats.data.remote.models.ResponseTickerV2
 import com.avelycure.cryptostats.domain.models.*
 import com.avelycure.cryptostats.domain.state.DataState
@@ -14,9 +16,11 @@ interface ICryptoRepo {
 
     fun getPriceFeed(): Observable<DataState<List<CoinPrice>>>
 
-    fun getTickerV1(symbol: String): Observable<DataState<TickerV1>>
+    fun getPriceFeedFromRemote(): Observable<List<ResponsePriceFeed>>
 
-    fun getTickerV2(symbol: String): Observable<DataState<TickerV2>>
+    fun getPriceFeedFromCache():List<EntityPriceFeed>
+
+    fun getTickerV1(symbol: String): Observable<DataState<TickerV1>>
 
     fun getTickerV2FromRemote(symbol: String): Observable<ResponseTickerV2>
 

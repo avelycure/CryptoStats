@@ -5,7 +5,9 @@ import com.avelycure.cryptostats.data.remote.api_service.GeminiApiService
 import com.avelycure.cryptostats.utils.network_utils.INetworkStatus
 import com.avelycure.cryptostats.data.local.dao.CacheDao
 import com.avelycure.cryptostats.data.local.entities.EntityCandles
+import com.avelycure.cryptostats.data.local.entities.EntityPriceFeed
 import com.avelycure.cryptostats.data.local.entities.mappers.*
+import com.avelycure.cryptostats.data.remote.models.ResponsePriceFeed
 import com.avelycure.cryptostats.data.remote.models.ResponseTickerV2
 import com.avelycure.cryptostats.data.remote.models.mappers.*
 import com.avelycure.cryptostats.domain.models.*
@@ -34,33 +36,10 @@ class CryptoRepo(
     }
 
     override fun getCandlesFromCache(): Observable<EntityCandles> {
-        return Observable.fromCallable { cacheDao.getCandles().last()}
+        return Observable.fromCallable { cacheDao.getCandles().last() }
     }
 
-    override fun getTickerV2(symbol: String): Observable<DataState<TickerV2>> {
-        return networkStatus.isOnline().flatMap { isOnline ->
-            if (isOnline) {
-                apiService
-                    .getTickerV2(symbol)
-                    .flatMap { tickerV2 ->
-                        cacheDao.insertTickerV2(tickerV2.toEntityTickerV2())
-                        Observable.fromCallable { DataState.DataRemote(data = tickerV2.toTickerV2()) }
-                    }.repeatWhen { completed ->
-                        Log.d("mytag", "Repeated request")
-                        completed.delay(5, TimeUnit.SECONDS)
-                    }
-            } else {
-                val result = cacheDao.getTickerV2().last().toTickerV2()
-                Observable.fromCallable { DataState.DataCache(data = result) }
-            }
-        }.retryWhen { error ->
-            Log.d("mytag", "Error in repo")
-            error.take(3).delay(100, TimeUnit.MILLISECONDS)
-            //maybe add throw exception or DataState.Error
-        }
-    }
-
-    override fun getTickerV2FromRemote(symbol: String): Observable<ResponseTickerV2>{
+    override fun getTickerV2FromRemote(symbol: String): Observable<ResponseTickerV2> {
         return apiService
             .getTickerV2(symbol)
             .flatMap { tickerV2 ->
@@ -97,6 +76,24 @@ class CryptoRepo(
             error.take(3).delay(100, TimeUnit.MILLISECONDS)
             //maybe add throw exception or DataState.Error
         }
+    }
+
+    override fun getPriceFeedFromRemote(): Observable<List<ResponsePriceFeed>> {
+        return apiService
+            .getPriceFeed()
+            .flatMap { priceFeed ->
+                cacheDao.dropPriceFeedTable()
+                for (price in priceFeed)
+                    cacheDao.insertPriceFeed(price.toEntityPriceFeed())
+                Observable.fromCallable { priceFeed }
+            }.repeatWhen { completed ->
+                Log.d("mytag", "Repeated request")
+                completed.delay(5, TimeUnit.SECONDS)
+            }
+    }
+
+    override fun getPriceFeedFromCache():List<EntityPriceFeed>{
+        return cacheDao.getPriceFeed()
     }
 
     override fun getTickerV1(symbol: String): Observable<DataState<TickerV1>> {

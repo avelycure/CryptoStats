@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.avelycure.cryptostats.data.repo.ICryptoRepo
 import com.avelycure.cryptostats.domain.interactors.GetCandles
+import com.avelycure.cryptostats.domain.interactors.GetCoinPrice
 import com.avelycure.cryptostats.domain.interactors.GetTickerV2
 import io.reactivex.rxjava3.core.Observable
 import com.avelycure.cryptostats.domain.models.*
@@ -19,7 +20,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 class CryptoInfoViewModel(
     private val repo: ICryptoRepo,
     private val getCandles: GetCandles,
-    private val getTickerV2: GetTickerV2
+    private val getTickerV2: GetTickerV2,
+    private val getCoinPrice: GetCoinPrice
 ) : ViewModel() {
 
     private val _state: MutableLiveData<CryptoInfoState> = MutableLiveData()
@@ -58,7 +60,7 @@ class CryptoInfoViewModel(
     }
 
     private fun requestCandles(symbol: String, timeFrame: String): Disposable {
-        return getCandles.execute(symbol,timeFrame)
+        return getCandles.execute(symbol, timeFrame)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponseCandles(data) }, {
@@ -76,7 +78,7 @@ class CryptoInfoViewModel(
     }
 
     private fun requestPriceFeed(pair: String): Disposable {
-        return repo.getPriceFeed()
+        return getCoinPrice.execute()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponsePriceFeed(data, pair) }, {
