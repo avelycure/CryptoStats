@@ -8,6 +8,7 @@ import com.avelycure.cryptostats.data.local.entities.EntityCandles
 import com.avelycure.cryptostats.data.local.entities.EntityPriceFeed
 import com.avelycure.cryptostats.data.local.entities.mappers.*
 import com.avelycure.cryptostats.data.remote.models.ResponsePriceFeed
+import com.avelycure.cryptostats.data.remote.models.ResponseTickerV1
 import com.avelycure.cryptostats.data.remote.models.ResponseTickerV2
 import com.avelycure.cryptostats.data.remote.models.mappers.*
 import com.avelycure.cryptostats.domain.models.*
@@ -53,31 +54,6 @@ class CryptoRepo(
 
     override fun getTickerV2FromCache() = cacheDao.getTickerV2().last()
 
-    override fun getPriceFeed(): Observable<DataState<List<CoinPrice>>> {
-        return networkStatus.isOnline().flatMap { isOnline ->
-            if (isOnline) {
-                apiService
-                    .getPriceFeed()
-                    .flatMap { priceFeed ->
-                        cacheDao.dropPriceFeedTable()
-                        for (price in priceFeed)
-                            cacheDao.insertPriceFeed(price.toEntityPriceFeed())
-                        Observable.fromCallable { DataState.DataRemote(data = priceFeed.map { it.toCoinPrice() }) }
-                    }.repeatWhen { completed ->
-                        Log.d("mytag", "Repeated request")
-                        completed.delay(5, TimeUnit.SECONDS)
-                    }
-            } else {
-                val result = cacheDao.getPriceFeed().map { it.toCoinPrice() }
-                Observable.fromCallable { DataState.DataCache(data = result) }
-            }
-        }.retryWhen { error ->
-            Log.d("mytag", "Error in repo")
-            error.take(3).delay(100, TimeUnit.MILLISECONDS)
-            //maybe add throw exception or DataState.Error
-        }
-    }
-
     override fun getPriceFeedFromRemote(): Observable<List<ResponsePriceFeed>> {
         return apiService
             .getPriceFeed()
@@ -92,7 +68,7 @@ class CryptoRepo(
             }
     }
 
-    override fun getPriceFeedFromCache():List<EntityPriceFeed>{
+    override fun getPriceFeedFromCache(): List<EntityPriceFeed> {
         return cacheDao.getPriceFeed()
     }
 
@@ -118,6 +94,20 @@ class CryptoRepo(
             //maybe add throw exception or DataState.Error
         }
     }
+
+    override fun getTickerV1FromRemote(symbol: String): Observable<ResponseTickerV1> {
+        return apiService
+            .getTickerV1(symbol)
+            .flatMap { tickerV1 ->
+                cacheDao.insertTickerV1(tickerV1.toEntityTickerV1())
+                Observable.fromCallable { tickerV1 }
+            }.repeatWhen { completed ->
+                Log.d("mytag", "Repeated request")
+                completed.delay(5, TimeUnit.SECONDS)
+            }
+    }
+
+    override fun getTickerV1FromCache() = cacheDao.getTickerV1().last()
 
     override fun getTrades(symbol: String, limit: Int): Observable<DataState<List<Trade>>> {
         return networkStatus.isOnline().flatMap { isOnline ->
