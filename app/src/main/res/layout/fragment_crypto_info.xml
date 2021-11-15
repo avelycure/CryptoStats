@@ -30,18 +30,16 @@
                     app:titleTextColor="?attr/titleTextColor" />
             </com.google.android.material.appbar.AppBarLayout>
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/ci_tv_coin_name"
+            <androidx.appcompat.widget.AppCompatSpinner
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:id="@+id/coin_spinner"
+                android:textSize="40sp"
+                android:backgroundTint="?attr/colorOnSurface"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="4dp"
-                android:text="Bitcoin"
-                android:textColor="?attr/titleTextColor"
-                android:textSize="40sp"
-                android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/toolbar_layout" />
+                app:layout_constraintTop_toBottomOf="@+id/toolbar_layout"/>
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="wrap_content"
@@ -50,22 +48,20 @@
                 android:textColor="?attr/titleTextColor"
                 android:textSize="20sp"
                 android:textStyle="bold|italic"
-                app:layout_constraintTop_toTopOf="@id/ci_tv_coin_name"
+                app:layout_constraintTop_toTopOf="@+id/coin_spinner"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/ci_tv_coin_value_name"
+            <androidx.appcompat.widget.AppCompatSpinner
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:id="@+id/currency_spinner"
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="8dp"
-                android:text="USD"
-                android:textColor="?attr/titleTextColor"
                 android:textSize="40sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/toolbar_layout" />
+                app:layout_constraintTop_toBottomOf="@+id/toolbar_layout"/>
 
             <include layout="@layout/stat24" />
 

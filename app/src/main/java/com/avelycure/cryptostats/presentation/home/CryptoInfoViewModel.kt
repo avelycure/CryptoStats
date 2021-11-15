@@ -24,6 +24,7 @@ class CryptoInfoViewModel(
     private val getTickerV1: GetTickerV1,
     private val getTrades: GetTrades
 ) : ViewModel() {
+    var firstStart = true
 
     private val _state: MutableLiveData<CryptoInfoState> = MutableLiveData()
     val state: LiveData<CryptoInfoState>
@@ -61,8 +62,8 @@ class CryptoInfoViewModel(
         }
     }
 
-    fun onDestroy(){
-        compositeDisposable.dispose()
+    fun clear(){
+        compositeDisposable.clear()
     }
 
     private fun requestCandles(symbol: String, timeFrame: String): Disposable {

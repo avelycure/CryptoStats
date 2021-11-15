@@ -8,9 +8,13 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatSpinner
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -18,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.avelycure.cryptostats.R
+import com.avelycure.cryptostats.common.Constants
 import com.avelycure.cryptostats.domain.models.CoinPrice
 import com.avelycure.cryptostats.domain.models.Statistic24h
 import com.github.mikephil.charting.charts.CandleStickChart
@@ -53,6 +58,27 @@ class CryptoInfoFragment : Fragment() {
     private val cryptoInfoViewModel: CryptoInfoViewModel by viewModel()
     private lateinit var adapter: TradeAdapter
 
+    private var coin = Constants.DEFAULT_COIN_SYMBOL
+    private var currency = Constants.DEFAULT_CURRENCY_SYMBOL
+    private var timeFrame = Constants.DEFAULT_TIME_FRAME
+
+    private lateinit var coinSpinner: AppCompatSpinner
+    private lateinit var coinSpinnerAdapter: ArrayAdapter<String>
+
+    private lateinit var currencySpinner: AppCompatSpinner
+    private lateinit var currencySpinnerAdapter: ArrayAdapter<String>
+
+    private fun fetchData() {
+        cryptoInfoViewModel.requestData(
+            CryptoInfoViewModel.RequestParameters(
+                symbol = "$coin$currency",
+                limit = 50,
+                timeFrame = timeFrame,
+                pair = (coin + currency).uppercase()
+            )
+        )
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -62,20 +88,14 @@ class CryptoInfoFragment : Fragment() {
         initViews(view)
 
         swipeRefresh.setOnRefreshListener {
-            cryptoInfoViewModel.requestData(
-                CryptoInfoViewModel.RequestParameters(
-                    symbol = "btcusd",
-                    limit = 50,
-                    timeFrame = "1m",
-                    pair = "BTCUSD"
-                )
-            )
+            cryptoInfoViewModel.clear()
+            fetchData()
             swipeRefresh.isRefreshing = false
         }
 
         cryptoInfoViewModel.state.observe(viewLifecycleOwner, { state ->
 
-            if(state.remoteData)
+            if (state.remoteData)
                 tvActuality.text = "actual"
             else
                 tvActuality.text = "cached"
@@ -128,12 +148,17 @@ class CryptoInfoFragment : Fragment() {
             rvTrades.adapter?.notifyDataSetChanged()
         })
 
+        if (savedInstanceState == null) {
+            fetchData()
+            cryptoInfoViewModel.firstStart = false
+        }
+
         return view
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        cryptoInfoViewModel.onDestroy()
+        cryptoInfoViewModel.clear()
     }
 
     private fun updateStats(stats: Statistic24h) {
@@ -174,6 +199,62 @@ class CryptoInfoFragment : Fragment() {
         currentTvAskPrice = view.findViewById(R.id.ci_tv_current_ask)
         swipeRefresh = view.findViewById(R.id.swipe_refresh_layout)
         tvActuality = view.findViewById(R.id.data_actuality)
+        coinSpinner = view.findViewById(R.id.coin_spinner)
+        currencySpinner = view.findViewById(R.id.currency_spinner)
+
+        coinSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                if (!cryptoInfoViewModel.firstStart) {
+                    cryptoInfoViewModel.clear()
+                    coin = Constants.COIN_SYMBOL.filterValues {
+                        it == parent?.getItemAtPosition(position).toString()
+                    }.keys.first()
+                    fetchData()
+                }
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {}
+        }
+
+        currencySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                if (!cryptoInfoViewModel.firstStart) {
+                    cryptoInfoViewModel.clear()
+                    currency = parent?.getItemAtPosition(position).toString()
+                    fetchData()
+                }
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {}
+        }
+
+        coinSpinnerAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            Constants.COIN_SYMBOL.values.toList()
+        )
+        coinSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        coinSpinner.adapter = coinSpinnerAdapter
+        coinSpinner.setSelection(coinSpinnerAdapter.getPosition(Constants.DEFAULT_COIN))
+
+        currencySpinnerAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            Constants.CURRENCY_SYMBOL.values.toList()
+        )
+        currencySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        currencySpinner.adapter = currencySpinnerAdapter
+        currencySpinner.setSelection(currencySpinnerAdapter.getPosition(Constants.DEFAULT_CURRENCY))
 
         (activity as AppCompatActivity).setSupportActionBar(view.findViewById(R.id.ci_toolbar))
         (activity as AppCompatActivity).supportActionBar?.title = "Crypto stats"
