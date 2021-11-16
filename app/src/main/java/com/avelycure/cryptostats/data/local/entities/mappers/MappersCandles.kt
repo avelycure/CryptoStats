@@ -37,8 +37,6 @@ fun List<List<Float>>.toEntityCandles(): EntityCandles {
     return EntityCandles(
         id = 0,
         dateOfSave = 0L
-        //candles = listOf(EntitySmallCandle(0,0,0f,0f,0f,0f,0f))
-        //todo think about creating new list
     )
 }
 

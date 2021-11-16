@@ -47,9 +47,6 @@ class CryptoRepo(
                 try {
                     Log.d("mytag", "length of candles: ${candles.size}")
                     cacheDao.insertCandles(candles)
-                    //val candleFK = cacheDao.getCandles()?.last()?.id ?: 0
-                    //for (candle in candles)
-                    //    cacheDao.insertSmallCandles(candle.toSmallCandle(candleFK))
                 } catch (e: Exception) {
                     Log.d("mytag", "i got error in candles: ${e.message}")
                 }//}
@@ -67,7 +64,7 @@ class CryptoRepo(
                 cacheDao.insertTickerV2(tickerV2.toEntityTickerV2())
                 Observable.fromCallable { tickerV2 }
             }.repeatWhen { completed ->
-                Log.d("mytag", "Repeated request")
+                Log.d("mytag", "Repeated request tickerv2")
                 completed.delay(10, TimeUnit.SECONDS)
             }
     }
@@ -81,7 +78,7 @@ class CryptoRepo(
                     cacheDao.insertPriceFeed(price.toEntityPriceFeed())
                 Observable.fromCallable { priceFeed }
             }.repeatWhen { completed ->
-                Log.d("mytag", "Repeated request")
+                Log.d("mytag", "Repeated request price feed")
                 completed.delay(10, TimeUnit.SECONDS)
             }
     }
@@ -93,7 +90,7 @@ class CryptoRepo(
                 cacheDao.insertTickerV1(tickerV1.toEntityTickerV1())
                 Observable.fromCallable { tickerV1 }
             }.repeatWhen { completed ->
-                Log.d("mytag", "Repeated request")
+                Log.d("mytag", "Repeated request ticker v1")
                 completed.delay(10, TimeUnit.SECONDS)
             }
     }
@@ -110,7 +107,7 @@ class CryptoRepo(
                     cacheDao.insertTradeHistory(trade.toTradeHistoryEntity())
                 Observable.fromCallable { trades }
             }.repeatWhen { completed ->
-                Log.d("mytag", "Repeated request")
+                Log.d("mytag", "Repeated request trade history")
                 completed.delay(30, TimeUnit.SECONDS)
             }
     }

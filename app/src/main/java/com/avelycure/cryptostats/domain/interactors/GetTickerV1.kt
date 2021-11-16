@@ -26,10 +26,6 @@ class GetTickerV1(
                         data = repo.getTickerV1FromCache().toTickerV1()
                     )
                 }
-        }.retryWhen { error ->
-            Log.d("mytag", "Error in repo")
-            error.take(3).delay(100, TimeUnit.MILLISECONDS)
-            //maybe add throw exception or DataState.Error
         }
     }
 }
