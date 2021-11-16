@@ -30,7 +30,7 @@ val appModule = module {
 
     fun provideAppDatabase(context: Context) =
         Room.databaseBuilder(context, AppDatabase::class.java, "database")
-            //.allowMainThreadQueries()
+            .allowMainThreadQueries()
             //.fallbackToDestructiveMigration()
             .build()
 

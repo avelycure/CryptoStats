@@ -71,7 +71,7 @@ class CryptoInfoViewModel(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponseCandles(data) }, {
-                Log.d("mytag", "error: ${it.message}")
+                Log.d("mytag", "error in candles: ${it.message}")
             }, {})
     }
 

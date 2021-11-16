@@ -25,10 +25,10 @@ class GetCandles(
                         data = repo.getCandlesFromCache().toCandleList()
                     )
                 }
-        }.retryWhen { error ->
+        }/*.retryWhen { error ->
             Log.d("mytag", "Error in repo candles")
             error.take(3).delay(100, TimeUnit.MILLISECONDS)
             //maybe add throw exception or DataState.Error
-        }
+        }*/
     }
 }

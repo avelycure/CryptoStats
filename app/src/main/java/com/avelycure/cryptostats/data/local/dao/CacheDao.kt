@@ -3,7 +3,10 @@ package com.avelycure.cryptostats.data.local.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Transaction
 import com.avelycure.cryptostats.data.local.entities.*
+import com.avelycure.cryptostats.data.local.entities.mappers.toEntityCandles
+import com.avelycure.cryptostats.data.local.entities.mappers.toSmallCandle
 import io.reactivex.rxjava3.core.Completable
 
 @Dao
@@ -43,11 +46,25 @@ interface CacheDao {
 
 
     @Insert
-    fun insertCandles(candle: EntityCandles): Completable
+    fun insertCandles(candle: EntityCandles)
+
+    @Insert
+    fun insertSmallCandles(candle: EntitySmallCandle)
 
     @Query("SELECT * FROM candles")
-    fun getCandles(): List<EntityCandles>
+    fun getCandles(): List<EntityCandles>?
+
+    @Query("SELECT * FROM small_candles")
+    fun getSmallCandles(): List<EntitySmallCandle>
 
     @Query("DELETE FROM candles")
     fun dropCandlesTable()
+
+    @Transaction
+    fun insertCandles(candles: List<List<Float>>){
+        insertCandles(candles.toEntityCandles())
+        val candleFK = getCandles()?.last()?.id ?: -1
+        for (candle in candles)
+            insertSmallCandles(candle.toSmallCandle(candleFK))
+    }
 }

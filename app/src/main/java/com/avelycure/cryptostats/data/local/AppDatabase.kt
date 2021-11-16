@@ -14,7 +14,8 @@ import com.avelycure.cryptostats.data.local.type_converters.ConverterListListFlo
         EntityPriceFeed::class,
         EntityTickerV1::class,
         EntityTradeHistory::class,
-        EntityCandles::class
+        EntityCandles::class,
+        EntitySmallCandle::class
     ), version = 1
 )
 @TypeConverters(
