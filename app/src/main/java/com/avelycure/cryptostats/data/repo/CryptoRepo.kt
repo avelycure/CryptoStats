@@ -25,7 +25,6 @@ class CryptoRepo(
         val candle = cacheDao.getCandles()?.last()
         if (candle != null) {
             candle.candles = cacheDao.getSmallCandles()
-            Log.d("mytag", "candles size: " + candle.candles.size)
             return candle
         }
         return EntityCandles()
@@ -43,13 +42,9 @@ class CryptoRepo(
         return apiService
             .getCandles(symbol, timeFrame)
             .flatMap { candles ->
-                //thread {
-                try {
-                    Log.d("mytag", "length of candles: ${candles.size}")
+                thread {
                     cacheDao.insertCandles(candles)
-                } catch (e: Exception) {
-                    Log.d("mytag", "i got error in candles: ${e.message}")
-                }//}
+                }
                 Observable.fromCallable { candles }
             }.repeatWhen { completed ->
                 Log.d("mytag", "Repeated request candles")
@@ -73,9 +68,11 @@ class CryptoRepo(
         return apiService
             .getPriceFeed()
             .flatMap { priceFeed ->
-                cacheDao.dropPriceFeedTable()
-                for (price in priceFeed)
-                    cacheDao.insertPriceFeed(price.toEntityPriceFeed())
+                thread {
+                    cacheDao.dropPriceFeedTable()
+                    for (price in priceFeed)
+                        cacheDao.insertPriceFeed(price.toEntityPriceFeed())
+                }
                 Observable.fromCallable { priceFeed }
             }.repeatWhen { completed ->
                 Log.d("mytag", "Repeated request price feed")
@@ -102,9 +99,11 @@ class CryptoRepo(
         return apiService
             .getTradeHistory(symbol, limit)
             .flatMap { trades ->
-                cacheDao.dropTradeHistoryTable()
-                for (trade in trades)
-                    cacheDao.insertTradeHistory(trade.toTradeHistoryEntity())
+                thread {
+                    cacheDao.dropTradeHistoryTable()
+                    for (trade in trades)
+                        cacheDao.insertTradeHistory(trade.toTradeHistoryEntity())
+                }
                 Observable.fromCallable { trades }
             }.repeatWhen { completed ->
                 Log.d("mytag", "Repeated request trade history")
