@@ -6,7 +6,6 @@ object Constants {
     val COIN_SYMBOL = mapOf(
         "btc" to "Bitcoin",
         "eth" to "Ethereum",
-        "doge" to "Dogecoin",
     )
 
     val CURRENCY_SYMBOL = mapOf(

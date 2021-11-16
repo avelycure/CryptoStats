@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import com.avelycure.cryptostats.data.local.entities.*
+import io.reactivex.rxjava3.core.Completable
 
 @Dao
 interface CacheDao {
@@ -42,7 +43,7 @@ interface CacheDao {
 
 
     @Insert
-    fun insertCandles(candle: EntityCandles)
+    fun insertCandles(candle: EntityCandles): Completable
 
     @Query("SELECT * FROM candles")
     fun getCandles(): List<EntityCandles>

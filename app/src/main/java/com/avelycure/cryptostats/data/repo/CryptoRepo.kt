@@ -10,6 +10,7 @@ import com.avelycure.cryptostats.data.remote.models.ResponseTickerV2
 import com.avelycure.cryptostats.data.remote.models.ResponseTradeHistory
 import com.avelycure.cryptostats.data.remote.models.mappers.*
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
 class CryptoRepo(
@@ -19,8 +20,8 @@ class CryptoRepo(
     override fun getCandlesFromCache() = cacheDao.getCandles().last()
     override fun getTickerV2FromCache() = cacheDao.getTickerV2().last()
     override fun getPriceFeedFromCache() = cacheDao.getPriceFeed()
-    override fun getTickerV1FromCache() = cacheDao.getTickerV1().last()
     override fun getTradesFromCache() = cacheDao.getTradeHistory()
+    override fun getTickerV1FromCache() = cacheDao.getTickerV1().last()
 
     override fun getCandlesFromRemote(
         symbol: String,
@@ -29,7 +30,7 @@ class CryptoRepo(
         return apiService
             .getCandles(symbol, timeFrame)
             .flatMap { candles ->
-                cacheDao.insertCandles(candles.toEntityCandles())
+                cacheDao.insertCandles(candles.toEntityCandles()).subscribeOn(Schedulers.newThread())
                 Observable.fromCallable { candles }
             }.repeatWhen { completed ->
                 Log.d("mytag", "Repeated request candles")
@@ -45,7 +46,7 @@ class CryptoRepo(
                 Observable.fromCallable { tickerV2 }
             }.repeatWhen { completed ->
                 Log.d("mytag", "Repeated request")
-                completed.delay(5, TimeUnit.SECONDS)
+                completed.delay(10, TimeUnit.SECONDS)
             }
     }
 
@@ -59,7 +60,7 @@ class CryptoRepo(
                 Observable.fromCallable { priceFeed }
             }.repeatWhen { completed ->
                 Log.d("mytag", "Repeated request")
-                completed.delay(5, TimeUnit.SECONDS)
+                completed.delay(10, TimeUnit.SECONDS)
             }
     }
 
@@ -71,7 +72,7 @@ class CryptoRepo(
                 Observable.fromCallable { tickerV1 }
             }.repeatWhen { completed ->
                 Log.d("mytag", "Repeated request")
-                completed.delay(5, TimeUnit.SECONDS)
+                completed.delay(10, TimeUnit.SECONDS)
             }
     }
 
@@ -88,7 +89,7 @@ class CryptoRepo(
                 Observable.fromCallable { trades }
             }.repeatWhen { completed ->
                 Log.d("mytag", "Repeated request")
-                completed.delay(5, TimeUnit.SECONDS)
+                completed.delay(30, TimeUnit.SECONDS)
             }
     }
 }
