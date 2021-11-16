@@ -29,10 +29,7 @@ val appModule = module {
     single<INetworkStatus> { NetworkStatus(get()) }
 
     fun provideAppDatabase(context: Context) =
-        Room.databaseBuilder(context, AppDatabase::class.java, "database")
-            //.allowMainThreadQueries()
-            //.fallbackToDestructiveMigration()
-            .build()
+        Room.databaseBuilder(context, AppDatabase::class.java, "database").build()
 
     fun provideScreenDao(appDatabase: AppDatabase) = appDatabase.cacheDao()
 

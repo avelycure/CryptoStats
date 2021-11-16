@@ -24,6 +24,7 @@ class CryptoInfoViewModel(
     private val getTickerV1: GetTickerV1,
     private val getTrades: GetTrades
 ) : ViewModel() {
+    var firstStart = true
 
     private val _state: MutableLiveData<CryptoInfoState> = MutableLiveData()
     val state: LiveData<CryptoInfoState>
@@ -61,8 +62,8 @@ class CryptoInfoViewModel(
         }
     }
 
-    fun onDestroy(){
-        compositeDisposable.dispose()
+    fun clear(){
+        compositeDisposable.clear()
     }
 
     private fun requestCandles(symbol: String, timeFrame: String): Disposable {
@@ -70,7 +71,7 @@ class CryptoInfoViewModel(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponseCandles(data) }, {
-                Log.d("mytag", "error: ${it.message}")
+                Log.d("mytag", "error in candles: ${it.message}")
             }, {})
     }
 
@@ -79,7 +80,7 @@ class CryptoInfoViewModel(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponsePriceFeed(data, pair) }, {
-                Log.d("mytag", "Errorpf: ${it.message}")
+                Log.d("mytag", "Error in repo while fetching coin price: ${it.message}")
             }, {})
     }
 
@@ -87,7 +88,9 @@ class CryptoInfoViewModel(
         return getTickerV1.execute(symbol)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .subscribe({ data -> onResponseTickerV1(data) }, {}, {})
+            .subscribe({ data -> onResponseTickerV1(data) }, {
+                Log.d("mytag", "Error in repo  while fetching  ticker v1: ${it.message}")
+            }, {})
     }
 
     private fun requestTickerV2(symbol: String): Disposable {
@@ -95,7 +98,7 @@ class CryptoInfoViewModel(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponseTickerV2(data) }, {
-                Log.d("mytag", "Error: ${it.message}")
+                Log.d("mytag", "Error in repo  while fetching  ticker v2: ${it.message}")
             }, {})
     }
 
@@ -103,7 +106,9 @@ class CryptoInfoViewModel(
         return getTrades.execute(symbol, limit)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .subscribe({ data -> onResponseTradeHistory(data) }, {}, {})
+            .subscribe({ data -> onResponseTradeHistory(data) }, {
+                Log.d("mytag", "Error in repo  while fetching  trades: ${it.message}")
+            }, {})
     }
 
     private fun onResponseCandles(candles: DataState<List<Candle>>) {
