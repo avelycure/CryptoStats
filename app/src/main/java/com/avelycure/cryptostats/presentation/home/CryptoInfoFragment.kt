@@ -60,6 +60,7 @@ class CryptoInfoFragment : Fragment() {
 
     private var coin = Constants.DEFAULT_COIN_SYMBOL
     private var currency = Constants.DEFAULT_CURRENCY_SYMBOL
+    private var currencySymbol = Constants.CURRENCY_SYMBOL
     private var timeFrame = Constants.DEFAULT_TIME_FRAME
 
     private lateinit var coinSpinner: AppCompatSpinner
@@ -128,21 +129,9 @@ class CryptoInfoFragment : Fragment() {
                 "Set 1"
             )
 
-            updateStats(state.statistic)
+            updateStats(state)
 
-            if (state.coinPrice.percentChange24h.isNotEmpty()) {
-                tvPriceChange.text =
-                    (state.coinPrice.price.toFloat() - state.statistic.high).toString()
-                if (state.coinPrice.price.toFloat() - state.statistic.high > 0F)
-                    tvPriceChange.setTextColor(Color.GREEN)
-                else
-                    tvPriceChange.setTextColor(Color.RED)
-
-                currentTvAskPrice.text = state.tickerV2.ask.toString()
-                currentTvBidPrice.text = state.tickerV2.bid.toString()
-            }
-
-            updatePrice(state.coinPrice)
+            updatePrice(state)
 
             adapter.tradeList = state.trades
             rvTrades.adapter?.notifyDataSetChanged()
@@ -161,21 +150,37 @@ class CryptoInfoFragment : Fragment() {
         cryptoInfoViewModel.clear()
     }
 
-    private fun updateStats(stats: Statistic24h) {
-        tvLowest24h.text = stats.low.toString()
-        tvHighest24h.text = stats.high.toString()
-        tvOpenPrice.text = stats.open.toString()
-    }
+    private fun updateStats(state: CryptoInfoState) {
+        if (state.coinPrice.percentChange24h.isNotEmpty()) {
+            tvCoinValue.text =
+                state.coinPrice.price + Constants.CURRENCY_SYMBOL.filterValues { it == currency }.keys.first()
+            tvPercentageChanging24h.text = "${state.coinPrice.percentChange24h.toFloat() * 100F}%"
 
-    private fun updatePrice(coinPrice: CoinPrice) {
-        if (coinPrice.percentChange24h.isNotEmpty()) {
-            tvCoinValue.text = coinPrice.price
-            tvPercentageChanging24h.text = "${coinPrice.percentChange24h.toFloat() * 100F}%"
-
-            if (coinPrice.percentChange24h.toFloat() > 0F)
+            if (state.coinPrice.percentChange24h.toFloat() > 0F)
                 tvPercentageChanging24h.setTextColor(Color.GREEN)
             else
                 tvPercentageChanging24h.setTextColor(Color.RED)
+        }
+        tvLowest24h.text =
+            state.statistic.low.toString() + Constants.CURRENCY_SYMBOL.filterValues { it == currency }.keys.first()
+        tvHighest24h.text =
+            state.statistic.high.toString() + Constants.CURRENCY_SYMBOL.filterValues { it == currency }.keys.first()
+    }
+
+    private fun updatePrice(state: CryptoInfoState) {
+        tvOpenPrice.text =
+            state.statistic.open.toString() + Constants.CURRENCY_SYMBOL.filterValues { it == currency }.keys.first()
+        currentTvAskPrice.text =
+            state.tickerV2.ask.toString() + Constants.CURRENCY_SYMBOL.filterValues { it == currency }.keys.first()
+        currentTvBidPrice.text =
+            state.tickerV2.bid.toString() + Constants.CURRENCY_SYMBOL.filterValues { it == currency }.keys.first()
+        if (state.coinPrice.percentChange24h.isNotEmpty()) {
+            tvPriceChange.text =
+                (state.coinPrice.price.toFloat() - state.statistic.high).toString() + Constants.CURRENCY_SYMBOL.filterValues { it == currency }.keys.first()
+            if (state.coinPrice.price.toFloat() - state.statistic.high > 0F)
+                tvPriceChange.setTextColor(Color.GREEN)
+            else
+                tvPriceChange.setTextColor(Color.RED)
         }
     }
 

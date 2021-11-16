@@ -43,7 +43,10 @@ class CryptoRepo(
             .getCandles(symbol, timeFrame)
             .flatMap { candles ->
                 thread {
-                    cacheDao.insertCandles(candles)
+                    cacheDao.insertCandles(candles.toEntityCandles())
+                    val candleFK = cacheDao.getCandles()?.last()?.id ?: -1
+                    for (candle in candles)
+                        cacheDao.insertSmallCandles(candle.toSmallCandle(candleFK))
                 }
                 Observable.fromCallable { candles }
             }.repeatWhen { completed ->

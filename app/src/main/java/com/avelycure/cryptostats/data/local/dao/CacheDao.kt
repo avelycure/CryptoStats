@@ -59,12 +59,4 @@ interface CacheDao {
 
     @Query("DELETE FROM candles")
     fun dropCandlesTable()
-
-    @Transaction
-    fun insertCandles(candles: List<List<Float>>){
-        insertCandles(candles.toEntityCandles())
-        val candleFK = getCandles()?.last()?.id ?: -1
-        for (candle in candles)
-            insertSmallCandles(candle.toSmallCandle(candleFK))
-    }
 }
