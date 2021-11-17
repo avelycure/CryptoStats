@@ -40,6 +40,7 @@ val appModule = module {
     single<GetCoinPrice> { GetCoinPrice(get(), get()) }
     single<GetTickerV1> { GetTickerV1(get(), get()) }
     single<GetTrades> { GetTrades(get(), get()) }
+    single<PrepareCandles> { PrepareCandles() }
 
     viewModel {
         CryptoInfoViewModel(
@@ -47,7 +48,8 @@ val appModule = module {
             getTickerV2 = get(),
             getCoinPrice = get(),
             getTickerV1 = get(),
-            getTrades = get()
+            getTrades = get(),
+            prepareCandles = get()
         )
     }
 

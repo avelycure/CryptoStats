@@ -35,40 +35,38 @@ android {
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.6.0'
-    implementation 'androidx.appcompat:appcompat:1.3.1'
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.4.0'
     implementation 'com.google.android.material:material:1.4.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
+
     // Retrofit
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-    implementation 'com.squareup.retrofit2:adapter-rxjava3:2.9.0'
-    implementation "com.squareup.okhttp3:logging-interceptor:4.3.1"
+    implementation retrofit2.retrofit
+    implementation retrofit2.converter_gson
+    implementation retrofit2.adapter_rxjava3
+    implementation retrofit2.logging_interceptor
 
     // OkHttp
-    implementation 'com.squareup.okhttp3:okhttp:4.9.0'
+    implementation okHttp.okHttp3
 
     // RxJava 3
-    implementation 'io.reactivex.rxjava3:rxjava:3.0.6'
-    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
+    implementation rxjava.rxjava3
+    implementation rxjava.rxandroid
 
     // Room
-    implementation 'androidx.room:room-runtime:2.3.0'
-    implementation 'androidx.room:room-rxjava3:2.3.0'
+    implementation room.room_runtime
+    implementation room.room_rxjava3
     kapt 'androidx.room:room-compiler:2.3.0'
     kapt "org.xerial:sqlite-jdbc:3.34.0"
 
     // Charts
-    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+    implementation charts.MPAndroidChart
 
     testImplementation 'junit:junit:'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
     // Koin core features
-    implementation "io.insert-koin:koin-core:3.1.3"
-    implementation "io.insert-koin:koin-android:3.1.3"
-
-    //SwipeRefreshLayout
-    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+    implementation koin.koin_core
+    implementation koin.koin_android
 }

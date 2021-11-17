@@ -10,7 +10,7 @@ fun List<List<Float>>.toCandleList(): List<Candle> {
     for (candle in this)
         candleList.add(
             Candle(
-                time = (candle[0] / 1000).roundToInt().toFloat(),
+                time = candle[0],
                 open = candle[1],
                 high = candle[2],
                 low = candle[3],
@@ -25,7 +25,7 @@ fun List<Float>.toSmallCandle(candleFK: Int): EntitySmallCandle {
     return EntitySmallCandle(
         id = 0,
         candleFK = candleFK,
-        time = (this[0] / 1000).roundToInt().toFloat(),
+        time = this[0],
         open = this[1],
         high = this[2],
         low = this[3],

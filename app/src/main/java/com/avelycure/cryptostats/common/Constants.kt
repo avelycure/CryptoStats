@@ -17,7 +17,7 @@ object Constants {
     const val DEFAULT_CURRENCY = "usd"
 
     const val DEFAULT_COIN_SYMBOL = "btc"
-    const val DEFAULT_CURRENCY_SYMBOL = "usd"
+    const val DEFAULT_CURRENCY_SYMBOL = "$"
 
     const val DEFAULT_TIME_FRAME = "1m"
 }

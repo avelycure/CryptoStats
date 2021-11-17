@@ -9,6 +9,8 @@
         <item name="titleTextColor">@color/green_light</item>
         <item name="textFillColor">@color/dark_green</item>
 
+        <item name="colorError">@color/scarlet</item>
+
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/yellow</item>
         <item name="colorPrimaryVariant">@color/peach</item>
