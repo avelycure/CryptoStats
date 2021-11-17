@@ -1,11 +1,11 @@
 # CryptoStats
 
 App for getting information from Gemini Api:
-* get coin value
-* get trades
-* get candles
-* get 24h coin statistic
-* get 24h high, low, open, close value of the coin
+* coin value
+* trades
+* candles
+* 24h coin statistic
+* 24h high, low, open, close value of the coin
 
 ## Project features
 * Kotlin
