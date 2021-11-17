@@ -14,6 +14,8 @@ App for getting information from Gemini Api:
 * Retrofit to fetch data from API
 * Room to cache data
 * MPAndroid to plot nice charts
+* CleanArchitecture
+* MVVM
 
 ## Functionality
 
