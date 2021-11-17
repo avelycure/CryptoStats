@@ -22,7 +22,8 @@ class CryptoInfoViewModel(
     private val getTickerV2: GetTickerV2,
     private val getCoinPrice: GetCoinPrice,
     private val getTickerV1: GetTickerV1,
-    private val getTrades: GetTrades
+    private val getTrades: GetTrades,
+    private val prepareCandles: PrepareCandles
 ) : ViewModel() {
     var firstStart = true
 
@@ -62,7 +63,7 @@ class CryptoInfoViewModel(
         }
     }
 
-    fun clear(){
+    fun clear() {
         compositeDisposable.clear()
     }
 
@@ -156,23 +157,19 @@ class CryptoInfoViewModel(
     }
 
     private fun handleCandles(data: List<Candle>, remoteData: Boolean) {
-        val dataForChart = data
+        prepareCandles.execute(data)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ dataForChart ->
+                val newStat = _state.value?.statistic?.copy(
+                    candles = dataForChart
+                ) ?: Statistic24h()
 
-        val first = dataForChart[0].time
-
-        val dataForChartCopy = arrayListOf<Candle>()
-        for (i in 0 until dataForChart.size)
-            if (i % 3 == 0)
-                dataForChartCopy.add(dataForChart[i].copy(time = (dataForChart[i].time - first) / 600F))
-
-        val newStat = _state.value?.statistic?.copy(
-            candles = dataForChartCopy
-        ) ?: Statistic24h()
-
-        _state.value = state.value?.copy(
-            statistic = newStat,
-            remoteData = remoteData
-        )
+                _state.value = state.value?.copy(
+                    statistic = newStat,
+                    remoteData = remoteData
+                )
+            }, {}, {})
     }
 
     private fun handlePriceFeed(data: List<CoinPrice>, pair: String, remoteData: Boolean) {

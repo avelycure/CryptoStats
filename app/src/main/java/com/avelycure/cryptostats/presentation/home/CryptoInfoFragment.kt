@@ -331,6 +331,12 @@ class CryptoInfoFragment : Fragment() {
                 setCenterAxisLabels(true)
 
                 textColor = activity?.getColorFromAttr(R.attr.colorOnSurface) ?: Color.BLACK
+
+                valueFormatter = object : ValueFormatter() {
+                    override fun getFormattedValue(value: Float): String {
+                        return "${(value / 10).roundToInt()}h"
+                    }
+                }
             }
 
             axisLeft.apply {
@@ -383,12 +389,11 @@ class CryptoInfoFragment : Fragment() {
     private fun makeCandleSet(data: ArrayList<CandleEntry>, label: String): CandleDataSet {
         return CandleDataSet(data, label).apply {
             color = Color.rgb(80, 80, 80)
-            shadowColor = Color.LTGRAY
             shadowWidth = 2F
-            decreasingColor = Color.RED
+            decreasingColor = activity?.getColorFromAttr(R.attr.colorError) ?: Color.RED
             decreasingPaintStyle = Paint.Style.FILL
             increasingPaintStyle = Paint.Style.FILL
-            increasingColor = Color.GREEN
+            increasingColor = activity?.getColorFromAttr(R.attr.titleTextColor) ?: Color.GREEN
             neutralColor = Color.BLUE
             setDrawValues(false)
         }
