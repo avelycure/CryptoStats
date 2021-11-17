@@ -11,7 +11,7 @@ class PrepareCandles() {
 
         val dataForChartCopy = arrayListOf<Candle>()
         for (i in 0 until data.size)
-            if (i % 2 == 0 || i % 3 == 0)
+            if (i % 2 == 0)
                 dataForChartCopy.add(data[i].copy(time = ((data[i].time - last) / 1000F / 360F)))
 
         return Observable.fromCallable { dataForChartCopy }

@@ -1,5 +1,6 @@
 package com.avelycure.cryptostats.presentation.home
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Paint
@@ -10,7 +11,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
@@ -23,8 +23,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.avelycure.cryptostats.R
 import com.avelycure.cryptostats.common.Constants
-import com.avelycure.cryptostats.domain.models.CoinPrice
-import com.avelycure.cryptostats.domain.models.Statistic24h
 import com.github.mikephil.charting.charts.CandleStickChart
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.Legend
@@ -42,7 +40,6 @@ import kotlin.math.roundToInt
 class CryptoInfoFragment : Fragment() {
     private lateinit var lineChart: LineChart
     private lateinit var candleChart: CandleStickChart
-    private lateinit var swipeRefresh: SwipeRefreshLayout
 
     private lateinit var tvCoinValue: AppCompatTextView
     private lateinit var tvPercentageChanging24h: AppCompatTextView
@@ -59,8 +56,8 @@ class CryptoInfoFragment : Fragment() {
     private lateinit var adapter: TradeAdapter
 
     private var coin = Constants.DEFAULT_COIN_SYMBOL
-    private var currency = Constants.DEFAULT_CURRENCY_SYMBOL
-    private var currencySymbol = Constants.CURRENCY_SYMBOL
+    private var currency = Constants.DEFAULT_CURRENCY
+    private var currencySymbol = Constants.DEFAULT_CURRENCY_SYMBOL
     private var timeFrame = Constants.DEFAULT_TIME_FRAME
 
     private lateinit var coinSpinner: AppCompatSpinner
@@ -80,6 +77,7 @@ class CryptoInfoFragment : Fragment() {
         )
     }
 
+    @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -87,12 +85,6 @@ class CryptoInfoFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_crypto_info, container, false)
 
         initViews(view)
-
-        swipeRefresh.setOnRefreshListener {
-            cryptoInfoViewModel.clear()
-            fetchData()
-            swipeRefresh.isRefreshing = false
-        }
 
         cryptoInfoViewModel.state.observe(viewLifecycleOwner, { state ->
 
@@ -150,10 +142,10 @@ class CryptoInfoFragment : Fragment() {
         cryptoInfoViewModel.clear()
     }
 
+    @SuppressLint("SetTextI18n")
     private fun updateStats(state: CryptoInfoState) {
         if (state.coinPrice.percentChange24h.isNotEmpty()) {
-            tvCoinValue.text =
-                state.coinPrice.price + Constants.CURRENCY_SYMBOL.filterValues { it == currency }.keys.first()
+            tvCoinValue.text =state.coinPrice.price + currencySymbol
             tvPercentageChanging24h.text = "${state.coinPrice.percentChange24h.toFloat() * 100F}%"
 
             if (state.coinPrice.percentChange24h.toFloat() > 0F)
@@ -162,21 +154,23 @@ class CryptoInfoFragment : Fragment() {
                 tvPercentageChanging24h.setTextColor(Color.RED)
         }
         tvLowest24h.text =
-            state.statistic.low.toString() + Constants.CURRENCY_SYMBOL.filterValues { it == currency }.keys.first()
+            state.statistic.low.toString() + currencySymbol
         tvHighest24h.text =
-            state.statistic.high.toString() + Constants.CURRENCY_SYMBOL.filterValues { it == currency }.keys.first()
+            state.statistic.high.toString() + currencySymbol
     }
 
+
+    @SuppressLint("SetTextI18n")
     private fun updatePrice(state: CryptoInfoState) {
         tvOpenPrice.text =
-            state.statistic.open.toString() + Constants.CURRENCY_SYMBOL.filterValues { it == currency }.keys.first()
+            state.statistic.open.toString() + currencySymbol
         currentTvAskPrice.text =
-            state.tickerV2.ask.toString() + Constants.CURRENCY_SYMBOL.filterValues { it == currency }.keys.first()
+            state.tickerV2.ask.toString() + currencySymbol
         currentTvBidPrice.text =
-            state.tickerV2.bid.toString() + Constants.CURRENCY_SYMBOL.filterValues { it == currency }.keys.first()
+            state.tickerV2.bid.toString() + currencySymbol
         if (state.coinPrice.percentChange24h.isNotEmpty()) {
             tvPriceChange.text =
-                (state.coinPrice.price.toFloat() - state.statistic.high).toString() + Constants.CURRENCY_SYMBOL.filterValues { it == currency }.keys.first()
+                (state.coinPrice.price.toFloat() - state.statistic.high).toString() + currencySymbol
             if (state.coinPrice.price.toFloat() - state.statistic.high > 0F)
                 tvPriceChange.setTextColor(Color.GREEN)
             else
@@ -202,7 +196,6 @@ class CryptoInfoFragment : Fragment() {
         tvPriceChange = view.findViewById(R.id.ci_tv_price_change)
         currentTvBidPrice = view.findViewById(R.id.ci_tv_current_price_bid)
         currentTvAskPrice = view.findViewById(R.id.ci_tv_current_ask)
-        swipeRefresh = view.findViewById(R.id.swipe_refresh_layout)
         tvActuality = view.findViewById(R.id.data_actuality)
         coinSpinner = view.findViewById(R.id.coin_spinner)
         currencySpinner = view.findViewById(R.id.currency_spinner)
@@ -236,6 +229,7 @@ class CryptoInfoFragment : Fragment() {
                 if (!cryptoInfoViewModel.firstStart) {
                     cryptoInfoViewModel.clear()
                     currency = parent?.getItemAtPosition(position).toString()
+                    currencySymbol = Constants.CURRENCY_SYMBOL.filterValues { it == currency }.keys.first()
                     fetchData()
                 }
             }
@@ -407,10 +401,5 @@ class CryptoInfoFragment : Fragment() {
     ): Int {
         theme.resolveAttribute(attrColor, typedValue, resolveRefs)
         return typedValue.data
-    }
-
-    fun getFormatTimeWithTZ(currentTime: Date): String {
-        val timeZoneDate = SimpleDateFormat("h:mm a", Locale.getDefault())
-        return timeZoneDate.format(currentTime)
     }
 }
