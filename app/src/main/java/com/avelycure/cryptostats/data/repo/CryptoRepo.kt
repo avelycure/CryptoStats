@@ -3,37 +3,64 @@ package com.avelycure.cryptostats.data.repo
 import android.util.Log
 import com.avelycure.cryptostats.data.remote.api_service.GeminiApiService
 import com.avelycure.cryptostats.data.local.dao.CacheDao
-import com.avelycure.cryptostats.data.local.entities.EntityCandles
-import com.avelycure.cryptostats.data.local.entities.EntitySmallCandle
+import com.avelycure.cryptostats.data.local.entities.*
 import com.avelycure.cryptostats.data.local.entities.mappers.*
 import com.avelycure.cryptostats.data.remote.models.ResponsePriceFeed
 import com.avelycure.cryptostats.data.remote.models.ResponseTickerV1
 import com.avelycure.cryptostats.data.remote.models.ResponseTickerV2
 import com.avelycure.cryptostats.data.remote.models.ResponseTradeHistory
 import com.avelycure.cryptostats.data.remote.models.mappers.*
+import com.avelycure.cryptostats.utils.exceptions.EmptyCacheException
 import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.schedulers.Schedulers
+import java.lang.Exception
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
-import kotlin.math.roundToInt
 
 class CryptoRepo(
     private val apiService: GeminiApiService,
     private val cacheDao: CacheDao
 ) : ICryptoRepo {
     override fun getCandlesFromCache(): EntityCandles {
-        val candle = cacheDao.getCandles()?.last()
-        if (candle != null) {
-            candle.candles = cacheDao.getSmallCandles()
-            return candle
-        }
-        return EntityCandles()
+        val candles = cacheDao.getCandles() ?: emptyList()
+        if (candles.isEmpty())
+            throw EmptyCacheException()
+
+        val smallCandles = cacheDao.getSmallCandles() ?: emptyList()
+        if (smallCandles.isEmpty())
+            throw EmptyCacheException()
+
+        val lastCandle = candles.last()
+        lastCandle.candles = smallCandles
+        return lastCandle
     }
 
-    override fun getTickerV2FromCache() = cacheDao.getTickerV2().last()
-    override fun getPriceFeedFromCache() = cacheDao.getPriceFeed()
-    override fun getTradesFromCache() = cacheDao.getTradeHistory()
-    override fun getTickerV1FromCache() = cacheDao.getTickerV1().last()
+    override fun getPriceFeedFromCache(): List<EntityPriceFeed> {
+        val result = cacheDao.getPriceFeed() ?: emptyList()
+        if (result.isEmpty())
+            throw EmptyCacheException()
+        return result
+    }
+
+    override fun getTickerV2FromCache(): EntityTickerV2 {
+        val result = cacheDao.getTickerV2() ?: emptyList()
+        if (result.isEmpty())
+            throw EmptyCacheException()
+        return result.last()
+    }
+
+    override fun getTradesFromCache(): List<EntityTradeHistory> {
+        val result = cacheDao.getTradeHistory() ?: emptyList()
+        if (result.isEmpty())
+            throw EmptyCacheException()
+        return result
+    }
+
+    override fun getTickerV1FromCache(): EntityTickerV1 {
+        val result = cacheDao.getTickerV1() ?: emptyList()
+        if (result.isEmpty())
+            throw EmptyCacheException()
+        return result.last()
+    }
 
     override fun getCandlesFromRemote(
         symbol: String,
