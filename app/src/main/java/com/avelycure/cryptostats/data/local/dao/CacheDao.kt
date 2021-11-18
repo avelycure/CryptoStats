@@ -16,13 +16,13 @@ interface CacheDao {
     fun insertTickerV1(tickerV1: EntityTickerV1)
 
     @Query("SELECT * FROM ticker_v1")
-    fun getTickerV1(): List<EntityTickerV1>
+    fun getTickerV1(): List<EntityTickerV1>?
 
     @Insert
     fun insertTickerV2(ticker: EntityTickerV2)
 
     @Query("SELECT * FROM ticker")
-    fun getTickerV2(): List<EntityTickerV2>
+    fun getTickerV2(): List<EntityTickerV2>?
 
 
     @Insert
@@ -32,14 +32,14 @@ interface CacheDao {
     fun dropTradeHistoryTable()
 
     @Query("SELECT * FROM trade_history")
-    fun getTradeHistory(): List<EntityTradeHistory>
+    fun getTradeHistory(): List<EntityTradeHistory>?
 
 
     @Insert
     fun insertPriceFeed(priceFeed: EntityPriceFeed)
 
     @Query("SELECT * FROM price_feed")
-    fun getPriceFeed(): List<EntityPriceFeed>
+    fun getPriceFeed(): List<EntityPriceFeed>?
 
     @Query("DELETE FROM price_feed")
     fun dropPriceFeedTable()
@@ -55,7 +55,7 @@ interface CacheDao {
     fun getCandles(): List<EntityCandles>?
 
     @Query("SELECT * FROM small_candles")
-    fun getSmallCandles(): List<EntitySmallCandle>
+    fun getSmallCandles(): List<EntitySmallCandle>?
 
     @Query("DELETE FROM candles")
     fun dropCandlesTable()
