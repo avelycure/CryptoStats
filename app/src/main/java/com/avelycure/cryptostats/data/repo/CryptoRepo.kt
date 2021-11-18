@@ -21,11 +21,11 @@ class CryptoRepo(
     private val cacheDao: CacheDao
 ) : ICryptoRepo {
     override fun getCandlesFromCache(): EntityCandles {
-        val candles = cacheDao.getCandles() ?: emptyList()
+        val candles = cacheDao.getCandles()
         if (candles.isEmpty())
             throw EmptyCacheException()
 
-        val smallCandles = cacheDao.getSmallCandles() ?: emptyList()
+        val smallCandles = cacheDao.getSmallCandles()
         if (smallCandles.isEmpty())
             throw EmptyCacheException()
 
@@ -35,28 +35,28 @@ class CryptoRepo(
     }
 
     override fun getPriceFeedFromCache(): List<EntityPriceFeed> {
-        val result = cacheDao.getPriceFeed() ?: emptyList()
+        val result = cacheDao.getPriceFeed()
         if (result.isEmpty())
             throw EmptyCacheException()
         return result
     }
 
     override fun getTickerV2FromCache(): EntityTickerV2 {
-        val result = cacheDao.getTickerV2() ?: emptyList()
+        val result = cacheDao.getTickerV2()
         if (result.isEmpty())
             throw EmptyCacheException()
         return result.last()
     }
 
     override fun getTradesFromCache(): List<EntityTradeHistory> {
-        val result = cacheDao.getTradeHistory() ?: emptyList()
+        val result = cacheDao.getTradeHistory()
         if (result.isEmpty())
             throw EmptyCacheException()
         return result
     }
 
     override fun getTickerV1FromCache(): EntityTickerV1 {
-        val result = cacheDao.getTickerV1() ?: emptyList()
+        val result = cacheDao.getTickerV1()
         if (result.isEmpty())
             throw EmptyCacheException()
         return result.last()
@@ -71,9 +71,12 @@ class CryptoRepo(
             .flatMap { candles ->
                 thread {
                     cacheDao.insertCandles(candles.toEntityCandles())
-                    val candleFK = cacheDao.getCandles()?.last()?.id ?: -1
-                    for (candle in candles)
-                        cacheDao.insertSmallCandles(candle.toSmallCandle(candleFK))
+                    val candlesEntitiesList = cacheDao.getCandles()
+                    if (candlesEntitiesList.isNotEmpty()) {
+                        val candleFK = candlesEntitiesList.last().id
+                        for (candle in candles)
+                            cacheDao.insertSmallCandles(candle.toSmallCandle(candleFK))
+                    }
                 }
                 Observable.fromCallable { candles }
             }.repeatWhen { completed ->
