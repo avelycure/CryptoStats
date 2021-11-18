@@ -31,6 +31,12 @@ class CryptoInfoViewModel(
 
     private val compositeDisposable = CompositeDisposable()
 
+    fun onTrigger(event: CryptoInfoEvent) {
+        when (event) {
+            is CryptoInfoEvent.OnRemoveHeadFromQueue -> removeHeadMessage()
+        }
+    }
+
     init {
         _state.value = CryptoInfoState(
             statistic = Statistic24h(),
@@ -52,11 +58,11 @@ class CryptoInfoViewModel(
     fun requestData(requestParameters: RequestParameters) {
         with(requestParameters) {
             compositeDisposable.addAll(
-                requestPriceFeed(pair),
                 requestCandles(symbol, timeFrame),
+                /*requestPriceFeed(pair),
                 requestTickerV1(symbol),
                 requestTickerV2(symbol),
-                requestTradeHistory(symbol, limit),
+                requestTradeHistory(symbol, limit),*/
             )
         }
     }
@@ -111,10 +117,11 @@ class CryptoInfoViewModel(
     }
 
     private fun onResponseCandles(candles: DataState<List<Candle>>) {
-        if (candles is DataState.DataRemote)
-            handleCandles(candles.data, true)
-        if (candles is DataState.DataCache)
-            handleCandles(candles.data, false)
+        when (candles) {
+            is DataState.DataRemote -> handleCandles(candles.data, true)
+            is DataState.DataCache -> handleCandles(candles.data, false)
+            is DataState.Response -> appendToMessageQueue(candles.uiComponent)
+        }
     }
 
     private fun onResponsePriceFeed(data: DataState<List<CoinPrice>>, pair: String) {
@@ -243,10 +250,22 @@ class CryptoInfoViewModel(
 
     private fun appendToMessageQueue(uiComponent: UIComponent) {
         val queue: Queue<UIComponent> = Queue(mutableListOf())
-        for (i in 0 until _state.value!!.errorQueue.count())
+        for (i in 0 until _state.value!!.errorQueue.count() - 1)
             _state.value!!.errorQueue.poll()?.let { queue.add(it) }
-        queue.add(uiComponent)
-        _state.value = _state.value!!.copy(errorQueue = queue)
+
+        val last = _state.value!!.errorQueue.poll()
+        if (last != null) {
+            queue.add(last)
+
+            if ((last as UIComponent.Dialog).description != (uiComponent as UIComponent.Dialog).description) {
+                Log.d("mytag", "not equal errors")
+                queue.add(uiComponent)
+                _state.value = _state.value!!.copy(errorQueue = queue)
+            }
+        } else {
+            queue.add(uiComponent)
+            _state.value = _state.value!!.copy(errorQueue = queue)
+        }
     }
 
     private fun removeHeadMessage() {

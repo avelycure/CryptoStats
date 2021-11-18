@@ -22,6 +22,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.avelycure.cryptostats.R
 import com.avelycure.cryptostats.common.Constants
+import com.avelycure.cryptostats.domain.state.UIComponent
+import com.avelycure.cryptostats.utils.ui.showError
 import com.github.mikephil.charting.charts.CandleStickChart
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.Legend
@@ -115,15 +117,16 @@ class CryptoInfoFragment : Fragment() {
                             )
                         }
                 ),
-                "Set 1"
+                "Candle chart"
             )
 
             updateStats(state)
 
             updatePrice(state)
 
-            adapter.tradeList = state.trades
-            rvTrades.adapter?.notifyDataSetChanged()
+            updateTrades(state)
+
+            displayErrors(state)
         })
 
         if (savedInstanceState == null) {
@@ -134,6 +137,24 @@ class CryptoInfoFragment : Fragment() {
         return view
     }
 
+    private fun displayErrors(state: CryptoInfoState) {
+        if (!state.errorQueue.isEmpty()) {
+            showError(
+                tvCoinValue,
+                requireContext(),
+                (state.errorQueue.peek() as UIComponent.Dialog).description
+            )
+            cryptoInfoViewModel.onTrigger(CryptoInfoEvent.OnRemoveHeadFromQueue)
+        }
+
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun updateTrades(state: CryptoInfoState?) {
+        adapter.tradeList = state?.trades ?: emptyList()
+        rvTrades.adapter?.notifyDataSetChanged()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         cryptoInfoViewModel.clear()
@@ -142,7 +163,7 @@ class CryptoInfoFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     private fun updateStats(state: CryptoInfoState) {
         if (state.coinPrice.percentChange24h.isNotEmpty()) {
-            tvCoinValue.text =state.coinPrice.price + currencySymbol
+            tvCoinValue.text = state.coinPrice.price + currencySymbol
             tvPercentageChanging24h.text = "${state.coinPrice.percentChange24h.toFloat() * 100F}%"
 
             if (state.coinPrice.percentChange24h.toFloat() > 0F)
@@ -226,7 +247,8 @@ class CryptoInfoFragment : Fragment() {
                 if (!cryptoInfoViewModel.firstStart) {
                     cryptoInfoViewModel.clear()
                     currency = parent?.getItemAtPosition(position).toString()
-                    currencySymbol = Constants.CURRENCY_SYMBOL.filterValues { it == currency }.keys.first()
+                    currencySymbol =
+                        Constants.CURRENCY_SYMBOL.filterValues { it == currency }.keys.first()
                     fetchData()
                 }
             }

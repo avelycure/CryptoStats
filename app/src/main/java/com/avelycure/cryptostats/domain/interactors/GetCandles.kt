@@ -1,11 +1,15 @@
 package com.avelycure.cryptostats.domain.interactors
 
+import android.util.Log
 import com.avelycure.cryptostats.data.local.entities.mappers.toCandleList
 import com.avelycure.cryptostats.data.repo.ICryptoRepo
 import com.avelycure.cryptostats.domain.models.Candle
 import com.avelycure.cryptostats.domain.state.DataState
+import com.avelycure.cryptostats.domain.state.UIComponent
 import com.avelycure.cryptostats.utils.network_utils.INetworkStatus
 import io.reactivex.rxjava3.core.Observable
+import java.net.UnknownHostException
+import java.util.NoSuchElementException
 
 class GetCandles(
     private val repo: ICryptoRepo,
@@ -23,6 +27,24 @@ class GetCandles(
                         data = repo.getCandlesFromCache().toCandleList()
                     )
                 }
+        }.onErrorReturn { error ->
+            when (error) {
+                is NoSuchElementException -> DataState.Response(
+                    uiComponent = UIComponent.Dialog(
+                        description = "No cache data, enable internet connection"
+                    )
+                )
+                is UnknownHostException -> DataState.Response(
+                    uiComponent = UIComponent.Dialog(
+                        description = "No internet connection"
+                    )
+                )
+                else -> DataState.Response(
+                    uiComponent = UIComponent.Dialog(
+                        description = error.message ?: "Unknown error occurred"
+                    )
+                )
+            }
         }
     }
 }
