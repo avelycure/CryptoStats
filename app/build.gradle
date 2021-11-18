@@ -69,4 +69,7 @@ dependencies {
     // Koin core features
     implementation koin.koin_core
     implementation koin.koin_android
+
+    //Mockito
+    implementation "org.mockito:mockito-core:2.8.47"
 }
