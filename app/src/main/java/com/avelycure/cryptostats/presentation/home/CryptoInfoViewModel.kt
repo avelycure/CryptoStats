@@ -57,13 +57,13 @@ class CryptoInfoViewModel(
 
     fun requestData(requestParameters: RequestParameters) {
         with(requestParameters) {
-            compositeDisposable.addAll(
-                requestCandles(symbol, timeFrame),
-                /*requestPriceFeed(pair),
-                requestTickerV1(symbol),
-                requestTickerV2(symbol),
-                requestTradeHistory(symbol, limit),*/
-            )
+            //compositeDisposable.addAll()
+            requestPriceFeed(pair)
+            requestCandles(symbol, timeFrame)
+
+            requestTickerV2(symbol)
+            requestTickerV1(symbol)
+            requestTradeHistory(symbol, limit)
         }
     }
 
@@ -125,40 +125,36 @@ class CryptoInfoViewModel(
     }
 
     private fun onResponsePriceFeed(data: DataState<List<CoinPrice>>, pair: String) {
-        if (data is DataState.DataRemote) {
-            Log.d("mytag", "View model remote")
-            handlePriceFeed(data.data, pair, true)
-        }
-        if (data is DataState.DataCache) {
-            Log.d("mytag", "View model cache")
-            handlePriceFeed(data.data, pair, false)
+        when (data) {
+            is DataState.DataRemote -> handlePriceFeed(data.data, pair, true)
+            is DataState.DataCache -> handlePriceFeed(data.data, pair, false)
+            is DataState.Response -> appendToMessageQueue(data.uiComponent)
         }
     }
 
     private fun onResponseTickerV1(data: DataState<TickerV1>) {
-        if (data is DataState.DataRemote)
-            handleTickerV1(data.data, true)
-        if (data is DataState.DataCache)
-            handleTickerV1(data.data, false)
+        when (data) {
+            is DataState.DataRemote -> handleTickerV1(data.data, true)
+            is DataState.DataCache -> handleTickerV1(data.data, false)
+            is DataState.Response -> appendToMessageQueue(data.uiComponent)
+        }
     }
 
     private fun onResponseTickerV2(data: DataState<TickerV2>) {
-        Log.d("mytag", "Got response from ticker")
-        if (data is DataState.DataRemote) {
-            Log.d("mytag", "Remote")
-            handleTickerV2(data.data, true)
-        }
-        if (data is DataState.DataCache) {
-            Log.d("mytag", "Cache")
-            handleTickerV2(data.data, false)
+        Log.d("mytag","got response tickerv2")
+        when (data) {
+            is DataState.DataRemote -> handleTickerV2(data.data, true)
+            is DataState.DataCache -> handleTickerV2(data.data, false)
+            is DataState.Response -> appendToMessageQueue(data.uiComponent)
         }
     }
 
     private fun onResponseTradeHistory(data: DataState<List<Trade>>) {
-        if (data is DataState.DataRemote)
-            handleTradeHistory(data.data, true)
-        if (data is DataState.DataCache)
-            handleTradeHistory(data.data, false)
+        when (data) {
+            is DataState.DataRemote -> handleTradeHistory(data.data, true)
+            is DataState.DataCache -> handleTradeHistory(data.data, false)
+            is DataState.Response -> appendToMessageQueue(data.uiComponent)
+        }
     }
 
     private fun handleCandles(data: List<Candle>, remoteData: Boolean) {
@@ -178,6 +174,7 @@ class CryptoInfoViewModel(
     }
 
     private fun handlePriceFeed(data: List<CoinPrice>, pair: String, remoteData: Boolean) {
+        Log.d("mytag", "got data: $remoteData $data")
         for (i in data)
             if (i.pair == pair) {
                 _state.value = _state.value?.copy(
@@ -249,7 +246,7 @@ class CryptoInfoViewModel(
     }
 
     private fun appendToMessageQueue(uiComponent: UIComponent) {
-        val queue: Queue<UIComponent> = Queue(mutableListOf())
+        /*val queue: Queue<UIComponent> = Queue(mutableListOf())
         for (i in 0 until _state.value!!.errorQueue.count() - 1)
             _state.value!!.errorQueue.poll()?.let { queue.add(it) }
 
@@ -266,6 +263,12 @@ class CryptoInfoViewModel(
             queue.add(uiComponent)
             _state.value = _state.value!!.copy(errorQueue = queue)
         }
+*/
+        val queue: Queue<UIComponent> = Queue(mutableListOf())
+        for (i in 0 until _state.value!!.errorQueue.count())
+            _state.value!!.errorQueue.poll()?.let { queue.add(it) }
+        queue.add(uiComponent)
+        _state.value = _state.value!!.copy(errorQueue = queue)
     }
 
     private fun removeHeadMessage() {
