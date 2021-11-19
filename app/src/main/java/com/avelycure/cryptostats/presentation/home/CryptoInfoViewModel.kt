@@ -16,12 +16,7 @@ import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 
 class CryptoInfoViewModel(
-    private val getCandles: GetCandles,
-    private val getTickerV2: GetTickerV2,
-    private val getCoinPrice: GetCoinPrice,
-    private val getTickerV1: GetTickerV1,
-    private val getTrades: GetTrades,
-    private val prepareCandles: PrepareCandles
+    val homeInteractors: HomeInteractors
 ) : ViewModel() {
     var firstStart = true
 
@@ -72,7 +67,7 @@ class CryptoInfoViewModel(
     }
 
     private fun requestCandles(symbol: String, timeFrame: String): Disposable {
-        return getCandles.execute(symbol, timeFrame)
+        return homeInteractors.getCandles.execute(symbol, timeFrame)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponseCandles(data) }, {
@@ -81,7 +76,7 @@ class CryptoInfoViewModel(
     }
 
     private fun requestPriceFeed(pair: String): Disposable {
-        return getCoinPrice.execute()
+        return homeInteractors.getCoinPrice.execute()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponsePriceFeed(data, pair) }, {
@@ -90,16 +85,16 @@ class CryptoInfoViewModel(
     }
 
     private fun requestTickerV1(symbol: String): Disposable {
-        return getTickerV1.execute(symbol)
+        return homeInteractors.getTickerV1.execute(symbol)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponseTickerV1(data) }, {
-                Log.d("mytag", "Error in repo  while fetching  ticker v1: ${it.message}")
+                //Log.d("mytag", "Error in repo  while fetching  ticker v1: ${it.message}")
             }, {})
     }
 
     private fun requestTickerV2(symbol: String): Disposable {
-        return getTickerV2.execute(symbol)
+        return homeInteractors.getTickerV2.execute(symbol)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponseTickerV2(data) }, {
@@ -108,7 +103,7 @@ class CryptoInfoViewModel(
     }
 
     private fun requestTradeHistory(symbol: String, limit: Int): Disposable {
-        return getTrades.execute(symbol, limit)
+        return homeInteractors.getTrades.execute(symbol, limit)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponseTradeHistory(data) }, {
@@ -158,7 +153,7 @@ class CryptoInfoViewModel(
     }
 
     private fun handleCandles(data: List<Candle>, remoteData: Boolean) {
-        prepareCandles.execute(data)
+        homeInteractors.prepareCandles.execute(data)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ dataForChart ->
@@ -277,7 +272,7 @@ class CryptoInfoViewModel(
             queue.remove()
             _state.value = _state.value!!.copy(errorQueue = queue)
         } catch (e: Exception) {
-            Log.d("mytag", "Nothing to remove from MessageQueue")
+            //Log.d("mytag", "Nothing to remove from MessageQueue")
         }
     }
 }

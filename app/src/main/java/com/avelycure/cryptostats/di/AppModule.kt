@@ -17,6 +17,7 @@ import com.avelycure.cryptostats.data.local.AppDatabase
 
 import androidx.room.Room
 import com.avelycure.cryptostats.domain.interactors.*
+import com.avelycure.cryptostats.presentation.home.HomeInteractors
 
 val appModule = module {
     single<ICryptoRepo> {
@@ -41,15 +42,20 @@ val appModule = module {
     single<GetTickerV1> { GetTickerV1(get(), get()) }
     single<GetTrades> { GetTrades(get(), get()) }
     single<PrepareCandles> { PrepareCandles() }
-
-    viewModel {
-        CryptoInfoViewModel(
+    single<HomeInteractors> {
+        HomeInteractors(
             getCandles = get(),
             getTickerV2 = get(),
             getCoinPrice = get(),
             getTickerV1 = get(),
             getTrades = get(),
             prepareCandles = get()
+        )
+    }
+
+    viewModel {
+        CryptoInfoViewModel(
+            homeInteractors = get()
         )
     }
 
