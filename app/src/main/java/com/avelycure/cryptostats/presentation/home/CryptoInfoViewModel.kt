@@ -53,11 +53,12 @@ class CryptoInfoViewModel(
     fun requestData(requestParameters: RequestParameters) {
         with(requestParameters) {
             //compositeDisposable.addAll()
+            requestTickerV1(symbol)
+
             requestPriceFeed(pair)
+            requestTickerV2(symbol)
             requestCandles(symbol, timeFrame)
 
-            requestTickerV2(symbol)
-            requestTickerV1(symbol)
             requestTradeHistory(symbol, limit)
         }
     }
@@ -71,7 +72,7 @@ class CryptoInfoViewModel(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponseCandles(data) }, {
-                Log.d("mytag", "error in candles: ${it.message}")
+                //Log.d("mytag", "error in candles: ${it.message}")
             }, {})
     }
 
@@ -80,7 +81,7 @@ class CryptoInfoViewModel(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponsePriceFeed(data, pair) }, {
-                Log.d("mytag", "Error in repo while fetching coin price: ${it.message}")
+                //Log.d("mytag", "Error in repo while fetching coin price: ${it.message}")
             }, {})
     }
 
@@ -98,7 +99,7 @@ class CryptoInfoViewModel(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponseTickerV2(data) }, {
-                Log.d("mytag", "Error in repo  while fetching  ticker v2: ${it.message}")
+                //Log.d("mytag", "Error in repo  while fetching  ticker v2: ${it.message}")
             }, {})
     }
 
@@ -107,7 +108,7 @@ class CryptoInfoViewModel(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ data -> onResponseTradeHistory(data) }, {
-                Log.d("mytag", "Error in repo  while fetching  trades: ${it.message}")
+                //Log.d("mytag", "Error in repo  while fetching  trades: ${it.message}")
             }, {})
     }
 
@@ -136,7 +137,7 @@ class CryptoInfoViewModel(
     }
 
     private fun onResponseTickerV2(data: DataState<TickerV2>) {
-        Log.d("mytag","got response tickerv2")
+        //Log.d("mytag","got response tickerv2")
         when (data) {
             is DataState.DataRemote -> handleTickerV2(data.data, true)
             is DataState.DataCache -> handleTickerV2(data.data, false)
@@ -169,7 +170,7 @@ class CryptoInfoViewModel(
     }
 
     private fun handlePriceFeed(data: List<CoinPrice>, pair: String, remoteData: Boolean) {
-        Log.d("mytag", "got data: $remoteData $data")
+        //Log.d("mytag", "got data: $remoteData $data")
         for (i in data)
             if (i.pair == pair) {
                 _state.value = _state.value?.copy(
@@ -199,7 +200,7 @@ class CryptoInfoViewModel(
         )
         _state.value = _state.value?.copy(
             tickerV2 = newTicker,
-            remoteData = true
+            remoteData = remoteData
         )
     }
 
