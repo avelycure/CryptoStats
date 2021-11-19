@@ -20,7 +20,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @RunWith(MockitoJUnitRunner::class)
-class TickerV1Test {
+class CryptoViewModelTest {
     @Rule
     @JvmField
     var rule = InstantTaskExecutorRule()
@@ -208,7 +208,6 @@ class TickerV1Test {
         )
         val result = cryptoInfoViewModel.state.value!!.statistic.high
         assertThat(result, equalTo(110f))
-
     }
 
     @Test
