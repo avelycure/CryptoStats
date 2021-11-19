@@ -1,6 +1,5 @@
 package com.avelycure.cryptostats.domain.interactors
 
-import android.util.Log
 import com.avelycure.cryptostats.data.local.entities.mappers.toCandleList
 import com.avelycure.cryptostats.data.repo.ICryptoRepo
 import com.avelycure.cryptostats.domain.models.Candle
@@ -10,7 +9,6 @@ import com.avelycure.cryptostats.utils.exceptions.EmptyCacheException
 import com.avelycure.cryptostats.utils.network_utils.INetworkStatus
 import io.reactivex.rxjava3.core.Observable
 import java.net.UnknownHostException
-import java.util.NoSuchElementException
 
 class GetCandles(
     private val repo: ICryptoRepo,
@@ -29,7 +27,6 @@ class GetCandles(
                     )
                 }
         }.onErrorReturn { error ->
-            Log.d("mytag", "GOT ERROR CANDLES")
             when (error) {
                 is EmptyCacheException -> DataState.Response(
                     uiComponent = UIComponent.Dialog(

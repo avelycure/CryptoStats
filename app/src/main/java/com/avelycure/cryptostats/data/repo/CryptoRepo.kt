@@ -80,7 +80,6 @@ class CryptoRepo(
                 }
                 Observable.fromCallable { candles }
             }.repeatWhen { completed ->
-                Log.d("mytag", "Repeated request candles")
                 completed.delay(5, TimeUnit.MINUTES)
             }
     }
@@ -92,7 +91,6 @@ class CryptoRepo(
                 cacheDao.insertTickerV2(tickerV2.toEntityTickerV2())
                 Observable.fromCallable { tickerV2 }
             }.repeatWhen { completed ->
-                Log.d("mytag", "Repeated request tickerv2")
                 completed.delay(10, TimeUnit.SECONDS)
             }
     }
@@ -108,7 +106,6 @@ class CryptoRepo(
                 }
                 Observable.fromCallable { priceFeed }
             }.repeatWhen { completed ->
-                Log.d("mytag", "Repeated request price feed")
                 completed.delay(10, TimeUnit.SECONDS)
             }
     }
@@ -120,7 +117,6 @@ class CryptoRepo(
                 cacheDao.insertTickerV1(tickerV1.toEntityTickerV1())
                 Observable.fromCallable { tickerV1 }
             }.repeatWhen { completed ->
-                Log.d("mytag", "Repeated request ticker v1")
                 completed.delay(10, TimeUnit.SECONDS)
             }
     }

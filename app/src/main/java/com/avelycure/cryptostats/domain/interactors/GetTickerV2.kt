@@ -31,7 +31,6 @@ class GetTickerV2(
                     )
                 }
         }.onErrorReturn { error ->
-            Log.d("mytag", "GOT ERROR TICKERV2")
             when (error) {
                 is EmptyCacheException -> DataState.Response(
                     uiComponent = UIComponent.Dialog(
