@@ -26,7 +26,8 @@ ext.versions = [
         okHttpInterceptor  : "4.3.1",
         room               : "2.3.0",
         charts             : "v3.1.0",
-        koin               : "3.1.3"
+        koin               : "3.1.3",
+        swipe_refresh      : "1.1.0"
 ]
 
 ext.retrofit2 = [
@@ -41,7 +42,7 @@ ext.okHttp = [
 ]
 
 ext.rxjava = [
-        rxjava3: "io.reactivex.rxjava3:rxjava:$versions.rxjava",
+        rxjava3  : "io.reactivex.rxjava3:rxjava:$versions.rxjava",
         rxandroid: "io.reactivex.rxjava3:rxandroid:$versions.rxAndroid"
 ]
 
@@ -57,4 +58,8 @@ ext.charts = [
 ext.koin = [
         koin_core   : "io.insert-koin:koin-core:$versions.koin",
         koin_android: "io.insert-koin:koin-android:$versions.koin"
+]
+
+ext.swipe_refresh = [
+        swipe_refresh: "androidx.swiperefreshlayout:swiperefreshlayout:$versions.swipe_refresh"
 ]

@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.avelycure.cryptostats.R
 import com.avelycure.cryptostats.common.Constants
 import com.avelycure.cryptostats.domain.state.UIComponent
@@ -50,6 +51,7 @@ class CryptoInfoFragment : Fragment() {
     private lateinit var currentTvAskPrice: AppCompatTextView
     private lateinit var tvActuality: AppCompatTextView
     private lateinit var rvTrades: RecyclerView
+    private lateinit var swipeRefresh: SwipeRefreshLayout
 
     private val cryptoInfoViewModel: CryptoInfoViewModel by viewModel()
     private lateinit var adapter: TradeAdapter
@@ -217,6 +219,18 @@ class CryptoInfoFragment : Fragment() {
         tvActuality = view.findViewById(R.id.data_actuality)
         coinSpinner = view.findViewById(R.id.coin_spinner)
         currencySpinner = view.findViewById(R.id.currency_spinner)
+        swipeRefresh = view.findViewById(R.id.swipe_refresh_layout)
+
+        swipeRefresh.setOnRefreshListener {
+            cryptoInfoViewModel.requestData(
+                CryptoInfoViewModel.RequestParameters(
+                    symbol = "$coin$currency",
+                    limit = 50,
+                    timeFrame = timeFrame,
+                    pair = (coin + currency).uppercase()
+                )
+            )
+        }
 
         coinSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(

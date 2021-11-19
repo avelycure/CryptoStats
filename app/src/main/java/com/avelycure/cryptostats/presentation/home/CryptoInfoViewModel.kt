@@ -51,7 +51,6 @@ class CryptoInfoViewModel(
 
     fun requestData(requestParameters: RequestParameters) {
         with(requestParameters) {
-            //compositeDisposable.addAll()
             requestTickerV1(symbol)
 
             requestPriceFeed(pair)
