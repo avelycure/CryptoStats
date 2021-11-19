@@ -11,8 +11,7 @@ data class EntityCandles @JvmOverloads constructor(
     @PrimaryKey(autoGenerate = true)
     var id: Int,
     var dateOfSave: Long,
+){
     @Ignore
     var candles: List<EntitySmallCandle> = emptyList()
-){
-    constructor() : this(0, 0, emptyList())
 }
