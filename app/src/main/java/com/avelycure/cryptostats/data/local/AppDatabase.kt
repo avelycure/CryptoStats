@@ -6,7 +6,6 @@ import androidx.room.TypeConverters
 import com.avelycure.cryptostats.data.local.dao.CacheDao
 import com.avelycure.cryptostats.data.local.entities.*
 import com.avelycure.cryptostats.data.local.type_converters.ConverterListFloat
-import com.avelycure.cryptostats.data.local.type_converters.ConverterListListFloat
 
 @Database(
     entities = arrayOf(
@@ -20,8 +19,7 @@ import com.avelycure.cryptostats.data.local.type_converters.ConverterListListFlo
 )
 @TypeConverters(
     value = arrayOf(
-        ConverterListFloat::class,
-        ConverterListListFloat::class
+        ConverterListFloat::class
     )
 )
 abstract class AppDatabase : RoomDatabase() {

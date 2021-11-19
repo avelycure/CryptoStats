@@ -1,6 +1,4 @@
-package com.avelycure.cryptostats.presentation.home
-
-import com.avelycure.cryptostats.domain.interactors.*
+package com.avelycure.cryptostats.domain.interactors
 
 data class HomeInteractors(
     val getTickerV1: GetTickerV1,

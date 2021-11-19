@@ -3,13 +3,11 @@ package com.avelycure.cryptostats
 import io.reactivex.rxjava3.core.Observable
 import org.junit.runner.RunWith
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.Observer
 import com.avelycure.cryptostats.domain.interactors.*
 import com.avelycure.cryptostats.domain.models.*
 import com.avelycure.cryptostats.domain.state.DataState
-import com.avelycure.cryptostats.presentation.home.CryptoInfoState
 import com.avelycure.cryptostats.presentation.home.CryptoInfoViewModel
-import com.avelycure.cryptostats.presentation.home.HomeInteractors
+import com.avelycure.cryptostats.domain.interactors.HomeInteractors
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.*
