@@ -1,19 +1,25 @@
 package com.avelycure.cryptostats
 
 import android.app.Application
-import com.avelycure.cryptostats.di.appModule
+import com.avelycure.cryptostats.di.*
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 
-class App: Application() {
+class App : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        startKoin{
+        startKoin {
             androidContext(this@App)
             androidLogger()
-            modules(appModule)
+            modules(
+                appModule,
+                cacheModule,
+                interactorsModule,
+                remoteModule,
+                viewModelModule
+            )
         }
     }
 }
