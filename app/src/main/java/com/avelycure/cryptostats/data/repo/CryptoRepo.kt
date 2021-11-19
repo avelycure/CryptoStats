@@ -70,12 +70,16 @@ class CryptoRepo(
             .getCandles(symbol, timeFrame)
             .flatMap { candles ->
                 thread {
-                    cacheDao.insertCandles(candles.toEntityCandles())
-                    val candlesEntitiesList = cacheDao.getCandles()
-                    if (candlesEntitiesList.isNotEmpty()) {
-                        val candleFK = candlesEntitiesList.last().id
-                        for (candle in candles)
-                            cacheDao.insertSmallCandles(candle.toSmallCandle(candleFK))
+                    synchronized(cacheDao){
+                        cacheDao.dropSmallCandlesTable()
+                        cacheDao.dropCandlesTable()
+                        cacheDao.insertCandles(candles.toEntityCandles())
+                        val candlesEntitiesList = cacheDao.getCandles()
+                        if (candlesEntitiesList.isNotEmpty()) {
+                            val candleFK = candlesEntitiesList.last().id
+                            for (candle in candles)
+                                cacheDao.insertSmallCandles(candle.toSmallCandle(candleFK))
+                        }
                     }
                 }
                 Observable.fromCallable { candles }
@@ -88,7 +92,11 @@ class CryptoRepo(
         return apiService
             .getTickerV2(symbol)
             .flatMap { tickerV2 ->
-                cacheDao.insertTickerV2(tickerV2.toEntityTickerV2())
+                thread {
+                    if (cacheDao.getTickerV2().size > 100)
+                        cacheDao.dropTickerV2Table()
+                    cacheDao.insertTickerV2(tickerV2.toEntityTickerV2())
+                }
                 Observable.fromCallable { tickerV2 }
             }.repeatWhen { completed ->
                 completed.delay(10, TimeUnit.SECONDS)
@@ -114,7 +122,11 @@ class CryptoRepo(
         return apiService
             .getTickerV1(symbol)
             .flatMap { tickerV1 ->
-                cacheDao.insertTickerV1(tickerV1.toEntityTickerV1())
+                thread {
+                    if (cacheDao.getTickerV1().size > 100)
+                        cacheDao.dropTickerV1Table()
+                    cacheDao.insertTickerV1(tickerV1.toEntityTickerV1())
+                }
                 Observable.fromCallable { tickerV1 }
             }.repeatWhen { completed ->
                 completed.delay(10, TimeUnit.SECONDS)
@@ -135,7 +147,6 @@ class CryptoRepo(
                 }
                 Observable.fromCallable { trades }
             }.repeatWhen { completed ->
-                Log.d("mytag", "Repeated request trade history")
                 completed.delay(30, TimeUnit.SECONDS)
             }
     }
