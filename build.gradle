@@ -27,7 +27,16 @@ ext.versions = [
         room               : "2.3.0",
         charts             : "v3.1.0",
         koin               : "3.1.3",
-        swipe_refresh      : "1.1.0"
+        swipe_refresh      : "1.1.0",
+        mockito_core       : "4.0.0",
+        mockito_inline     : "2.13.0",
+        mockito_kotlin     : "4.0.0",
+        junit_ext          : "1.1.3",
+        arch_core_testing  : "2.1.0",
+        espresso_core      : "3.4.0",
+        test_rules         : "1.4.0",
+        test_runner        : "1.4.0",
+        arch_lifecycle_ext : "1.1.1"
 ]
 
 ext.retrofit2 = [
@@ -62,4 +71,32 @@ ext.koin = [
 
 ext.swipe_refresh = [
         swipe_refresh: "androidx.swiperefreshlayout:swiperefreshlayout:$versions.swipe_refresh"
+]
+
+ext.junit = [
+        junit    : "junit:junit:",
+        junit_ext: "androidx.test.ext:junit:$versions.junit_ext"
+]
+
+ext.mockito = [
+        core  : "org.mockito:mockito-core:$versions.mockito_core",
+        inline: "org.mockito:mockito-inline:$versions.mockito_inline",
+        kotlin: "org.mockito.kotlin:mockito-kotlin:$versions.mockito_kotlin"
+]
+
+ext.arch_core = [
+        core_testing: "androidx.arch.core:core-testing:$versions.arch_core_testing"
+]
+
+ext.espresso = [
+        espresso_core: "androidx.test.espresso:espresso-core:$versions.espresso_core"
+]
+
+ext.testing = [
+        rules : "androidx.test:rules:$versions.test_rules",
+        runner: "androidx.test:runner:$versions.test_runner"
+]
+
+ext.architecture_components = [
+        extensions: "android.arch.lifecycle:extensions:$versions.arch_lifecycle_ext"
 ]
