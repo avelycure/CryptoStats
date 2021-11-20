@@ -14,7 +14,6 @@ android {
         targetSdk 31
         versionCode 1
         versionName "1.0"
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -56,15 +55,33 @@ dependencies {
     // Room
     implementation room.room_runtime
     implementation room.room_rxjava3
-    kapt 'androidx.room:room-compiler:2.3.0'
+    testImplementation "junit:junit:4.13.2"
+    kapt "androidx.room:room-compiler:2.3.0"
     kapt "org.xerial:sqlite-jdbc:3.34.0"
 
     // Charts
     implementation charts.MPAndroidChart
 
-    testImplementation 'junit:junit:'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    //SwipeRefresh
+    implementation swipe_refresh.swipe_refresh
+
+    //Testing
+    testImplementation junit.junit
+    testImplementation junit.junit_ext
+    testImplementation arch_core.core_testing
+
+    androidTestImplementation junit.junit
+    androidTestImplementation espresso.espresso_core
+    androidTestImplementation testing.rules
+    androidTestImplementation testing.runner
+
+    //Mockito
+    implementation mockito.core
+    testImplementation mockito.inline
+    testImplementation mockito.kotlin
+
+    // Android architecture component library
+    implementation architecture_components.extensions
 
     // Koin core features
     implementation koin.koin_core

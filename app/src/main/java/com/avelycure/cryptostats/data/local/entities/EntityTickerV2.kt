@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.avelycure.cryptostats.data.local.type_converters.ConverterListFloat
 
-@Entity(tableName = "ticker")
+@Entity(tableName = "ticker_v2")
 data class EntityTickerV2(
     @PrimaryKey(autoGenerate = true)
     val id: Int,

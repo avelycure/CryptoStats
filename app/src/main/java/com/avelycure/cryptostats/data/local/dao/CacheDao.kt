@@ -9,6 +9,7 @@ import com.avelycure.cryptostats.data.local.entities.mappers.toEntityCandles
 import com.avelycure.cryptostats.data.local.entities.mappers.toSmallCandle
 import io.reactivex.rxjava3.core.Completable
 
+//todo actually it is not returning null it returns empty list
 @Dao
 interface CacheDao {
 
@@ -18,12 +19,17 @@ interface CacheDao {
     @Query("SELECT * FROM ticker_v1")
     fun getTickerV1(): List<EntityTickerV1>
 
+    @Query("DELETE FROM ticker_v1")
+    fun dropTickerV1Table()
+
     @Insert
     fun insertTickerV2(ticker: EntityTickerV2)
 
-    @Query("SELECT * FROM ticker")
+    @Query("SELECT * FROM ticker_v2")
     fun getTickerV2(): List<EntityTickerV2>
 
+    @Query("DELETE FROM ticker_v2")
+    fun dropTickerV2Table()
 
     @Insert
     fun insertTradeHistory(trade: EntityTradeHistory)
@@ -52,11 +58,14 @@ interface CacheDao {
     fun insertSmallCandles(candle: EntitySmallCandle)
 
     @Query("SELECT * FROM candles")
-    fun getCandles(): List<EntityCandles>?
+    fun getCandles(): List<EntityCandles>
 
     @Query("SELECT * FROM small_candles")
     fun getSmallCandles(): List<EntitySmallCandle>
 
     @Query("DELETE FROM candles")
     fun dropCandlesTable()
+
+    @Query("DELETE FROM small_candles")
+    fun dropSmallCandlesTable()
 }
