@@ -6,8 +6,6 @@ import android.widget.TextView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.UiController
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.avelycure.cryptostats.R
@@ -18,11 +16,11 @@ import org.hamcrest.TypeSafeMatcher
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.test.espresso.matcher.ViewMatchers.isRoot
 
 import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ViewActions.scrollTo
-import org.hamcrest.CoreMatchers.anyOf
+import androidx.test.espresso.matcher.ViewMatchers.*
+import org.hamcrest.CoreMatchers.*
 import org.hamcrest.Matcher
 
 
@@ -83,6 +81,68 @@ class CryptoInfoFragmentTest : TestCase() {
         onView(withId(R.id.ci_tv_price_change)).check(
             matches(
                 anyOf(HasRedColor(), HasGreenColor())
+            )
+        )
+    }
+
+    @Test
+    fun shouldShowDollarSymbol() {
+        onView(isRoot()).perform(waitFor(5000))
+
+        onView(withId(R.id.ci_tv_coin_value)).check(
+            matches(
+                withText(
+                    endsWith("$")
+                )
+            )
+        )
+
+        onView(withId(R.id.ci_tv_lowest_in_last_24h)).check(
+            matches(
+                withText(
+                    endsWith("\$")
+                )
+            )
+        )
+
+        onView(withId(R.id.ci_tv_highest_in_last_24h)).check(
+            matches(
+                withText(
+                    endsWith("\$")
+                )
+            )
+        )
+
+        onView(withId(R.id.ci_tv_open_price)).perform(scrollTo()).check(
+            matches(
+                withText(
+                    endsWith("\$")
+                )
+            )
+        )
+
+        onView(withId(R.id.ci_tv_price_change)).perform(scrollTo()).check(
+            matches(
+                withText(
+                    endsWith("\$")
+                )
+            )
+        )
+
+        onView(withId(R.id.ci_tv_current_price_bid)).perform(scrollTo())
+            .check(
+                matches(
+                    withText(
+                        endsWith("\$")
+                    )
+                )
+            )
+
+        onView(withId(R.id.ci_tv_current_ask)).perform(scrollTo()).check(
+            matches(
+                withText(
+                    endsWith("\$")
+                )
             )
         )
     }
