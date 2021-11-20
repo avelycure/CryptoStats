@@ -231,6 +231,7 @@ class CryptoInfoFragment : Fragment() {
                     pair = (coin + currency).uppercase()
                 )
             )
+            swipeRefresh.isRefreshing = false
         }
 
         coinSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {

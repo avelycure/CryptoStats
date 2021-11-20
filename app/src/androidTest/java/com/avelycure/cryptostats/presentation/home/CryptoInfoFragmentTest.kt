@@ -23,6 +23,7 @@ import org.junit.runner.RunWith
 import androidx.test.espresso.matcher.ViewMatchers.isRoot
 
 import androidx.test.espresso.ViewAction
+import androidx.test.espresso.action.ViewActions.scrollTo
 import androidx.test.espresso.matcher.ViewMatchers
 import org.hamcrest.Matcher
 
@@ -35,9 +36,11 @@ class CryptoInfoFragmentTest : TestCase() {
 
     @Test
     fun shouldBeVisible() {
-        onView(isRoot()).perform(waitFor(3000))
+        onView(isRoot()).perform(waitFor(5000))
 
+        //stat24
         onView(withId(R.id.ci_tv_coin_value)).check(matches(isDisplayed()))
+
         onView(withId(R.id.ci_tv_percent_change_in_last_24h)).check(matches(isDisplayed()))
         onView(withId(R.id.ci_tv_lowest_in_last_24h)).check(matches(isDisplayed()))
         onView(withId(R.id.ci_tv_highest_in_last_24h)).check(matches(isDisplayed()))
@@ -45,6 +48,28 @@ class CryptoInfoFragmentTest : TestCase() {
         onView(withId(R.id.tv24low)).check(matches(isDisplayed()))
         onView(withId(R.id.tv24percent)).check(matches(isDisplayed()))
         onView(withId(R.id.tv24high)).check(matches(isDisplayed()))
+
+        // price24
+        onView(withId(R.id.price_open)).perform(scrollTo()).check(matches(isDisplayed()))
+        onView(withId(R.id.price_change)).perform(scrollTo()).check(matches(isDisplayed()))
+
+        onView(withId(R.id.ci_tv_open_price)).perform(scrollTo()).check(matches(isDisplayed()))
+        onView(withId(R.id.ci_tv_price_change)).perform(scrollTo()).check(matches(isDisplayed()))
+
+        //price
+        onView(withId(R.id.current_price_bid)).perform(scrollTo()).check(matches(isDisplayed()))
+        onView(withId(R.id.current_ask)).perform(scrollTo()).check(matches(isDisplayed()))
+
+        onView(withId(R.id.ci_tv_current_price_bid)).perform(scrollTo())
+            .check(matches(isDisplayed()))
+        onView(withId(R.id.ci_tv_current_ask)).perform(scrollTo()).check(matches(isDisplayed()))
+
+        //charts
+        onView(withId(R.id.chart)).perform(scrollTo()).check(matches(isDisplayed()))
+        onView(withId(R.id.candle_stick_chart)).perform(scrollTo()).check(matches(isDisplayed()))
+
+        //trades
+        onView(withId(R.id.trades)).perform(scrollTo()).check(matches(isDisplayed()))
     }
 }
 
