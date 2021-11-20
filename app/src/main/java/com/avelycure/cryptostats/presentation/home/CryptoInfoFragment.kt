@@ -172,22 +172,16 @@ class CryptoInfoFragment : Fragment() {
                 tvPercentageChanging24h.setTextColor(Color.GREEN)
             else
                 tvPercentageChanging24h.setTextColor(Color.RED)
-        }
         tvLowest24h.text =
             state.statistic.low.toString() + currencySymbol
         tvHighest24h.text =
             state.statistic.high.toString() + currencySymbol
+        }
     }
 
 
     @SuppressLint("SetTextI18n")
     private fun updatePrice(state: CryptoInfoState) {
-        tvOpenPrice.text =
-            state.statistic.open.toString() + currencySymbol
-        currentTvAskPrice.text =
-            state.tickerV2.ask.toString() + currencySymbol
-        currentTvBidPrice.text =
-            state.tickerV2.bid.toString() + currencySymbol
         if (state.coinPrice.percentChange24h.isNotEmpty()) {
             tvPriceChange.text =
                 (state.coinPrice.price.toFloat() - state.statistic.high).toString() + currencySymbol
@@ -195,6 +189,12 @@ class CryptoInfoFragment : Fragment() {
                 tvPriceChange.setTextColor(Color.GREEN)
             else
                 tvPriceChange.setTextColor(Color.RED)
+            tvOpenPrice.text =
+                state.statistic.open.toString() + currencySymbol
+            currentTvAskPrice.text =
+                state.tickerV2.ask.toString() + currencySymbol
+            currentTvBidPrice.text =
+                state.tickerV2.bid.toString() + currencySymbol
         }
     }
 
