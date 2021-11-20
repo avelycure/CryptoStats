@@ -16,6 +16,8 @@ App for getting information from Gemini Api:
 * MPAndroid to plot nice charts
 * CleanArchitecture
 * MVVM
+* Instrumental tests with Espresso
+* Unit test with JUnit4 and Mockito
 
 ## Functionality
 
