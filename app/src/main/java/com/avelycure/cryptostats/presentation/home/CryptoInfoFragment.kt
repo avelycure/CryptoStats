@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.Paint
 import android.os.Bundle
+import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -164,7 +165,7 @@ class CryptoInfoFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     private fun updateStats(state: CryptoInfoState) {
-        if (state.coinPrice.percentChange24h.isNotEmpty()) {
+        if (state.coinPrice.percentChange24h.isNotBlank()) {
             tvCoinValue.text = state.coinPrice.price + currencySymbol
             tvPercentageChanging24h.text = "${state.coinPrice.percentChange24h.toFloat() * 100F}%"
 
@@ -172,17 +173,16 @@ class CryptoInfoFragment : Fragment() {
                 tvPercentageChanging24h.setTextColor(Color.GREEN)
             else
                 tvPercentageChanging24h.setTextColor(Color.RED)
-        tvLowest24h.text =
-            state.statistic.low.toString() + currencySymbol
-        tvHighest24h.text =
-            state.statistic.high.toString() + currencySymbol
+            tvLowest24h.text =
+                state.statistic.low.toString() + currencySymbol
+            tvHighest24h.text =
+                state.statistic.high.toString() + currencySymbol
         }
     }
 
-
     @SuppressLint("SetTextI18n")
     private fun updatePrice(state: CryptoInfoState) {
-        if (state.coinPrice.percentChange24h.isNotEmpty()) {
+        if (state.coinPrice.percentChange24h.isNotBlank()) {
             tvPriceChange.text =
                 (state.coinPrice.price.toFloat() - state.statistic.high).toString() + currencySymbol
             if (state.coinPrice.price.toFloat() - state.statistic.high > 0F)
