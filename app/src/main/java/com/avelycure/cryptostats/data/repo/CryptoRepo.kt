@@ -1,6 +1,5 @@
 package com.avelycure.cryptostats.data.repo
 
-import android.util.Log
 import com.avelycure.cryptostats.data.remote.api_service.GeminiApiService
 import com.avelycure.cryptostats.data.local.dao.CacheDao
 import com.avelycure.cryptostats.data.local.entities.*
@@ -12,7 +11,6 @@ import com.avelycure.cryptostats.data.remote.models.ResponseTradeHistory
 import com.avelycure.cryptostats.data.remote.models.mappers.*
 import com.avelycure.cryptostats.utils.exceptions.EmptyCacheException
 import io.reactivex.rxjava3.core.Observable
-import java.lang.Exception
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 

@@ -1,11 +1,9 @@
 package com.avelycure.cryptostats
 
 import com.avelycure.cryptostats.data.local.entities.*
-import com.avelycure.cryptostats.data.remote.models.*
 import com.avelycure.cryptostats.data.repo.CryptoRepo
 import com.avelycure.cryptostats.data.repo.ICryptoRepo
 import com.avelycure.cryptostats.domain.interactors.*
-import com.avelycure.cryptostats.domain.models.Candle
 import com.avelycure.cryptostats.domain.state.DataState
 import com.avelycure.cryptostats.utils.network_utils.INetworkStatus
 import com.avelycure.cryptostats.utils.network_utils.NetworkStatus
