@@ -20,4 +20,9 @@ App for getting information from Gemini Api:
 * Unit test with JUnit4 and Mockito
 
 ## Functionality
+The entire application fits on one screen. It has different types of statistics for the selected cryptocurrency obtained from the Gemini API.
 
+## Charts
+Currency changes can be seen on the charts that were built using the [[MPAndroid library]](https://github.com/PhilJay/MPAndroidChart). Changes over 24 hours are presented using a line graph. 
+
+Candles are represented using a candlestick chart
