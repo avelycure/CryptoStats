@@ -222,6 +222,7 @@ class CryptoInfoFragment : Fragment() {
         swipeRefresh = view.findViewById(R.id.swipe_refresh_layout)
 
         swipeRefresh.setOnRefreshListener {
+            cryptoInfoViewModel.clear()
             cryptoInfoViewModel.requestData(
                 CryptoInfoViewModel.RequestParameters(
                     symbol = "$coin$currency",

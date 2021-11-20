@@ -19,11 +19,16 @@ class CryptoInfoViewModel(
 ) : ViewModel() {
     var firstStart = true
 
+    private lateinit var disposableTickerV1: Disposable
+    private lateinit var disposableTickerV2: Disposable
+    private lateinit var disposableTrades: Disposable
+    private lateinit var disposableCandles: Disposable
+    private lateinit var disposableCoinPrice: Disposable
+    private lateinit var disposablePrepareCandles: Disposable
+
     private val _state: MutableLiveData<CryptoInfoState> = MutableLiveData()
     val state: LiveData<CryptoInfoState>
         get() = _state
-
-    private val compositeDisposable = CompositeDisposable()
 
     fun onTrigger(event: CryptoInfoEvent) {
         when (event) {
@@ -51,18 +56,24 @@ class CryptoInfoViewModel(
 
     fun requestData(requestParameters: RequestParameters) {
         with(requestParameters) {
-            requestTickerV1(symbol)
+            disposableTickerV1 = requestTickerV1(symbol)
 
-            requestPriceFeed(pair)
-            requestTickerV2(symbol)
-            requestCandles(symbol, timeFrame)
+            disposableCoinPrice = requestPriceFeed(pair)
+            disposableTickerV2 = requestTickerV2(symbol)
+            disposableCandles = requestCandles(symbol, timeFrame)
 
-            requestTradeHistory(symbol, limit)
+            disposableTrades = requestTradeHistory(symbol, limit)
         }
     }
 
     fun clear() {
-        compositeDisposable.clear()
+        disposableTickerV1.dispose()
+
+        disposableCoinPrice.dispose()
+        disposableTickerV2.dispose()
+        disposableCandles.dispose()
+
+        disposableTrades.dispose()
     }
 
     private fun requestCandles(symbol: String, timeFrame: String): Disposable {
