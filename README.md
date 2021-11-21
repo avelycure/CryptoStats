@@ -24,8 +24,6 @@ App for getting information from Gemini Api:
 
 ## Functionality
 
-https://github.com/avelycure/avelycure/blob/master/assets/cryptostats/app.mp4
-
 The entire application fits on one screen. It has different types of statistics for the selected cryptocurrency obtained from the Gemini API.
 
 <p>
