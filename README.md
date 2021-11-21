@@ -9,18 +9,16 @@ App for getting information from Gemini Api:
 
 ## Project features
 
-* Kotlin
-* [RXJava3](https://github.com/ReactiveX/RxJava) + [RxAndroid](https://github.com/ReactiveX/RxAndroid) for making async work
-* Koin for dependecy injection
+* 100% Kotlin
+* Functional & Reactive Programming with [RXJava3](https://github.com/ReactiveX/RxJava) + [RxAndroid](https://github.com/ReactiveX/RxAndroid) for making async work
+* Dependency injection with [Koin](https://insert-koin.io/) 
 * Retrofit to fetch data from API
-* Room to cache data
+* Cache local data with [Room Persistence Library](https://developer.android.com/training/data-storage/room)
 * MPAndroid to plot nice charts
-* CleanArchitecture
-* MVVM
+* Modern architecture (Clean Architecture, Model-View-ViewModel)
 * Instrumental tests with Espresso
 * Unit test with JUnit4 and Mockito
-* Crashlytics with Firebase
-* GoogleAnalytics
+* Firebase: Crashlytics, GoogleAnalytics
 
 ## Functionality
 
