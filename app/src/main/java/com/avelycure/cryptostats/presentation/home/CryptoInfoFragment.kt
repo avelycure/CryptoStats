@@ -34,6 +34,7 @@ import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import com.google.firebase.analytics.FirebaseAnalytics
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.collections.ArrayList
 import kotlin.math.roundToInt
@@ -68,6 +69,8 @@ class CryptoInfoFragment : Fragment() {
     private lateinit var currencySpinner: AppCompatSpinner
     private lateinit var currencySpinnerAdapter: ArrayAdapter<String>
 
+    private lateinit var mFirebaseAnalytics: FirebaseAnalytics
+
     private fun fetchData() {
         cryptoInfoViewModel.requestData(
             CryptoInfoViewModel.RequestParameters(
@@ -77,6 +80,11 @@ class CryptoInfoFragment : Fragment() {
                 pair = (coin + currency).uppercase()
             )
         )
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
     }
 
     @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
@@ -156,6 +164,8 @@ class CryptoInfoFragment : Fragment() {
         rvTrades.adapter?.notifyDataSetChanged()
     }
 
+
+
     override fun onDestroy() {
         super.onDestroy()
         cryptoInfoViewModel.clear()
@@ -195,6 +205,8 @@ class CryptoInfoFragment : Fragment() {
                 state.tickerV2.bid.toString() + currencySymbol
         }
     }
+
+
 
     private fun initViews(view: View) {
         lineChart = view.findViewById(R.id.chart)
