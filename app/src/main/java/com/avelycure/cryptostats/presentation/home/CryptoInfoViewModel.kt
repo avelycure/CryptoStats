@@ -35,7 +35,7 @@ class CryptoInfoViewModel(
             coinPrice = CoinPrice(),
             tickerV2 = TickerV2(),
             trades = emptyList(),
-            remoteData = true,
+            remoteData = false,
             errorQueue = Queue(mutableListOf())
         )
     }
@@ -112,7 +112,10 @@ class CryptoInfoViewModel(
         when (candles) {
             is DataState.DataRemote -> handleCandles(candles.data, true)
             is DataState.DataCache -> handleCandles(candles.data, false)
-            is DataState.Response -> appendToMessageQueue(candles.uiComponent)
+            is DataState.Response -> {
+                compositeDisposable.clear()
+                appendToMessageQueue(candles.uiComponent)
+            }
         }
     }
 
@@ -120,7 +123,10 @@ class CryptoInfoViewModel(
         when (data) {
             is DataState.DataRemote -> handlePriceFeed(data.data, pair, true)
             is DataState.DataCache -> handlePriceFeed(data.data, pair, false)
-            is DataState.Response -> appendToMessageQueue(data.uiComponent)
+            is DataState.Response -> {
+                compositeDisposable.clear()
+                appendToMessageQueue(data.uiComponent)
+            }
         }
     }
 
@@ -128,7 +134,10 @@ class CryptoInfoViewModel(
         when (data) {
             is DataState.DataRemote -> handleTickerV1(data.data, true)
             is DataState.DataCache -> handleTickerV1(data.data, false)
-            is DataState.Response -> appendToMessageQueue(data.uiComponent)
+            is DataState.Response -> {
+                compositeDisposable.clear()
+                appendToMessageQueue(data.uiComponent)
+            }
         }
     }
 
@@ -136,7 +145,10 @@ class CryptoInfoViewModel(
         when (data) {
             is DataState.DataRemote -> handleTickerV2(data.data, true)
             is DataState.DataCache -> handleTickerV2(data.data, false)
-            is DataState.Response -> appendToMessageQueue(data.uiComponent)
+            is DataState.Response -> {
+                compositeDisposable.clear()
+                appendToMessageQueue(data.uiComponent)
+            }
         }
     }
 
@@ -144,7 +156,10 @@ class CryptoInfoViewModel(
         when (data) {
             is DataState.DataRemote -> handleTradeHistory(data.data, true)
             is DataState.DataCache -> handleTradeHistory(data.data, false)
-            is DataState.Response -> appendToMessageQueue(data.uiComponent)
+            is DataState.Response -> {
+                compositeDisposable.clear()
+                appendToMessageQueue(data.uiComponent)
+            }
         }
     }
 
