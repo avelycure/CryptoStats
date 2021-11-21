@@ -32,7 +32,7 @@ The entire application fits on one screen. It has different types of statistics 
 
 ## Caching
 
-According to the principles of clean architecture, data is handled on the Data Layer. There is a [CryptoRepo](https://github.com/avelycure/CryptoStats/blob/master/app/src/main/java/com/avelycure/cryptostats/data/repo/CryptoRepo.kt) class that can execute requests to the Gemini server using [Retrofit](https://github.com/avelycure/CryptoStats/blob/master/app/src/main/java/com/avelycure/cryptostats/data/remote/api_service/GeminiApiService.kt) and can save the result to the [Room](https://github.com/avelycure/CryptoStats/blob/master/app/src/main/java/com/avelycure/cryptostats/data/local/dao/CacheDao.kt) database. The work of determining from which source to receive data is performed by [interactors](https://github.com/avelycure/CryptoStats/tree/master/app/src/main/java/com/avelycure/cryptostats/domain/interactors)
+According to the principles of Clean Architecture, data is handled on the Data Layer. There is a [CryptoRepo](https://github.com/avelycure/CryptoStats/blob/master/app/src/main/java/com/avelycure/cryptostats/data/repo/CryptoRepo.kt) class that can execute requests to the Gemini server using [Retrofit](https://github.com/avelycure/CryptoStats/blob/master/app/src/main/java/com/avelycure/cryptostats/data/remote/api_service/GeminiApiService.kt) and can save the result to the [Room](https://github.com/avelycure/CryptoStats/blob/master/app/src/main/java/com/avelycure/cryptostats/data/local/dao/CacheDao.kt) database. The work of determining from which source to receive data is performed by [interactors](https://github.com/avelycure/CryptoStats/tree/master/app/src/main/java/com/avelycure/cryptostats/domain/interactors)
 
 ## Charts
 
