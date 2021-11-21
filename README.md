@@ -1,6 +1,6 @@
 # CryptoStats
 
-App for getting information from Gemini Api:
+App for getting information from [Gemini API](https://docs.gemini.com/rest-api/):
 * Coin value
 * Trades
 * Candles
@@ -10,9 +10,9 @@ App for getting information from Gemini Api:
 ## Project features
 
 * 100% Kotlin
-* Functional & Reactive Programming with [RXJava3](https://github.com/ReactiveX/RxJava) + [RxAndroid](https://github.com/ReactiveX/RxAndroid) for making async work
+* Functional & Reactive Programming with [RXJava3](https://github.com/ReactiveX/RxJava) + [RxAndroid](https://github.com/ReactiveX/RxAndroid)
 * Dependency injection with [Koin](https://insert-koin.io/) 
-* Retrofit to fetch data from API
+* Retrofit to fetch data from the [Gemini API](https://docs.gemini.com/rest-api/)
 * Cache local data with [Room Persistence Library](https://developer.android.com/training/data-storage/room)
 * MPAndroid to plot nice charts
 * Modern architecture (Clean Architecture, Model-View-ViewModel)
