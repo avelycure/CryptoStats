@@ -30,6 +30,10 @@ The entire application fits on one screen. It has different types of statistics 
   <img src="https://github.com/avelycure/avelycure/blob/master/assets/cryptostats/cache1.jpg" width="256" />
 </p>
 
+## Caching
+
+According to the principles of clean architecture, data is handled on the Data Layer. There is a [CryptoRepo](https://github.com/avelycure/CryptoStats/blob/master/app/src/main/java/com/avelycure/cryptostats/data/repo/CryptoRepo.kt) class that can execute requests to the Gemini server using [Retrofit](https://github.com/avelycure/CryptoStats/blob/master/app/src/main/java/com/avelycure/cryptostats/data/remote/api_service/GeminiApiService.kt) and can save the result to the [Room](https://github.com/avelycure/CryptoStats/blob/master/app/src/main/java/com/avelycure/cryptostats/data/local/dao/CacheDao.kt) database. The work of determining from which source to receive data is performed by [interactors](https://github.com/avelycure/CryptoStats/tree/master/app/src/main/java/com/avelycure/cryptostats/domain/interactors)
+
 ## Charts
 
 Currency changes can be seen on the charts that were built using the [MPAndroid library](https://github.com/PhilJay/MPAndroidChart). Changes over 24 hours are presented using a line graph. 
