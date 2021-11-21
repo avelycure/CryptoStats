@@ -1,5 +1,6 @@
 package com.avelycure.cryptostats.data.repo
 
+import com.avelycure.cryptostats.common.Timings
 import com.avelycure.cryptostats.data.remote.api_service.GeminiApiService
 import com.avelycure.cryptostats.data.local.dao.CacheDao
 import com.avelycure.cryptostats.data.local.entities.*
@@ -68,7 +69,7 @@ class CryptoRepo(
             .getCandles(symbol, timeFrame)
             .flatMap { candles ->
                 thread {
-                    synchronized(cacheDao){
+                    synchronized(cacheDao) {
                         cacheDao.dropSmallCandlesTable()
                         cacheDao.dropCandlesTable()
                         cacheDao.insertCandles(candles.toEntityCandles())
@@ -82,7 +83,7 @@ class CryptoRepo(
                 }
                 Observable.fromCallable { candles }
             }.repeatWhen { completed ->
-                completed.delay(5, TimeUnit.MINUTES)
+                completed.delay(Timings.CANDLES_TIMING, TimeUnit.SECONDS)
             }
     }
 
@@ -97,7 +98,7 @@ class CryptoRepo(
                 }
                 Observable.fromCallable { tickerV2 }
             }.repeatWhen { completed ->
-                completed.delay(10, TimeUnit.SECONDS)
+                completed.delay(Timings.TICKER_V2_TIMING, TimeUnit.SECONDS)
             }
     }
 
@@ -112,7 +113,7 @@ class CryptoRepo(
                 }
                 Observable.fromCallable { priceFeed }
             }.repeatWhen { completed ->
-                completed.delay(10, TimeUnit.SECONDS)
+                completed.delay(Timings.PRICE_FEED_TIMING, TimeUnit.SECONDS)
             }
     }
 
@@ -127,7 +128,7 @@ class CryptoRepo(
                 }
                 Observable.fromCallable { tickerV1 }
             }.repeatWhen { completed ->
-                completed.delay(10, TimeUnit.SECONDS)
+                completed.delay(Timings.TICKER_V1_TIMING, TimeUnit.SECONDS)
             }
     }
 
@@ -145,7 +146,7 @@ class CryptoRepo(
                 }
                 Observable.fromCallable { trades }
             }.repeatWhen { completed ->
-                completed.delay(30, TimeUnit.SECONDS)
+                completed.delay(Timings.TRADES_TIMING, TimeUnit.SECONDS)
             }
     }
 }
