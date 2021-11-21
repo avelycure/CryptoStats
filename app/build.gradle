@@ -3,6 +3,8 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-parcelize'
     id 'kotlin-kapt'
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
 }
 
 android {
@@ -55,9 +57,13 @@ dependencies {
     // Room
     implementation room.room_runtime
     implementation room.room_rxjava3
-    testImplementation "junit:junit:4.13.2"
+
     kapt "androidx.room:room-compiler:2.3.0"
     kapt "org.xerial:sqlite-jdbc:3.34.0"
+
+    //Crashlytics
+    implementation firebase.analytics
+    implementation firebase.crashlytics
 
     // Charts
     implementation charts.MPAndroidChart
@@ -66,6 +72,7 @@ dependencies {
     implementation swipe_refresh.swipe_refresh
 
     //Testing
+    testImplementation "junit:junit:4.13.2"
     testImplementation junit.junit
     testImplementation junit.junit_ext
     testImplementation arch_core.core_testing

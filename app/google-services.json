@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "507913390085",
+    "project_id": "cryptostats-7dc2f",
+    "storage_bucket": "cryptostats-7dc2f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:507913390085:android:89c5273df61f8173d7346c",
+        "android_client_info": {
+          "package_name": "com.avelycure.cryptostats"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "507913390085-4b6krer64m6hc5rsmu48q104hfrom511.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_ETIv6WdeNsn0ItvLJD04vRuvsik2YU8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "507913390085-4b6krer64m6hc5rsmu48q104hfrom511.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

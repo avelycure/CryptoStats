@@ -3,13 +3,8 @@ package com.avelycure.cryptostats.data.local.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import androidx.room.Transaction
 import com.avelycure.cryptostats.data.local.entities.*
-import com.avelycure.cryptostats.data.local.entities.mappers.toEntityCandles
-import com.avelycure.cryptostats.data.local.entities.mappers.toSmallCandle
-import io.reactivex.rxjava3.core.Completable
 
-//todo actually it is not returning null it returns empty list
 @Dao
 interface CacheDao {
 
