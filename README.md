@@ -19,10 +19,13 @@ App for getting information from Gemini Api:
 * MVVM
 * Instrumental tests with Espresso
 * Unit test with JUnit4 and Mockito
+* Crashlytics with Firebase
+* GoogleAnalytics
 
 ## Functionality
 
 The entire application fits on one screen. It has different types of statistics for the selected cryptocurrency obtained from the Gemini API.
+<video src="https://github.com/avelycure/avelycure/blob/master/assets/cryptostats/app.mp4" width="256"/>
 <p>
   <img src="https://github.com/avelycure/avelycure/blob/master/assets/cryptostats/actual1.jpg" width="256" />
   <img src="https://github.com/avelycure/avelycure/blob/master/assets/cryptostats/actual2.jpg" width="256" />
