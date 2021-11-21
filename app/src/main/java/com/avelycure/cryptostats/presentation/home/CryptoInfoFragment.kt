@@ -132,10 +132,8 @@ class CryptoInfoFragment : Fragment() {
             displayErrors(state)
         })
 
-        if (savedInstanceState == null) {
+        if (savedInstanceState == null)
             fetchData()
-            cryptoInfoViewModel.firstStart = false
-        }
 
         return view
     }
@@ -234,6 +232,27 @@ class CryptoInfoFragment : Fragment() {
             swipeRefresh.isRefreshing = false
         }
 
+        coinSpinnerAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            Constants.COIN_SYMBOL.values.toList()
+        )
+        coinSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        coinSpinner.adapter = coinSpinnerAdapter
+        coinSpinner.setSelection(coinSpinnerAdapter.getPosition(Constants.DEFAULT_COIN), false)
+
+        currencySpinnerAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            Constants.CURRENCY_SYMBOL.values.toList()
+        )
+        currencySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        currencySpinner.adapter = currencySpinnerAdapter
+        currencySpinner.setSelection(
+            currencySpinnerAdapter.getPosition(Constants.DEFAULT_CURRENCY),
+            false
+        )
+
         coinSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
@@ -241,13 +260,12 @@ class CryptoInfoFragment : Fragment() {
                 position: Int,
                 id: Long
             ) {
-                if (!cryptoInfoViewModel.firstStart) {
-                    cryptoInfoViewModel.clear()
-                    coin = Constants.COIN_SYMBOL.filterValues {
-                        it == parent?.getItemAtPosition(position).toString()
-                    }.keys.first()
-                    fetchData()
-                }
+                val selectedItem = Constants.COIN_SYMBOL.filterValues {
+                    it == parent?.getItemAtPosition(position).toString()
+                }.keys.first()
+                cryptoInfoViewModel.clear()
+                coin = selectedItem
+                fetchData()
             }
 
             override fun onNothingSelected(p0: AdapterView<*>?) {}
@@ -260,35 +278,15 @@ class CryptoInfoFragment : Fragment() {
                 position: Int,
                 id: Long
             ) {
-                if (!cryptoInfoViewModel.firstStart) {
-                    cryptoInfoViewModel.clear()
-                    currency = parent?.getItemAtPosition(position).toString()
-                    currencySymbol =
-                        Constants.CURRENCY_SYMBOL.filterValues { it == currency }.keys.first()
-                    fetchData()
-                }
+                cryptoInfoViewModel.clear()
+                currency = parent?.getItemAtPosition(position).toString()
+                currencySymbol =
+                    Constants.CURRENCY_SYMBOL.filterValues { it == currency }.keys.first()
+                fetchData()
             }
 
             override fun onNothingSelected(p0: AdapterView<*>?) {}
         }
-
-        coinSpinnerAdapter = ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_spinner_item,
-            Constants.COIN_SYMBOL.values.toList()
-        )
-        coinSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        coinSpinner.adapter = coinSpinnerAdapter
-        coinSpinner.setSelection(coinSpinnerAdapter.getPosition(Constants.DEFAULT_COIN))
-
-        currencySpinnerAdapter = ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_spinner_item,
-            Constants.CURRENCY_SYMBOL.values.toList()
-        )
-        currencySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        currencySpinner.adapter = currencySpinnerAdapter
-        currencySpinner.setSelection(currencySpinnerAdapter.getPosition(Constants.DEFAULT_CURRENCY))
 
         (activity as AppCompatActivity).setSupportActionBar(view.findViewById(R.id.ci_toolbar))
         (activity as AppCompatActivity).supportActionBar?.title = "Crypto stats"

@@ -1,5 +1,6 @@
 package com.avelycure.cryptostats.domain.interactors
 
+import android.util.Log
 import com.avelycure.cryptostats.data.local.entities.mappers.toCandleList
 import com.avelycure.cryptostats.data.repo.ICryptoRepo
 import com.avelycure.cryptostats.domain.models.Candle
@@ -28,11 +29,13 @@ class GetCandles(
                 }
         }.onErrorReturn { error ->
             when (error) {
-                is EmptyCacheException -> DataState.Response(
-                    uiComponent = UIComponent.Dialog(
-                        description = error.message ?: "No cache data, turn on the Internet"
+                is EmptyCacheException -> {
+                    DataState.Response(
+                        uiComponent = UIComponent.Dialog(
+                            description = error.message ?: "No cache data, turn on the Internet"
+                        )
                     )
-                )
+                }
                 is UnknownHostException -> DataState.Response(
                     uiComponent = UIComponent.Dialog(
                         description = "No internet connection"

@@ -17,14 +17,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 class CryptoInfoViewModel(
     val homeInteractors: HomeInteractors
 ) : ViewModel() {
-    var firstStart = true
-
-    private lateinit var disposableTickerV1: Disposable
-    private lateinit var disposableTickerV2: Disposable
-    private lateinit var disposableTrades: Disposable
-    private lateinit var disposableCandles: Disposable
-    private lateinit var disposableCoinPrice: Disposable
-    private lateinit var disposablePrepareCandles: Disposable
+    private val compositeDisposable = CompositeDisposable()
 
     private val _state: MutableLiveData<CryptoInfoState> = MutableLiveData()
     val state: LiveData<CryptoInfoState>
@@ -56,24 +49,18 @@ class CryptoInfoViewModel(
 
     fun requestData(requestParameters: RequestParameters) {
         with(requestParameters) {
-            disposableTickerV1 = requestTickerV1(symbol)
-
-            disposableCoinPrice = requestPriceFeed(pair)
-            disposableTickerV2 = requestTickerV2(symbol)
-            disposableCandles = requestCandles(symbol, timeFrame)
-
-            disposableTrades = requestTradeHistory(symbol, limit)
+            compositeDisposable.addAll(
+                requestCandles(symbol, timeFrame),
+                requestTickerV1(symbol),
+                requestPriceFeed(pair),
+                requestTickerV2(symbol),
+                requestTradeHistory(symbol, limit)
+            )
         }
     }
 
     fun clear() {
-        disposableTickerV1.dispose()
-
-        disposableCoinPrice.dispose()
-        disposableTickerV2.dispose()
-        disposableCandles.dispose()
-
-        disposableTrades.dispose()
+        compositeDisposable.clear()
     }
 
     private fun requestCandles(symbol: String, timeFrame: String): Disposable {
@@ -146,7 +133,6 @@ class CryptoInfoViewModel(
     }
 
     private fun onResponseTickerV2(data: DataState<TickerV2>) {
-        //Log.d("mytag","got response tickerv2")
         when (data) {
             is DataState.DataRemote -> handleTickerV2(data.data, true)
             is DataState.DataCache -> handleTickerV2(data.data, false)
@@ -179,7 +165,6 @@ class CryptoInfoViewModel(
     }
 
     private fun handlePriceFeed(data: List<CoinPrice>, pair: String, remoteData: Boolean) {
-        //Log.d("mytag", "got data: $remoteData $data")
         for (i in data)
             if (i.pair == pair) {
                 _state.value = _state.value?.copy(
@@ -251,24 +236,6 @@ class CryptoInfoViewModel(
     }
 
     private fun appendToMessageQueue(uiComponent: UIComponent) {
-        /*val queue: Queue<UIComponent> = Queue(mutableListOf())
-        for (i in 0 until _state.value!!.errorQueue.count() - 1)
-            _state.value!!.errorQueue.poll()?.let { queue.add(it) }
-
-        val last = _state.value!!.errorQueue.poll()
-        if (last != null) {
-            queue.add(last)
-
-            if ((last as UIComponent.Dialog).description != (uiComponent as UIComponent.Dialog).description) {
-                Log.d("mytag", "not equal errors")
-                queue.add(uiComponent)
-                _state.value = _state.value!!.copy(errorQueue = queue)
-            }
-        } else {
-            queue.add(uiComponent)
-            _state.value = _state.value!!.copy(errorQueue = queue)
-        }
-*/
         val queue: Queue<UIComponent> = Queue(mutableListOf())
         for (i in 0 until _state.value!!.errorQueue.count())
             _state.value!!.errorQueue.poll()?.let { queue.add(it) }
